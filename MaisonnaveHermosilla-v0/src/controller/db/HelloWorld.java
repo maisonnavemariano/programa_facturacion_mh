@@ -9,7 +9,9 @@ public class HelloWorld {
 		System.out.println("Hello world");
 		DBEngine motor = new DBEngine();
 		
-		for ( Cliente cliente : motor.buscarCliente("Arr"))
+		motor.agregarCliente(new Cliente("20-36698447-0","MAISONNAVE,Mariano", "EXE",-1));
+		
+		for(Cliente cliente: motor.buscarCliente("MAIS"))
 			System.out.println(cliente.toString());
 	}
 

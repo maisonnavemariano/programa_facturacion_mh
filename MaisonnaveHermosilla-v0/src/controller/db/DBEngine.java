@@ -18,7 +18,11 @@ public class DBEngine {
 		}catch(Exception e){e.printStackTrace();}
 	}
 	
-
+	/**
+	 * 
+	 * @param Codigo_Cliente
+	 * @return
+	 */
 	public Cliente getCliente(int Codigo_Cliente){
 		String query = "SELECT * FROM Cliente WHERE Codigo_Cliente = "+Codigo_Cliente;
 		Cliente toReturn = null;
@@ -47,6 +51,11 @@ public class DBEngine {
 		}
 		return toReturn;
 	}
+	/**
+	 * 
+	 * @param denominacion
+	 * @return
+	 */
 	public List<Cliente> buscarCliente(String denominacion){
 		Cliente aux;
 		List<Cliente> lista = new ArrayList<Cliente>();
@@ -80,6 +89,11 @@ public class DBEngine {
 		}
 		return lista;
 	}
+	/**
+	 * 
+	 * @param CUIT
+	 * @return
+	 */
 	public List<Cliente> buscarCUIT(String CUIT){ 
 		Cliente aux;
 		List<Cliente> lista = new ArrayList<Cliente>();
@@ -112,6 +126,44 @@ public class DBEngine {
 			e.printStackTrace();
 		}
 		return lista;
+	}
+	
+	public boolean agregarCliente(Cliente cliente){
+		String query = "INSERT INTO Cliente "
+				+ "( CUIT, Denominacion, Direccion, Localidad, Telefono, Email, Habilitado, Condicion_iva ) "
+				+ "VALUES (?,?,?,?,?,?,?,?)";
+//				+ "( '"+cliente.getCuit()+"',"
+//				+ "'"+cliente.getDireccion()+"',"
+//				+ "'"+cliente.getLocalidad()+"',"
+//				+ "'"+cliente.getTelefono()+"',"
+//				+ " '"+cliente.getCorreoElectronico()+"', "
+//				+ "'"+cliente.getHabilitado()+"', "
+//				+ "'"+cliente.getCondicionIva()+"', "
+//				+ " )";
+		
+
+		try {
+		    PreparedStatement preparedStmt = conn.prepareStatement(query);
+
+		    preparedStmt.setString (1, cliente.getCuit());
+		    preparedStmt.setString (2, cliente.getDenominacion());
+		    preparedStmt.setString (3, cliente.getDireccion());
+		    preparedStmt.setString (4, cliente.getLocalidad());
+		    preparedStmt.setString (5, cliente.getTelefono());
+		    preparedStmt.setString (6, cliente.getCorreoElectronico());
+		    preparedStmt.setString (7, cliente.getHabilitado());
+		    preparedStmt.setString (8, cliente.getCondicionIva());
+		      preparedStmt.execute();
+		    return true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	public Cliente eliminarCliente(int Codigo_Cliente){
+		return null;
 	}
 
 }
