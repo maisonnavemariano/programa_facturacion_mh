@@ -1,4 +1,4 @@
-package db_controller;
+package controller.db;
 
 public class HelloWorld {
 

@@ -1,5 +1,6 @@
 package controller;
 
+import controller.db.Cliente;
 import controller.model.*;
 import controller.view.*;
 
