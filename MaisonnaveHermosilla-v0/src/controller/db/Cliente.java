@@ -25,6 +25,19 @@ public class Cliente {
     private final StringProperty habilitado;
    // private final ObjectProperty<LocalDate> birthday;
 
+    public Cliente(int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+    		String telefono, String correoElectronico, String condicionIva, String habilitado){
+
+        this.cuit = new SimpleStringProperty(CUIT);
+        this.denominacion = new SimpleStringProperty(denominacion);
+        this.direccion = new SimpleStringProperty(direccion);
+        this.localidad = new SimpleStringProperty(localidad);
+        this.telefono = new SimpleStringProperty(telefono);
+        this.correoElectronico = new SimpleStringProperty(correoElectronico);
+        this.condicionIva = new SimpleStringProperty(condicionIva);
+        this.habilitado = new SimpleStringProperty(habilitado);
+        this.codigoCliente = new SimpleIntegerProperty(Codigo_Cliente);
+    }
     /**
      * Default constructor. LLama al otro constructor con nombre y apellido nulos.
      */
@@ -223,6 +236,9 @@ public class Cliente {
 
     public StringProperty habilitadoProperty() {
         return habilitado;
+    }
+    public String toString(){
+    	return this.codigoCliente +", "+this.cuit+", "+this.denominacion;
     }
     /* 
     /**
