@@ -13,6 +13,7 @@ import javafx.beans.property.StringProperty;
  * @author Maria Virginia Sabando
  */
 public class Cliente {
+	protected final int CODIGO_INVALIDO = -1;
 
 	//private final IntegerProperty codigoCliente;
 	private IntegerProperty codigoCliente;
@@ -43,7 +44,7 @@ public class Cliente {
      * Default constructor. LLama al otro constructor con nombre y apellido nulos.
      */
     public Cliente() {
-        this(null, null, null,0);
+        this(null, null, null);
     }
 
     /**
@@ -51,14 +52,14 @@ public class Cliente {
      * Requiere de todos los datos que no pueden ser nulos, los demás
      * son seteados a su valor por defecto, que puede ser nulo.
      */
-    public Cliente(String cu, String de, String ci, int cc) {
+    public Cliente(String cu, String de, String ci) {
         this.cuit = new SimpleStringProperty(cu);
         this.denominacion = new SimpleStringProperty(de);
         this.condicionIva = new SimpleStringProperty(ci);
         
         // hay que ver como se inicializa el codigoCliente.
         // por ahora es pasado por parametro.
-        this.codigoCliente = new SimpleIntegerProperty(cc);
+        this.codigoCliente = new SimpleIntegerProperty(CODIGO_INVALIDO);
         
         // el resto de los campos se completa con información por defecto.
         this.direccion = new SimpleStringProperty("Calle Falsa 123");
@@ -74,6 +75,9 @@ public class Cliente {
         //this.birthday = new SimpleObjectProperty<LocalDate>(LocalDate.of(1999, 2, 21));
     }
     
+    public boolean esValidoCodigoCliente(){
+    	return this.codigoCliente.get() != this.CODIGO_INVALIDO;    	
+    }
     //SETTERS Y GETTERS DE LA CLASE Cliente.
 
     /**

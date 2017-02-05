@@ -10,7 +10,7 @@ public class HelloWorld {
 		System.out.println("Hello world");
 		motor = new DBEngine();
 
-		Cliente maiso = new Cliente("20-36698447-0", "MAISONNAVE, Mariano","EXE", -1);
+		Cliente maiso = new Cliente("20-36698447-0", "MAISONNAVE, Mariano","EXE");
 
 		
 		

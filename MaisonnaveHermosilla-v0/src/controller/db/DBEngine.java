@@ -2,6 +2,7 @@ package controller.db;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DBEngine {
@@ -17,6 +18,11 @@ public class DBEngine {
 		
 		}catch(Exception e){e.printStackTrace();}
 	}
+	
+
+	// ==================================================================================================================================
+	//     ** ** ** **                                    CLIENTES                                                 ** ** ** **
+	// ==================================================================================================================================
 	
 	/**
 	 * 
@@ -198,6 +204,59 @@ public class DBEngine {
 			e.printStackTrace();
 		}
 		return toReturn;
+	}
+	
+	// ==================================================================================================================================
+	//     ** ** ** **                                    PRESUPUESTOS                                              ** ** ** **
+	// ==================================================================================================================================
+	/**
+	 * 
+	 * @param nro_presupuesto
+	 * @return
+	 */
+	public Presupuesto verPresupuesto(int nro_presupuesto){
+		Presupuesto toReturn = null;
+		
+		String query = "SELECT * FROM Presupuesto WHERE Nro_Presupuesto = "+nro_presupuesto;
+		Statement st;
+		
+		try {
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			if(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double monto_total, Date fecha
+				toReturn = new Presupuesto(this.getConceptos(nro_presupuesto),
+						this.getCliente(rs.getInt("Codigo_Cliente")),
+						(rs.getString("Efectivo").equals("S") ? true:false),
+						rs.getFloat("Alicuota"),
+						rs.getDouble("Monto_total"),
+						rs.getDate("Fecha"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return toReturn;
+	}
+	private List<Concepto> getConceptos(int Nro_presu){
+		List<Concepto> lista = new ArrayList<Concepto>();
+		Concepto aux;
+
+		String query = "SELECT * FROM Concepto_Presupuesto WHERE Nro_Presupuesto = "+Nro_presu;
+		Statement st;
+		try {
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			while(rs.next()){
+				aux = new Concepto(rs.getString("Concepto"),
+						rs.getDouble("Monto"));
+				lista.add(aux);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return lista;
 	}
 
 }
