@@ -13,8 +13,9 @@ import javafx.beans.property.StringProperty;
  * @author Maria Virginia Sabando
  */
 public class Cliente {
-	
-	private final IntegerProperty codigoCliente;
+
+	//private final IntegerProperty codigoCliente;
+	private IntegerProperty codigoCliente;
     private final StringProperty cuit;
     private final StringProperty denominacion;
     private final StringProperty direccion;
@@ -239,6 +240,10 @@ public class Cliente {
     }
     public String toString(){
     	return this.codigoCliente +", "+this.cuit+", "+this.denominacion;
+    }
+    
+    public void actualizarCodigoCliente(int cc){
+        this.codigoCliente = new SimpleIntegerProperty(cc);
     }
     /* 
     /**

@@ -127,7 +127,11 @@ public class DBEngine {
 		}
 		return lista;
 	}
-	
+	/**
+	 * 
+	 * @param cliente
+	 * @return
+	 */
 	public boolean agregarCliente(Cliente cliente){
 		String query = "INSERT INTO Cliente "
 				+ "( CUIT, Denominacion, Direccion, Localidad, Telefono, Email, Habilitado, Condicion_iva ) "
@@ -153,7 +157,20 @@ public class DBEngine {
 		    preparedStmt.setString (6, cliente.getCorreoElectronico());
 		    preparedStmt.setString (7, cliente.getHabilitado());
 		    preparedStmt.setString (8, cliente.getCondicionIva());
-		      preparedStmt.execute();
+		    preparedStmt.execute();
+		    
+		    // OBTENIENDO EL Codigo_Cliente del ultimo cliente insertado.
+		    
+		    String query_aux = "SELECT LAST_INSERT_ID() AS ultimo_codigo_cliente";
+			Statement st = conn.createStatement();
+		    ResultSet rs = st.executeQuery(query_aux);
+		    int codigo_cliente = -1;
+		    if(rs.next())
+		    	codigo_cliente = rs.getInt("ultimo_codigo_cliente");
+		    cliente.actualizarCodigoCliente(codigo_cliente);
+		    st.close();
+		    
+		    
 		    return true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -162,8 +179,25 @@ public class DBEngine {
 		
 		return false;
 	}
+	/**
+	 * 
+	 * @param Codigo_Cliente
+	 * @return
+	 */
 	public Cliente eliminarCliente(int Codigo_Cliente){
-		return null;
+		Cliente toReturn = this.getCliente(Codigo_Cliente);
+		String query = "DELETE FROM Cliente "
+				+ "WHERE Codigo_Cliente = ?";
+		PreparedStatement preparedStmt;
+		try {
+			preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setInt(1, Codigo_Cliente);
+			preparedStmt.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return toReturn;
 	}
 
 }
