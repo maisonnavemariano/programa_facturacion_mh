@@ -34,15 +34,15 @@ public class Main extends Application {
     public Main() {
     	
     	  // Add some sample data
-        clienteData.add(new Cliente("27373557469","Virginia Sabando","Monotributista",001));
-        clienteData.add(new Cliente("20366984470", "Maisonnave","Responsable Inscripto",002));
-        clienteData.add(new Cliente("20226579800", "Kurz S.A.","Responsable Inscripto",003));
-        clienteData.add(new Cliente("33657984988", "Meier Hnos.","Responsable Inscripto", 667));
-        clienteData.add(new Cliente("23455768983", "Meyer Ferretería", "Exento",765));
-        clienteData.add(new Cliente("33462578932", "Kunz Supermercado","Exento", 611));
-        clienteData.add(new Cliente("77668332442", "Perfumería Best","Responsable Inscripto",004));
-        clienteData.add(new Cliente("32411325532", "Meier","Exento",557));
-        clienteData.add(new Cliente("23476786321", "Mueller","Exento",780));
+        clienteData.add(new Cliente("27373557469","Virginia Sabando","Monotributista"));
+        clienteData.add(new Cliente("20366984470", "Maisonnave","Responsable Inscripto"));
+        clienteData.add(new Cliente("20226579800", "Kurz S.A.","Responsable Inscripto"));
+        clienteData.add(new Cliente("33657984988", "Meier Hnos.","Responsable Inscripto"));
+        clienteData.add(new Cliente("23455768983", "Meyer Ferretería", "Exento"));
+        clienteData.add(new Cliente("33462578932", "Kunz Supermercado","Exento"));
+        clienteData.add(new Cliente("77668332442", "Perfumería Best","Responsable Inscripto"));
+        clienteData.add(new Cliente("32411325532", "Meier","Exento"));
+        clienteData.add(new Cliente("23476786321", "Mueller","Exento"));
     }
     
     /**
