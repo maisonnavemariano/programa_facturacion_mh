@@ -258,5 +258,67 @@ public class DBEngine {
 		
 		return lista;
 	}
+	/**
+	 * 
+	 * @param cliente
+	 * @return
+	 */
+	public List<Presupuesto> verPresupuestos(Cliente cliente){
+		List<Presupuesto> lista = new ArrayList<Presupuesto>();
+		Presupuesto aux;
+		Statement st ;
+		
+		String query = "SELECT * FROM Presupuesto WHERE Codigo_Cliente = "+ cliente.getCodigoCliente()+ " ORDER BY Fecha ASC";
+		
+		try {
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double monto_total, Date fecha
+				aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
+						this.getCliente(rs.getInt("Codigo_Cliente")),
+						(rs.getString("Efectivo").equals("S") ? true:false),
+						rs.getFloat("Alicuota"),
+						rs.getDouble("Monto_total"),
+						rs.getDate("Fecha"));
+				lista.add(aux);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return lista;
+	}
+	
+	public Presupuesto verUltimoPresupuesto(Cliente cliente){
+		String query = "SELECT * "
+				+ "FROM Presupuesto "
+				+ "WHERE Codigo_Cliente = "+cliente.getCodigoCliente()+" AND "
+						+ "Fecha = "
+						+ "(SELECT  max(Fecha) "
+						+ "FROM  Presupuesto "
+						+ "WHERE  Codigo_Cliente = "+cliente.getCodigoCliente()+")";
+		Presupuesto toReturn = null;
+		Statement st ;
+		
+		try {
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			if(rs.next()){
+				toReturn = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
+						this.getCliente(rs.getInt("Codigo_Cliente")),
+						(rs.getString("Efectivo").equals("S") ? true:false),
+						rs.getFloat("Alicuota"),
+						rs.getDouble("Monto_total"),
+						rs.getDate("Fecha"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return toReturn;
+	}
+	
+	
 
 }
