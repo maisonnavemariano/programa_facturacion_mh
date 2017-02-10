@@ -13,5 +13,12 @@ public class Concepto {
 	public String toString(){
 		return "[concepto: "+concepto+", "+monto+" ]";
 	}
+	
+	public String getConcepto(){
+		return concepto;
+	}
+	public Double getMonto(){
+		return monto;
+	}
 
 }

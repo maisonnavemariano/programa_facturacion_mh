@@ -40,5 +40,24 @@ public class Presupuesto {
 	public String toString(){
 		return "Nro_Prespuesto: "+Nro_Presupuesto+" cliente: "+cliente.toString()+" Monto total: "+monto_total+ " fecha: "+fecha.toString()+" conceptos: "+conceptos.toString();
 	}
-
+	
+	public int getNroPresupuesto(){
+		return Nro_Presupuesto;
+	}
+	
+	public Cliente getCliente(){
+		return cliente;
+	}
+	public Date getFecha(){
+		return fecha;
+	}
+	public boolean efectivo(){
+		return efectivo;
+	}
+	public float getAlicuota(){
+		return alicuota;
+	}
+	public double getMontoTotal(){
+		return monto_total;
+	}
 }

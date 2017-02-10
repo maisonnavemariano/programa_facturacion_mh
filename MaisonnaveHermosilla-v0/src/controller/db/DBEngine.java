@@ -288,7 +288,11 @@ public class DBEngine {
 		}
 		return lista;
 	}
-	
+	/**
+	 * 
+	 * @param cliente
+	 * @return
+	 */
 	public Presupuesto verUltimoPresupuesto(Cliente cliente){
 		String query = "SELECT * "
 				+ "FROM Presupuesto "
@@ -318,6 +322,76 @@ public class DBEngine {
 		
 		return toReturn;
 	}
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public boolean agregarPresupuesto(Presupuesto p){
+		boolean toReturn = false;
+		String query = "INERT INTO Presupuesto (Codigo_Cliente, Fecha, Efectivo, Alicuota, Monto_total) VALUES ('"+p.getCliente().getCodigoCliente()+"', "
+				+ "'"+p.getFecha()+"', "
+				+ "'"+(p.efectivo()?"S":"N") +"', "
+				+ "'"+p.getAlicuota()+"', "
+				+ "'"+p.getMontoTotal()+"' ) ; ";
+		
+		PreparedStatement pt;
+		
+		try {
+			pt = conn.prepareStatement(query);
+			pt.executeQuery();
+			toReturn = true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if (toReturn){
+		    // OBTENIENDO EL Nro_Presupuesto del ultimo presupuesto insertado, para actualizarlo del objeto presupuesto.
+		    
+		    String query_aux = "SELECT LAST_INSERT_ID() AS ultimo_presupuesto";
+			Statement st;
+			try {
+				st = conn.createStatement();
+			    ResultSet rs = st.executeQuery(query_aux);
+			    int nro_presu = -1;
+			    if(rs.next())
+			    	nro_presu = rs.getInt("ultimo_presupuesto");
+			    p.actualizarNroPresupuesto(nro_presu);
+			    st.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			// Para insertar los conceptos necesitamos el paso previo inmediato, INSERTAR EL NRO DE PRESUPUESTO EN EL OBJETO 'p'
+			insertarConceptos(p);
+
+		}
+		return toReturn;
+	}
+	
+	private void insertarConceptos(Presupuesto p){
+		String query = "";
+		for ( Concepto concepto : p.getConceptos()){
+			query += "INSERT INTO Concepto_presupuesto (Nro_Presupuesto, Concepto, Monto) VALUES ('"+p.getNroPresupuesto()+"', '"+concepto.getConcepto()+"', '"+concepto.getMonto()+"') ; ";
+		}
+		
+		PreparedStatement pt;
+		
+		try {
+			pt = conn.prepareStatement(query);
+			pt.executeQuery();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		
+	}
+	
+	
+	
+	
 	
 	
 
