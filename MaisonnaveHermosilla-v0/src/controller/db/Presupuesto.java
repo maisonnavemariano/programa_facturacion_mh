@@ -63,4 +63,7 @@ public class Presupuesto {
 	public double getMontoTotal(){
 		return monto_total;
 	}
+	public void setMontoTotal(double mt){
+		monto_total = mt;
+	}
 }

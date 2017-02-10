@@ -19,24 +19,34 @@ public class HelloWorld {
 
 		Cliente alberdi = motor.getCliente(1);
 		
-		for(Presupuesto pp : motor.verPresupuestos(alberdi)){
-			System.out.println(pp.toString());
-		}
-
-		Concepto c1 = new Concepto("Concepto prueba 1", 1200);
-		Concepto c2 = new Concepto("Concepto prueba 2", 1500);
-		List<Concepto> con = new ArrayList<Concepto>();
-		con.add(c1);
-		con.add(c2);
-		Presupuesto nuevo = new Presupuesto( con, alberdi, false,0.0f ,2700, (Calendar.getInstance().getTime()) );
+		Presupuesto p = motor.verUltimoPresupuesto(alberdi);
+		System.out.println(p.toString());
+		System.out.println("modificamos presupuesto..");
+		p.getConceptos().get(0).setConcepto("concepto modificado.");
+		p.setMontoTotal(2800.00);
+		motor.editarPresupuesto(p);
+		p = motor.verUltimoPresupuesto(alberdi);
+		System.out.println(p.toString());
 		
-		System.out.println("Nro presu antes de insertar: "+nuevo.getNroPresupuesto());
-		motor.agregarPresupuesto(nuevo);
-		System.out.println("Nro presu despues de insertar: "+nuevo.getNroPresupuesto());
-			
-		for(Presupuesto pp : motor.verPresupuestos(alberdi)){
-			System.out.println(pp.toString());
-		}
+		
+//		for(Presupuesto pp : motor.verPresupuestos(alberdi)){
+//			System.out.println(pp.toString());
+//		}
+//
+//		Concepto c1 = new Concepto("Concepto prueba 1", 1200);
+//		Concepto c2 = new Concepto("Concepto prueba 2", 1500);
+//		List<Concepto> con = new ArrayList<Concepto>();
+//		con.add(c1);
+//		con.add(c2);
+//		Presupuesto nuevo = new Presupuesto( con, alberdi, false,0.0f ,2700, (Calendar.getInstance().getTime()) );
+//		
+//		System.out.println("Nro presu antes de insertar: "+nuevo.getNroPresupuesto());
+//		motor.agregarPresupuesto(nuevo);
+//		System.out.println("Nro presu despues de insertar: "+nuevo.getNroPresupuesto());
+//			
+//		for(Presupuesto pp : motor.verPresupuestos(alberdi)){
+//			System.out.println(pp.toString());
+//		}
 
 	}
 	

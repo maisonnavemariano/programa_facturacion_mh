@@ -20,5 +20,8 @@ public class Concepto {
 	public Double getMonto(){
 		return monto;
 	}
+	public void setConcepto(String c ){
+		concepto = c;
+	}
 
 }

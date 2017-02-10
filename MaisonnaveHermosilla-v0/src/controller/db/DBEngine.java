@@ -315,6 +315,7 @@ public class DBEngine {
 						rs.getFloat("Alicuota"),
 						rs.getDouble("Monto_total"),
 						rs.getDate("Fecha"));
+						toReturn.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -391,11 +392,59 @@ public class DBEngine {
 		}	
 		
 	}
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public boolean editarPresupuesto(Presupuesto p){
+		boolean toReturn = false;
+		String query = "UPDATE Presupuesto SET Codigo_Cliente = ?, Fecha = ?, Efectivo = ?, Alicuota = ?, Monto_total = ? WHERE Nro_Presupuesto = ?";
+	    PreparedStatement preparedStmt;
+		try {
+			preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setInt(1, p.getCliente().getCodigoCliente());
+			preparedStmt.setString(2,  p.getFecha());
+			preparedStmt.setString(3, (p.efectivo? "S":"N"));
+			preparedStmt.setFloat(4, p.getAlicuota() );
+			preparedStmt.setDouble(5, p.getMontoTotal());
+			preparedStmt.setInt(6, p.getNroPresupuesto());
+			
+			// execute the java preparedstatement
+			preparedStmt.executeUpdate();
+			toReturn = true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(toReturn)
+			actualizarConceptos(p);
+		return toReturn;
+	}
+	private void actualizarConceptos(Presupuesto p){
+		//borrarlos y cargarlos de nuevo..
+		boolean eliminados = false;
+		String query = "DELETE FROM Concepto_presupuesto WHERE Nro_Presupuesto = ?";
+		PreparedStatement preparedStmt;
+		try {
+			preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setInt(1, p.getNroPresupuesto());
+			
+			preparedStmt.execute();
+			eliminados = true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(eliminados){
+			//agregamos 
+			this.insertarConceptos(p);
+		}
+	}
 	
-	
-	
-	
-	
+	public boolean efectivizarPresupuesto(Presupuesto p){
+		return false;
+	}
 	
 
 }
