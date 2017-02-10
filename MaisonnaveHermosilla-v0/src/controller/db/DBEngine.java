@@ -241,7 +241,7 @@ public class DBEngine {
 		List<Concepto> lista = new ArrayList<Concepto>();
 		Concepto aux;
 
-		String query = "SELECT * FROM Concepto_Presupuesto WHERE Nro_Presupuesto = "+Nro_presu;
+		String query = "SELECT * FROM Concepto_presupuesto WHERE Nro_Presupuesto = "+Nro_presu;
 		Statement st;
 		try {
 			st = conn.createStatement();
@@ -280,6 +280,7 @@ public class DBEngine {
 						rs.getFloat("Alicuota"),
 						rs.getDouble("Monto_total"),
 						rs.getDate("Fecha"));
+				aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 				lista.add(aux);
 			}
 		} catch (SQLException e) {
@@ -329,17 +330,16 @@ public class DBEngine {
 	 */
 	public boolean agregarPresupuesto(Presupuesto p){
 		boolean toReturn = false;
-		String query = "INERT INTO Presupuesto (Codigo_Cliente, Fecha, Efectivo, Alicuota, Monto_total) VALUES ('"+p.getCliente().getCodigoCliente()+"', "
+		String query = "INSERT INTO Presupuesto (Codigo_Cliente, Fecha, Efectivo, Alicuota, Monto_total) VALUES ('"+p.getCliente().getCodigoCliente()+"', "
 				+ "'"+p.getFecha()+"', "
 				+ "'"+(p.efectivo()?"S":"N") +"', "
 				+ "'"+p.getAlicuota()+"', "
 				+ "'"+p.getMontoTotal()+"' ) ; ";
-		
 		PreparedStatement pt;
 		
 		try {
 			pt = conn.prepareStatement(query);
-			pt.executeQuery();
+			pt.execute();
 			toReturn = true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -372,16 +372,19 @@ public class DBEngine {
 	}
 	
 	private void insertarConceptos(Presupuesto p){
-		String query = "";
-		for ( Concepto concepto : p.getConceptos()){
-			query += "INSERT INTO Concepto_presupuesto (Nro_Presupuesto, Concepto, Monto) VALUES ('"+p.getNroPresupuesto()+"', '"+concepto.getConcepto()+"', '"+concepto.getMonto()+"') ; ";
-		}
+		String query = "INSERT INTO Concepto_presupuesto (Nro_Presupuesto, Concepto, Monto) VALUES (?,?,?)";
 		
 		PreparedStatement pt;
 		
 		try {
 			pt = conn.prepareStatement(query);
-			pt.executeQuery();
+			for ( Concepto concepto : p.getConceptos()){
+				pt.setInt(1,  p.getNroPresupuesto());
+				pt.setString(2, concepto.getConcepto());
+				pt.setDouble(3, concepto.getMonto());
+				pt.addBatch();
+			}
+			pt.executeBatch();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

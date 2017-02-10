@@ -1,6 +1,7 @@
 package controller.db;
 
 import java.util.List;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Presupuesto {
@@ -12,17 +13,19 @@ public class Presupuesto {
 	protected boolean efectivo;
 	protected float alicuota;
 	protected double monto_total;
-	protected Date fecha;
+	protected String fecha;
 	
 	
 	public Presupuesto(List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double monto_total, Date fecha){
+
+		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
 		Nro_Presupuesto = PRESUPUESTO_INVALIDO;
 		this.conceptos = conceptos;
 		this.cliente = cliente;
 		this.efectivo = efectivo;
 		this.alicuota = alicuota;
 		this.monto_total = monto_total;
-		this.fecha = fecha;
+		this.fecha = format1.format(fecha);
 	}
 	
 	public List<Concepto> getConceptos(){
@@ -48,7 +51,7 @@ public class Presupuesto {
 	public Cliente getCliente(){
 		return cliente;
 	}
-	public Date getFecha(){
+	public String getFecha(){
 		return fecha;
 	}
 	public boolean efectivo(){
