@@ -3,7 +3,6 @@ package controller.db;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class DBEngine {
@@ -442,8 +441,11 @@ public class DBEngine {
 			this.insertarConceptos(p);
 		}
 	}
-	
-	
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 */
 	public Transaccion efectivizarPresupuesto(Presupuesto p){
 		// proceso de actualizar las cuentas corrientes.
 		Transaccion t = null;
@@ -463,7 +465,11 @@ public class DBEngine {
 			
 			preparedStmt = conn.prepareStatement(query);
 			preparedStmt.setInt(1, p.getCliente().getCodigoCliente());
-			// FALTA COMPLETAR PARAMETROS < ===========================================================
+			preparedStmt.setString(2, t.getFecha());
+			preparedStmt.setString(3, "D");
+			preparedStmt.setDouble(4, p.getMontoTotal());
+			preparedStmt.setString(5, "");
+			preparedStmt.setDouble(6, nuevo_estado);
 			
 			
 			preparedStmt.execute();
@@ -503,9 +509,18 @@ public class DBEngine {
 		return estado;
 	}
 	private void actualizarEstadoCuentaCorriente(Cliente c,double monto){
-
-		// FALTA COMPLETAR OPERACION < ===========================================================
-		// cambiar el valor en la tabla Cuenta_corriente
+		String query = "INSERT INTO Cuenta_corriente (Codigo_Cliente, Monto) VALUES (? , ?) ";
+		PreparedStatement pt;
+		
+		try {
+			pt = conn.prepareStatement(query);
+			pt.setInt(1, c.getCodigoCliente());
+			pt.setDouble(2, monto);
+			pt.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
