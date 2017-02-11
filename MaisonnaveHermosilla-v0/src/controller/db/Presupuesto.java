@@ -66,4 +66,7 @@ public class Presupuesto {
 	public void setMontoTotal(double mt){
 		monto_total = mt;
 	}
+	public void setEfectivo(boolean b){
+		efectivo = b;
+	}
 }

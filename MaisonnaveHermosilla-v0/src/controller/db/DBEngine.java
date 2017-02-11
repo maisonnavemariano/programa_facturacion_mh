@@ -2,6 +2,7 @@ package controller.db;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -442,9 +443,69 @@ public class DBEngine {
 		}
 	}
 	
-	public boolean efectivizarPresupuesto(Presupuesto p){
-		return false;
+	
+	public Transaccion efectivizarPresupuesto(Presupuesto p){
+		// proceso de actualizar las cuentas corrientes.
+		Transaccion t = null;
+		boolean efectivo = false;
+		
+		String query = "INSERT INTO Transaccion (Codigo_Cliente, Fecha, Evento, Monto, Concepto, Estado_cuenta_corriente) VALUES (?,?,?,?,?,?) ";
+		PreparedStatement preparedStmt;
+
+		try {
+			// MODIFICAR CUENTA CORRIENTE
+			double estado_cuenta_corriente = this.obtenerEstadoCuentaCorriente(p.getCliente());
+			double nuevo_estado = estado_cuenta_corriente - p.getMontoTotal();
+			this.actualizarEstadoCuentaCorriente(p.getCliente(), nuevo_estado);
+			// REGISTRAR TRANSACCION
+			t = new Transaccion(p.getCliente(), Calendar.getInstance().getTime(), 'D', p.getMontoTotal(),"",nuevo_estado);
+			
+			
+			preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setInt(1, p.getCliente().getCodigoCliente());
+			// FALTA COMPLETAR PARAMETROS < ===========================================================
+			
+			
+			preparedStmt.execute();
+			efectivo = true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		
+		// 
+		if(efectivo){ 
+			// REGISTRAR CAMBIO EN EL OBJETO PRESUPUESTO.
+			p.setEfectivo(true);
+			this.editarPresupuesto(p);			
+		}
+		return (efectivo? t : null);
 	}
 	
+	private double obtenerEstadoCuentaCorriente(Cliente C){
+		String query = "SELECT * FROM Cuenta_corriente WHERE Codigo_Cliente = "+C.getCodigoCliente();
+		double estado = -1;
+	    Statement st;
+		try {
+			st = conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    if(rs.next()){
+		    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+	    		//String telefono, String correoElectronico, String condicionIva, String habilitado
+		    	estado = rs.getDouble("Monto");
+		    }
+		    st.close();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		return estado;
+	}
+	private void actualizarEstadoCuentaCorriente(Cliente c,double monto){
+
+		// FALTA COMPLETAR OPERACION < ===========================================================
+		// cambiar el valor en la tabla Cuenta_corriente
+	}
 
 }
