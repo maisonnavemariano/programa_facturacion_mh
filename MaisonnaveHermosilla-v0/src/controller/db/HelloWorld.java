@@ -19,14 +19,20 @@ public class HelloWorld {
 
 		Cliente alberdi = motor.getCliente(1);
 		
-		Presupuesto p = motor.verUltimoPresupuesto(alberdi);
-		System.out.println(p.toString());
-		System.out.println("modificamos presupuesto..");
-		p.getConceptos().get(0).setConcepto("concepto modificado.");
-		p.setMontoTotal(2800.00);
-		motor.editarPresupuesto(p);
-		p = motor.verUltimoPresupuesto(alberdi);
-		System.out.println(p.toString());
+		
+		motor.efectuarPago(alberdi,  459.8 , "Cancelación de deuda generada por error. ");
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// ALBERDI TIENE UNA DEUDA DE 459.8 que esta MAALL
+		// CHEQUEAR!! 				(CHEQUEADO CON ARROQUY, SO TRI MA y  DON MODESTO, SOLO ESTA MAL CON ALBERDI ) 
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//		Presupuesto p = motor.verUltimoPresupuesto(alberdi);
+//		System.out.println(p.toString());
+//		System.out.println("modificamos presupuesto..");
+//		p.getConceptos().get(0).setConcepto("concepto modificado.");
+//		p.setMontoTotal(2800.00);
+//		motor.editarPresupuesto(p);
+//		p = motor.verUltimoPresupuesto(alberdi);
+//		System.out.println(p.toString());
 		
 		
 //		for(Presupuesto pp : motor.verPresupuestos(alberdi)){

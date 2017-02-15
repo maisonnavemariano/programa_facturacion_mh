@@ -466,7 +466,7 @@ public class DBEngine {
 			preparedStmt = conn.prepareStatement(query);
 			preparedStmt.setInt(1, p.getCliente().getCodigoCliente());
 			preparedStmt.setString(2, t.getFecha());
-			preparedStmt.setString(3, "D");
+			preparedStmt.setString(3, "P");
 			preparedStmt.setDouble(4, p.getMontoTotal());
 			preparedStmt.setString(5, "");
 			preparedStmt.setDouble(6, nuevo_estado);
@@ -487,7 +487,7 @@ public class DBEngine {
 			p.setEfectivo(true);
 			this.editarPresupuesto(p);			
 		}
-		return (efectivo? t : null);
+		return (efectivo? t : null);//devolvemos la transaccion solo si la logramos guardar en la base de datos
 	}
 	
 	private double obtenerEstadoCuentaCorriente(Cliente C){
@@ -509,18 +509,57 @@ public class DBEngine {
 		return estado;
 	}
 	private void actualizarEstadoCuentaCorriente(Cliente c,double monto){
-		String query = "INSERT INTO Cuenta_corriente (Codigo_Cliente, Monto) VALUES (? , ?) ";
+		String query = "UPDATE Cuenta_corriente SET Codigo_Cliente=?,  Monto = ?  WHERE Codigo_Cliente=? ";
 		PreparedStatement pt;
 		
 		try {
 			pt = conn.prepareStatement(query);
 			pt.setInt(1, c.getCodigoCliente());
 			pt.setDouble(2, monto);
+			pt.setInt(3, c.getCodigoCliente());
 			pt.execute();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	
+	public Transaccion efectuarPago(Cliente cliente, double monto_pagado, String obs){
+		Transaccion toReturn = null;
+		boolean efectivo = false;
+		String query = "INSERT INTO Transaccion (Codigo_Cliente, Fecha, Evento, Monto, Concepto, Estado_cuenta_corriente) VALUES (?,?,?,?,?,?) ";
+		PreparedStatement preparedStmt;
+		try{
+
+			// MODIFICAR CUENTA CORRIENTE
+			double estado_cuenta_corriente = this.obtenerEstadoCuentaCorriente(cliente);
+			double nuevo_estado = estado_cuenta_corriente +  monto_pagado;
+			this.actualizarEstadoCuentaCorriente(cliente, nuevo_estado);
+			// REGISTRAR TRANSACCION
+			toReturn = new Transaccion(cliente, Calendar.getInstance().getTime(), 'C', monto_pagado,obs,nuevo_estado);
+						
+			preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setInt(1, cliente.getCodigoCliente());
+			preparedStmt.setString(2, toReturn.getFecha());
+			preparedStmt.setString(3, "R");
+			preparedStmt.setDouble(4, monto_pagado);
+			preparedStmt.setString(5, obs);
+			preparedStmt.setDouble(6, nuevo_estado);
+			
+			
+			preparedStmt.execute();
+			efectivo = true; //llego sin excepcion hasta aquí
+			
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		
+		return (efectivo?toReturn:null);//devolvemos la transaccion solo si la logramos guardar en la base de datos
+	}
+	
+	
+	
+	
 
 }
