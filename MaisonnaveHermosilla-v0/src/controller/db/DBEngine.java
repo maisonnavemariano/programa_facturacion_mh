@@ -447,6 +447,9 @@ public class DBEngine {
 	 * @return
 	 */
 	public Transaccion efectivizarPresupuesto(Presupuesto p){
+		// ===================================================================================================================================================================================
+		//              FALTA LUEGO DE EFECTIVIZAR, ASOCIAR AL PRESUPUESTO P, EL NRO DE TRANSACCION QUE SE ACABA DE GENERAR. (SE LO DEBE ASOCIAR AL OBJETO Y EN LA BASE DE DATOS!!!!!!!!!!!!)
+		// ===================================================================================================================================================================================
 		// proceso de actualizar las cuentas corrientes.
 		Transaccion t = null;
 		boolean efectivo = false;

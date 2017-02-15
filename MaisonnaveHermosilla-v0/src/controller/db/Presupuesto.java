@@ -15,6 +15,12 @@ public class Presupuesto {
 	protected double monto_total;
 	protected String fecha;
 	
+	// :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: ::::::::::
+	//puede o no tener asociado un nro transaccion
+	// :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: ::::::::::
+	protected Transaccion transaccion_asociado; // solo si presupuesto es efectivo
+	
+	
 	
 	public Presupuesto(List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double monto_total, Date fecha){
 
