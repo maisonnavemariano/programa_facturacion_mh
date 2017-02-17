@@ -75,6 +75,9 @@ public class Cliente {
         //this.birthday = new SimpleObjectProperty<LocalDate>(LocalDate.of(1999, 2, 21));
     }
     
+    public void invalidarCliente(){
+    	this.codigoCliente = new SimpleIntegerProperty( this.CODIGO_INVALIDO);
+    }
     public boolean esValidoCodigoCliente(){
     	return this.codigoCliente.get() != this.CODIGO_INVALIDO;    	
     }

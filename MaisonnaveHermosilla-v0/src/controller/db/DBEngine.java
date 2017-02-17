@@ -5,10 +5,31 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * Clase que permite un manejo transparente de la base de datos 'programa_facturacion_mh'. Brindando operaciones para manipular Clientes, Presupuestos, Transacciones y Pagos.
+ * 
+ * DESCRIPCIÓN DE LA BASE DE DATOS:
+ * +-----------------------------------+
+ * | Tables_in_programa_facturacion_mh |
+ * +-----------------------------------+
+ * | Cliente                           |
+ * | Concepto_presupuesto              |
+ * | Cuenta_corriente                  |
+ * | Presupuesto                       |
+ * | Transaccion                       |
+ * +-----------------------------------+
+ * 
+ * CONFIGURACIÓN POR DEFECTO A LA BASE DE DATOS:
+ * 		Por defecto la conección se establece con el jdbc Driver para mysql.
+ * 		La conección es con el usuario root, conectado a localhost directo a la base de datos 'programa_facturacion_mh'. 
+ * 
+ * @author maiso
+ *
+ */
 public class DBEngine {
 	protected Connection conn;
 	protected final String myDriver = "com.mysql.jdbc.Driver";
-	protected String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh";
+	protected String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
 	
 	public DBEngine(){
 		try{
@@ -25,9 +46,12 @@ public class DBEngine {
 	// ==================================================================================================================================
 	
 	/**
+	 * El método consulta a la base de datos por el único cliente que tiene ese dado Codigo_Cliente, si el mismo no aparece retorna un objeto nulo. 
+	 * Si el cliente es encontrado, se recuperan sus atributos de la base de datos y se los retornan a la clase que llamo el método. 
+	 * Obs: Todos los atributos pueden ser nulos, menos el codigo_cliente y el CUIT.
 	 * 
-	 * @param Codigo_Cliente
-	 * @return
+	 * @param Codigo_Cliente Número de identificación ÚNICO del cliente.
+	 * @return Objeto de tipo Cliente, con todos sus parámetros cargados: Codigo_Cliente (NOT NULL), CUIT (NOT NULL),Denominacion,Direccion,Localidad,Telefono,Email, Condicion_iva, Habilitado. 
 	 */
 	public Cliente getCliente(int Codigo_Cliente){
 		String query = "SELECT * FROM Cliente WHERE Codigo_Cliente = "+Codigo_Cliente;
@@ -58,9 +82,11 @@ public class DBEngine {
 		return toReturn;
 	}
 	/**
+	 * Busca en la base de Clientes por un cliente que contenga en algun lugar del campo "denominacion", el String pasado por parámetro ('denominacion'). No es sensible a minusculas y mayusculas.
 	 * 
-	 * @param denominacion
-	 * @return
+	 * Retorna todo aquel cliente que contenga el String buscado. Si no encuentra ningun cliente retorna una lista vacía.
+	 * @param denominacion Un String que representa la busqueda del cliente, se buscara en el campo "Denominacion", de la base de datos "Cliente" por un String que coincida con el pasado por parámetro.
+	 * @return Una lista conteniendo los Clientes que coinciden con la busqueda, o una lista vacía si no existe ninguna coincidencia.
 	 */
 	public List<Cliente> buscarCliente(String denominacion){
 		Cliente aux;
@@ -96,9 +122,10 @@ public class DBEngine {
 		return lista;
 	}
 	/**
-	 * 
-	 * @param CUIT
-	 * @return
+	 * Utiliza el String pasado por parámetro para buscar clientes. Todo aquel Cliente que tenga un CUIT coincidente, o que contenga al CUIT pasado por parámetro sera retornado en la lista.
+	 * Para la busqueda no es necesario pasar un CUIT completo, busca por coincidencias en todo el String, y retorna todas las coincidencias en una lista. Si no hay coincidencias retorna una lsita vacía.
+	 * @param CUIT el String que se utilizará para la búsqueda, puede ser un CUIT parcial, no necesita ser completo.
+	 * @return Retorna una lista de Clientes con todos aquellos que en su CUIT contengan al CUIT buscado, retornará una lista vacía en caso de que no haya coincidencias.
 	 */
 	public List<Cliente> buscarCUIT(String CUIT){ 
 		Cliente aux;
@@ -113,8 +140,6 @@ public class DBEngine {
 			st = conn.createStatement();
 		    ResultSet rs = st.executeQuery(query);
 		    while(rs.next()){
-		    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
-	    		//String telefono, String correoElectronico, String condicionIva, String habilitado
 		    	aux = new Cliente(rs.getInt("Codigo_Cliente"),
 		    			rs.getString("CUIT"),
 		    			rs.getString("Denominacion"),
@@ -134,22 +159,15 @@ public class DBEngine {
 		return lista;
 	}
 	/**
-	 * 
-	 * @param cliente
-	 * @return
+	 * Recibe un cliente por parámetro y lo inserta en la base de datos. UTiliza todos sus atributos a excepción del 'Codigo_Cliente', el cual hasta ese momento debería ser inválido ya que es un numero asociado a la base de datos.
+	 * Luego de insertar el cliente en la base de datos, recupera el su número de cliente (Codigo_Cliente), el cual lo identifica únivocamente en la base de datos, y lo inserta en el objeto pasado por parámetro.
+	 * @param cliente Recibe un Objeto tipo cliente, y lo inserta en la base de datos. Luego de insertar actualiza su Codigo_Cliente, por aquel con el cuál fue cargado en la base de datos.
+	 * @return True si fue insertado correctamente. False si hubo algún error (Base de datos desconectada, problemas de conexión).
 	 */
 	public boolean agregarCliente(Cliente cliente){
 		String query = "INSERT INTO Cliente "
 				+ "( CUIT, Denominacion, Direccion, Localidad, Telefono, Email, Habilitado, Condicion_iva ) "
 				+ "VALUES (?,?,?,?,?,?,?,?)";
-//				+ "( '"+cliente.getCuit()+"',"
-//				+ "'"+cliente.getDireccion()+"',"
-//				+ "'"+cliente.getLocalidad()+"',"
-//				+ "'"+cliente.getTelefono()+"',"
-//				+ " '"+cliente.getCorreoElectronico()+"', "
-//				+ "'"+cliente.getHabilitado()+"', "
-//				+ "'"+cliente.getCondicionIva()+"', "
-//				+ " )";
 		
 
 		try {
@@ -186,22 +204,25 @@ public class DBEngine {
 		return false;
 	}
 	/**
-	 * 
-	 * @param Codigo_Cliente
-	 * @return
+	 * Elimina un cliente de la base de datos. Retorna un objeto conteniendo el Cliente eliminado, con su Codigo_Cliente anulado (ya que ese Codigo_Cliente no existe más en la base de datos). 
+	 * @param Codigo_Cliente Código del cliente buscado para ser eliminado, cada código representa a un único cliente. 
+	 * @return Retorna el cliente eliminado, si no encontró ningún cliente con el código pasado por parámetro retorna null.
 	 */
 	public Cliente eliminarCliente(int Codigo_Cliente){
 		Cliente toReturn = this.getCliente(Codigo_Cliente);
-		String query = "DELETE FROM Cliente "
-				+ "WHERE Codigo_Cliente = ?";
-		PreparedStatement preparedStmt;
-		try {
-			preparedStmt = conn.prepareStatement(query);
-			preparedStmt.setInt(1, Codigo_Cliente);
-			preparedStmt.execute();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(toReturn != null){
+			String query = "DELETE FROM Cliente "
+					+ "WHERE Codigo_Cliente = ?";
+			PreparedStatement preparedStmt;
+			try {
+				preparedStmt = conn.prepareStatement(query);
+				preparedStmt.setInt(1, Codigo_Cliente);
+				preparedStmt.execute();
+				toReturn.invalidarCliente();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return toReturn;
 	}
@@ -209,6 +230,7 @@ public class DBEngine {
 	// ==================================================================================================================================
 	//     ** ** ** **                                    PRESUPUESTOS                                              ** ** ** **
 	// ==================================================================================================================================
+	
 	/**
 	 * 
 	 * @param nro_presupuesto
@@ -441,15 +463,17 @@ public class DBEngine {
 			this.insertarConceptos(p);
 		}
 	}
+	
+	// ==================================================================================================================================
+	//     ** ** ** **                                    TRANSACCIONES                                                ** ** ** **
+	// ==================================================================================================================================
+
 	/**
 	 * 
 	 * @param p
 	 * @return
 	 */
 	public Transaccion efectivizarPresupuesto(Presupuesto p){
-		// ===================================================================================================================================================================================
-		//              FALTA LUEGO DE EFECTIVIZAR, ASOCIAR AL PRESUPUESTO P, EL NRO DE TRANSACCION QUE SE ACABA DE GENERAR. (SE LO DEBE ASOCIAR AL OBJETO Y EN LA BASE DE DATOS!!!!!!!!!!!!)
-		// ===================================================================================================================================================================================
 		// proceso de actualizar las cuentas corrientes.
 		Transaccion t = null;
 		boolean efectivo = false;
@@ -476,6 +500,7 @@ public class DBEngine {
 			
 			
 			preparedStmt.execute();
+			
 			efectivo = true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -487,6 +512,23 @@ public class DBEngine {
 		// 
 		if(efectivo){ 
 			// REGISTRAR CAMBIO EN EL OBJETO PRESUPUESTO.
+			// 1. AGREGAMOS EL NRO DE TRANSACCION GENERADA AL PRESUPUESTO
+			// 2. MARCAMOS PRESUPUESTO COMO EFECTIVO
+			// 3. REGISTRAMOS CAMBIO EN EFECTIVO EN LA BASE DE DE DATOS.
+			String query_aux = "SELECT LAST_INSERT_ID() AS ultima_transaccion";
+			Statement st;
+			try {
+				st = conn.createStatement();
+			    ResultSet rs = st.executeQuery(query_aux);
+			    int nro_trans = -1;
+			    if(rs.next())
+			    	nro_trans = rs.getInt("ultima_transaccion");
+			    p.actualizarNroTransaccion(nro_trans);
+			    st.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			p.setEfectivo(true);
 			this.editarPresupuesto(p);			
 		}

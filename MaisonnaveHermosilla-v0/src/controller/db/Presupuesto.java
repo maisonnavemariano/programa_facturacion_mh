@@ -6,6 +6,7 @@ import java.util.Date;
 
 public class Presupuesto {
 	protected final int PRESUPUESTO_INVALIDO = -1;
+	protected final int NRO_TRANSACCION_INVALIDO = -1;
 	
 	protected int Nro_Presupuesto;
 	protected List<Concepto> conceptos;
@@ -18,7 +19,7 @@ public class Presupuesto {
 	// :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: ::::::::::
 	//puede o no tener asociado un nro transaccion
 	// :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: ::::::::::
-	protected Transaccion transaccion_asociado; // solo si presupuesto es efectivo
+	protected int transaccion_asociado; // solo si presupuesto es efectivo
 	
 	
 	
@@ -32,6 +33,10 @@ public class Presupuesto {
 		this.alicuota = alicuota;
 		this.monto_total = monto_total;
 		this.fecha = format1.format(fecha);
+		this.transaccion_asociado = this.NRO_TRANSACCION_INVALIDO;
+	}
+	public void actualizarNroTransaccion(int nt){
+		this.transaccion_asociado = nt;
 	}
 	
 	public List<Concepto> getConceptos(){
