@@ -31,6 +31,10 @@ public class DBEngine {
 	protected final String myDriver = "com.mysql.jdbc.Driver";
 	protected String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
 	
+	
+	
+	protected int ProximoNumeroPresupuesto; // para poder ofrecer el proximo numero presupuesto.
+	
 	public DBEngine(){
 		try{
 
@@ -40,7 +44,9 @@ public class DBEngine {
 		}catch(Exception e){e.printStackTrace();}
 	}
 	
-
+	public int getProximoNumeroPresupuesto(){
+		return this.ProximoNumeroPresupuesto;
+	}
 	// ==================================================================================================================================
 	//     ** ** ** **                                    CLIENTES                                                 ** ** ** **
 	// ==================================================================================================================================
@@ -232,9 +238,10 @@ public class DBEngine {
 	// ==================================================================================================================================
 	
 	/**
-	 * 
-	 * @param nro_presupuesto
-	 * @return
+	 * Método que recibe un nro_presupuesto y consulta a la base de datos por el presupuesto que se corresponde con dicho numero. Como el número es único en la base de datos, solo retorna uno, o ninguno (null) si 
+	 * no existe tal presupuesto. 
+	 * @param nro_presupuesto Número de presupuesto buscado.
+	 * @return Objeto tipo Presupuesto conteniendo todos los datos recuperados de la base de datos sobre el presupuesto 'Nro_Presupuestpo', o NULL si no existe dicho prespuesto en la base de datos.
 	 */
 	public Presupuesto verPresupuesto(int nro_presupuesto){
 		Presupuesto toReturn = null;
@@ -281,9 +288,9 @@ public class DBEngine {
 		return lista;
 	}
 	/**
-	 * 
-	 * @param cliente
-	 * @return
+	 * Retorna una lista de todos los prespuestos existentes en la base de datos que fueron realizados al cliente 'cliente'. 
+	 * @param cliente Cliente al cual se le quieren pedir todos los presupuestos. La busqueda se realiza mediante su código de cliente.
+	 * @return Una lista con todos los presupuestos que le corresponden al cliente 'cliente', o una lista vacía en caso de que no existe el cliente, o no tenga presupuestos asociados.
 	 */
 	public List<Presupuesto> verPresupuestos(Cliente cliente){
 		List<Presupuesto> lista = new ArrayList<Presupuesto>();
@@ -312,9 +319,9 @@ public class DBEngine {
 		return lista;
 	}
 	/**
-	 * 
-	 * @param cliente
-	 * @return
+	 * Retorna el último presupuesto que se le realizó al cliente 'cliente'.
+	 * @param cliente Cliente al cual se le requiere el último presupuesto. Se utiliza su código de cliente para la busqueda.
+	 * @return El ultimo presupuesto del cliente pasado por parámetro, o nulo en caso de que no existe el cliente, o no tenga presupuestos asociados.
 	 */
 	public Presupuesto verUltimoPresupuesto(Cliente cliente){
 		String query = "SELECT * "
@@ -347,9 +354,12 @@ public class DBEngine {
 		return toReturn;
 	}
 	/**
+	 * Agrega un nuevo presupuesto a la base de datos. Lo vincula con el cliente que contiene el presupuesto mediante su Codigo_Cliente. 
+	 * Al insertar en la base de datos al presupuesto se lo hace con un nuevo Nro_Presupuesto, a este mismo numero se lo agrega al objeto 'p'. Para que mantenga la referencia de su propio Nro_Presupuesto.
 	 * 
-	 * @param p
-	 * @return
+	 * Por último se guarda al Nro_Presupuesto+1 como el proximo numero de presupuesto que va a salir, para poder ofrecer el servicio de devolver este numero para la interfaz gráfica de construccion de presupuestos.
+	 * @param p Presupuesto a agregar en la base de datos
+	 * @return True si pudo insertar correctamente en la base de datos. False caso contrario.
 	 */
 	public boolean agregarPresupuesto(Presupuesto p){
 		boolean toReturn = false;
@@ -378,8 +388,10 @@ public class DBEngine {
 				st = conn.createStatement();
 			    ResultSet rs = st.executeQuery(query_aux);
 			    int nro_presu = -1;
-			    if(rs.next())
+			    if(rs.next()){
 			    	nro_presu = rs.getInt("ultimo_presupuesto");
+			    	this.ProximoNumeroPresupuesto = nro_presu+1;
+			    }
 			    p.actualizarNroPresupuesto(nro_presu);
 			    st.close();
 			} catch (SQLException e) {
@@ -415,9 +427,13 @@ public class DBEngine {
 		
 	}
 	/**
+	 * Realiza una operacion de UPDATE sobre la base de datos, cambiando los atributos del presupuesto. Para buscar el presupuesto utiliza el nro de presupuesto el cual es único.
+	 *  
+	 * @param p Presupuesto buscado en la base de datos para ser actualizado. Actualiza todos su atributos: Codigo_Cliente, Fecha, Efectivo, Alicuota y Monto_total. 
+	 * @return True si se pudo modificar correctamente. False en caso contrario.
 	 * 
-	 * @param p
-	 * @return
+	 * 
+	 * OBS IMPORTANTE: el parametro efectivo no debe ser cambiado a mano, en lugar de eso se debe usar el método 'efectivizarPresupuesto'.
 	 */
 	public boolean editarPresupuesto(Presupuesto p){
 		boolean toReturn = false;
@@ -469,7 +485,13 @@ public class DBEngine {
 	// ==================================================================================================================================
 
 	/**
-	 * 
+	 * Método complejo que toma un presupuesto y lo efectiviza realizando los siguientes pasos:
+	 * 		1. Crea la transaccion asociada a la efectivización, con fecha actual y con el monto y los valores del presupuesto.
+	 * 		2. Actualiza el estado de la cuenta corriente restandole el monto del presupuesto (generando deuda),en la base de datos (métodos auxiliares: obtenerEstadoCuentaCorriente,actualizarEstadoCuentaCorriente).
+	 * 		3. Se registra la transacción en la base de datos.
+	 * 		4. Se vincula el presupuesto a el numero de transaccion que generó.
+	 * 		5. Se cambia el atributo del presupuesto para reflejar que ya es efectivo.
+	 * 		6. Este último cambio es enviado a la base de datos y termina el método.
 	 * @param p
 	 * @return
 	 */
@@ -495,7 +517,7 @@ public class DBEngine {
 			preparedStmt.setString(2, t.getFecha());
 			preparedStmt.setString(3, "P");
 			preparedStmt.setDouble(4, p.getMontoTotal());
-			preparedStmt.setString(5, "");
+			preparedStmt.setString(5, "Efectivización de presupuesto");
 			preparedStmt.setDouble(6, nuevo_estado);
 			
 			
@@ -568,7 +590,20 @@ public class DBEngine {
 			e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * Método que permite reflejar la situación en la que un cliente realizo un pago. Es un pago de un importe de 'monto_pagado' en la cuenta del cliente 'cliente'. Con la posibilidad de dejar una observación
+	 * mediante el String "obs".
+	 * 
+	 * PASOS:
+	 * 		1. genera el cambio en la cuenta corriente
+	 * 		2. genera la transaccion.
+	 * 		3. guarda la transaccion en la base de datos.
+	 * 
+	 * @param cliente Cliente que efectúa el pago.
+	 * @param monto_pagado importe del monto pagado.
+	 * @param obs Observación sobre el pago.
+	 * @return Retorna la transacción que genero en la base de datos.  Returna null si hay algun problema al insertar en la base de datos. 
+	 */
 	public Transaccion efectuarPago(Cliente cliente, double monto_pagado, String obs){
 		Transaccion toReturn = null;
 		boolean efectivo = false;
