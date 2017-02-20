@@ -27,13 +27,13 @@ import java.util.List;
  *
  */
 public class DBEngine {
-	protected Connection conn;
 	protected final String myDriver = "com.mysql.jdbc.Driver";
-	protected String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
+	protected final String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
 	
 	
 	
 	protected int ProximoNumeroPresupuesto; // para poder ofrecer el proximo numero presupuesto.
+	protected Connection conn;
 	
 	public DBEngine(){
 		try{
@@ -480,6 +480,35 @@ public class DBEngine {
 		}
 	}
 	
+	/**
+	 * Método que genera PARA TODOS los clientes HABILITADOS, una nueva factura NO efectivizada, con los mismos conceptos que el presupuesto anterior. 
+	 * @return
+	 */
+	public boolean factorarTodos(){
+		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
+		// 																			TRABAJO POR HACER
+		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
+		/*
+		 * PASOS:
+		 * 		1 - Para cada Cliente habilitado hacer:
+		 * 			I   - Recuperar ultimo presupuesto (método verUltimoPresupuesto(Cliente cliente) ).
+		 * 			II  - Crear un nuevo presupuesto idéntco, pero con un nuevo número de presupuesto, fecha nueva, efectivo en NO y número de transacción NULL (porq aún no es efectivo).
+		 * 			III - Insertar nuevo presupuesto en la base de datos (método: agregarPresupuesto(Presupuesto p).
+		 */
+		return false;
+	}
+	/**
+	 * Permite recuperar aquellos presupuestos no efectivos (los borradores), para poder editarlos uno por uno, modificarlos, guardarlos en la base de datos nuevamente corregidos, o incluso para efectivizarlos. 
+	 * @return
+	 */
+	public List<Presupuesto> obtenerPresupuestosNoEfectivos(){
+		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
+		// 																			TRABAJO POR HACER
+		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
+		return null;
+	}
+	
+	
 	// ==================================================================================================================================
 	//     ** ** ** **                                    TRANSACCIONES                                                ** ** ** **
 	// ==================================================================================================================================
@@ -493,7 +522,7 @@ public class DBEngine {
 	 * 		5. Se cambia el atributo del presupuesto para reflejar que ya es efectivo.
 	 * 		6. Este último cambio es enviado a la base de datos y termina el método.
 	 * @param p
-	 * @return
+	 * @return Retorna la Transaccion que se generó al efectiviar el presupuesto
 	 */
 	public Transaccion efectivizarPresupuesto(Presupuesto p){
 		// proceso de actualizar las cuentas corrientes.
@@ -638,8 +667,7 @@ public class DBEngine {
 		return (efectivo?toReturn:null);//devolvemos la transaccion solo si la logramos guardar en la base de datos
 	}
 	
-	
-	
+
 	
 
 }
