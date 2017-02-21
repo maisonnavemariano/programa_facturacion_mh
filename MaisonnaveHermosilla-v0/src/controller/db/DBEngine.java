@@ -3,6 +3,7 @@ package controller.db;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -233,6 +234,41 @@ public class DBEngine {
 		return toReturn;
 	}
 	
+	public boolean inhabilitarCliente(Cliente c){
+	    PreparedStatement preparedStmt;
+		if(c.esValidoCodigoCliente()){
+			String update = "UPDATE Cliente SET Habilitado = 'N' WHERE Codigo_Cliente = ?";
+		    try {
+				preparedStmt = conn.prepareStatement(update);
+				preparedStmt.setInt(1, c.getCodigoCliente());
+				preparedStmt.executeUpdate();
+				return true;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    
+		}
+		return false;
+	}
+	public boolean habilitarCLiente(Cliente c){
+	    PreparedStatement preparedStmt;
+		if(c.esValidoCodigoCliente()){
+			String update = "UPDATE Cliente SET Habilitado = 'S' WHERE Codigo_Cliente = ?";
+		    try {
+				preparedStmt = conn.prepareStatement(update);
+				preparedStmt.setInt(1, c.getCodigoCliente());
+				preparedStmt.executeUpdate();
+				return true;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    
+		}
+		return false;
+	}
+	
 	// ==================================================================================================================================
 	//     ** ** ** **                                    PRESUPUESTOS                                              ** ** ** **
 	// ==================================================================================================================================
@@ -353,6 +389,7 @@ public class DBEngine {
 		
 		return toReturn;
 	}
+	
 	/**
 	 * Agrega un nuevo presupuesto a la base de datos. Lo vincula con el cliente que contiene el presupuesto mediante su Codigo_Cliente. 
 	 * Al insertar en la base de datos al presupuesto se lo hace con un nuevo Nro_Presupuesto, a este mismo numero se lo agrega al objeto 'p'. Para que mantenga la referencia de su propio Nro_Presupuesto.
@@ -482,9 +519,8 @@ public class DBEngine {
 	
 	/**
 	 * Método que genera PARA TODOS los clientes HABILITADOS, una nueva factura NO efectivizada, con los mismos conceptos que el presupuesto anterior. 
-	 * @return
 	 */
-	public boolean factorarTodos(){
+	public void facturarTodos(){
 		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
 		// 																			TRABAJO POR HACER
 		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
@@ -492,20 +528,81 @@ public class DBEngine {
 		 * PASOS:
 		 * 		1 - Para cada Cliente habilitado hacer:
 		 * 			I   - Recuperar ultimo presupuesto (método verUltimoPresupuesto(Cliente cliente) ).
-		 * 			II  - Crear un nuevo presupuesto idéntco, pero con un nuevo número de presupuesto, fecha nueva, efectivo en NO y número de transacción NULL (porq aún no es efectivo).
+		 * 			II  - Crear un nuevo presupuesto idéntco, pero con un nuevo número de presupuesto, fecha nueva, efectivo en NO y número de transacción NULL (porq aún no es efectivo) (ver 'facturarBorrador').
 		 * 			III - Insertar nuevo presupuesto en la base de datos (método: agregarPresupuesto(Presupuesto p).
 		 */
-		return false;
+		String query = "SELECT * FROM Cliente WHERE Habilitado = 'S'";
+		List<Cliente> clientes = new ArrayList<Cliente>();
+		Cliente auxiliar;
+		Statement st;
+		try {
+			st = conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    while(rs.next()){
+		    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+	    		//String telefono, String correoElectronico, String condicionIva, String habilitado
+		    	auxiliar = new Cliente(rs.getInt("Codigo_Cliente"),
+		    			rs.getString("CUIT"),
+		    			rs.getString("Denominacion"),
+		    			rs.getString("Direccion"),
+		    			rs.getString("Localidad"),
+		    			rs.getString("Telefono"),
+		    			rs.getString("Email"),
+		    			rs.getString("Condicion_iva"),
+		    			rs.getString("Habilitado"));
+		    	clientes.add(auxiliar);
+		    }
+		    st.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		for(Cliente c : clientes)
+			this.facturarBorrador(c);
+
+	}
+	private void facturarBorrador(Cliente cliente){
+		Presupuesto ultimo = this.verUltimoPresupuesto(cliente);
+		Presupuesto nuevo = new Presupuesto(ultimo.getConceptos()	,cliente ,false, ultimo.getAlicuota(),ultimo.getMontoTotal(), Calendar.getInstance().getTime()) ; 
+		this.agregarPresupuesto(nuevo);
+		
 	}
 	/**
-	 * Permite recuperar aquellos presupuestos no efectivos (los borradores), para poder editarlos uno por uno, modificarlos, guardarlos en la base de datos nuevamente corregidos, o incluso para efectivizarlos. 
-	 * @return
+	 * Permite recuperar aquellos presupuestos no efectivos (los borradores), para poder editarlos uno por uno, modificarlos, guardarlos en la base de datos nuevamente corregidos, o incluso para efectivizarlos.
+	 * @return Una lista con todos los presupuestos no efectivos, o una lista vacía en caso de que no haya presupuestos sin efectivizar. 
+	 * 
+	 * Obs: Puede entregar presupuestos de clientes no habilitados, si es que existen clientes no habilitados con presupuestos borrador creados.
 	 */
 	public List<Presupuesto> obtenerPresupuestosNoEfectivos(){
 		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
 		// 																			TRABAJO POR HACER
 		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
-		return null;
+		String query = "SELECT * "
+				+ "FROM Presupuesto"
+				+ "WHERE Efectivo = 'N'";
+		
+		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();
+		Presupuesto aux;
+		
+		try {
+			Statement st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			while(rs.next()){
+				aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
+						this.getCliente(rs.getInt("Codigo_Cliente")),
+						(rs.getString("Efectivo").equals("S") ? true:false),
+						rs.getFloat("Alicuota"),
+						rs.getDouble("Monto_total"),
+						rs.getDate("Fecha"));
+				aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
+				toReturn.add(aux);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return toReturn;
 	}
 	
 	
