@@ -179,7 +179,7 @@ public class DBEngine {
 
 		try {
 		    PreparedStatement preparedStmt = conn.prepareStatement(query);
-
+//TODO:  Que oasa si el cliente tiene atributos nulos?
 		    preparedStmt.setString (1, cliente.getCuit());
 		    preparedStmt.setString (2, cliente.getDenominacion());
 		    preparedStmt.setString (3, cliente.getDireccion());
@@ -251,7 +251,7 @@ public class DBEngine {
 		}
 		return false;
 	}
-	public boolean habilitarCLiente(Cliente c){
+	public boolean habilitarCliente(Cliente c){
 	    PreparedStatement preparedStmt;
 		if(c.esValidoCodigoCliente()){
 			String update = "UPDATE Cliente SET Habilitado = 'S' WHERE Codigo_Cliente = ?";
@@ -302,6 +302,7 @@ public class DBEngine {
 		}
 		return toReturn;
 	}
+	
 	private List<Concepto> getConceptos(int Nro_presu){
 		List<Concepto> lista = new ArrayList<Concepto>();
 		Concepto aux;
@@ -472,6 +473,7 @@ public class DBEngine {
 	 * 
 	 * OBS IMPORTANTE: el parametro efectivo no debe ser cambiado a mano, en lugar de eso se debe usar el método 'efectivizarPresupuesto'.
 	 */
+	//TODO: limitar la edicion a presupuestos no efectivos
 	public boolean editarPresupuesto(Presupuesto p){
 		boolean toReturn = false;
 		String query = "UPDATE Presupuesto SET Codigo_Cliente = ?, Fecha = ?, Efectivo = ?, Alicuota = ?, Monto_total = ? WHERE Nro_Presupuesto = ?";
