@@ -3,6 +3,7 @@ package controller;
 import controller.db.Cliente;
 //import controller.model.*;
 import controller.view.*;
+import controller.db.*;
 
 import java.io.IOException;
 
@@ -26,15 +27,22 @@ public class Main extends Application {
     /**
      * The data as an observable list of Clientes.
      */
-    private ObservableList<Cliente> clienteData = FXCollections.observableArrayList();
+    private ObservableList<Cliente> clienteData;
  
+    /**
+     * Motor de la base de datos.
+     */
+    private DBEngine DBMotor;
    
     /**
      * Constructor vacío
      */
     public Main() {
     	
-    	  // Add some sample data
+    	DBMotor = new DBEngine();
+    	clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente("PRE"));
+    	
+    /*	  // Add some sample data
         clienteData.add(new Cliente("27373557469","Virginia Sabando","Monotributista"));
         clienteData.add(new Cliente("20366984470", "Maisonnave","Responsable Inscripto"));
         clienteData.add(new Cliente("20226579800", "Kurz S.A.","Responsable Inscripto"));
@@ -43,7 +51,7 @@ public class Main extends Application {
         clienteData.add(new Cliente("33462578932", "Kunz Supermercado","Exento"));
         clienteData.add(new Cliente("77668332442", "Perfumería Best","Responsable Inscripto"));
         clienteData.add(new Cliente("32411325532", "Meier","Exento"));
-        clienteData.add(new Cliente("23476786321", "Mueller","Exento"));
+        clienteData.add(new Cliente("23476786321", "Mueller","Exento"));*/
         
     }
     

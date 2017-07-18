@@ -24,14 +24,14 @@ import exception.InvalidClientException;
  * 
  * CONFIGURACIÓN POR DEFECTO A LA BASE DE DATOS:
  * 		Por defecto la conección se establece con el jdbc Driver para mysql.
- * 		La conección es con el usuario root, conectado a localhost directo a la base de datos 'programa_facturacion_mh'. 
+ * 		La conección es con el usuario root, conectado a 192.168.3.107 directo a la base de datos 'programa_facturacion_mh'. 
  * 
  * @author maiso
  *
  */
 public class DBEngine {
 	protected final String myDriver = "com.mysql.jdbc.Driver";
-	protected final String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
+	protected final String myUrl  = "jdbc:mysql://192.168.3.107/programa_facturacion_mh"; 
 	
 	
 	
