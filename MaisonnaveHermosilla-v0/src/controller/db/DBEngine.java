@@ -3,8 +3,10 @@ package controller.db;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+
+import exception.InvalidBudgetException;
+import exception.InvalidClientException;
 
 /**
  * Clase que permite un manejo transparente de la base de datos 'programa_facturacion_mh'. Brindando operaciones para manipular Clientes, Presupuestos, Transacciones y Pagos.
@@ -45,9 +47,11 @@ public class DBEngine {
 		}catch(Exception e){e.printStackTrace();}
 	}
 	
-	public int getProximoNumeroPresupuesto(){
-		return this.ProximoNumeroPresupuesto;
-	}
+	//private int getProximoNumeroPresupuesto(){
+	//	return this.ProximoNumeroPresupuesto;
+	//}
+	
+	
 	// ==================================================================================================================================
 	//     ** ** ** **                                    CLIENTES                                                 ** ** ** **
 	// ==================================================================================================================================
@@ -328,8 +332,13 @@ public class DBEngine {
 	 * Retorna una lista de todos los prespuestos existentes en la base de datos que fueron realizados al cliente 'cliente'. 
 	 * @param cliente Cliente al cual se le quieren pedir todos los presupuestos. La busqueda se realiza mediante su código de cliente.
 	 * @return Una lista con todos los presupuestos que le corresponden al cliente 'cliente', o una lista vacía en caso de que no existe el cliente, o no tenga presupuestos asociados.
+	 * @throws InvalidClientException 
 	 */
-	public List<Presupuesto> verPresupuestos(Cliente cliente){
+	public List<Presupuesto> verPresupuestos(Cliente cliente) throws InvalidClientException{
+		if (!cliente.esValidoCodigoCliente())
+			throw new InvalidClientException("Cliente no insertado en la base de datos.");
+		
+		
 		List<Presupuesto> lista = new ArrayList<Presupuesto>();
 		Presupuesto aux;
 		Statement st ;
@@ -359,8 +368,12 @@ public class DBEngine {
 	 * Retorna el último presupuesto que se le realizó al cliente 'cliente'.
 	 * @param cliente Cliente al cual se le requiere el último presupuesto. Se utiliza su código de cliente para la busqueda.
 	 * @return El ultimo presupuesto del cliente pasado por parámetro, o nulo en caso de que no existe el cliente, o no tenga presupuestos asociados.
+	 * @throws InvalidClientException 
 	 */
-	public Presupuesto verUltimoPresupuesto(Cliente cliente){
+	public Presupuesto verUltimoPresupuesto(Cliente cliente) throws InvalidClientException{
+		if (!cliente.esValidoCodigoCliente())
+			throw new InvalidClientException("Cliente no insertado en la base de datos.");
+		
 		String query = "SELECT * "
 				+ "FROM Presupuesto "
 				+ "WHERE Codigo_Cliente = "+cliente.getCodigoCliente()+" AND "
@@ -438,13 +451,20 @@ public class DBEngine {
 			}
 			
 			// Para insertar los conceptos necesitamos el paso previo inmediato, INSERTAR EL NRO DE PRESUPUESTO EN EL OBJETO 'p'
-			insertarConceptos(p);
+			try {
+				insertarConceptos(p);
+			} catch (InvalidBudgetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		}
 		return toReturn;
 	}
 	
-	private void insertarConceptos(Presupuesto p){
+	private void insertarConceptos(Presupuesto p) throws InvalidBudgetException{
+		if(!p.hasValidNumber())
+			throw new InvalidBudgetException("Presupuesto no creado en base de datos.");
 		String query = "INSERT INTO Concepto_presupuesto (Nro_Presupuesto, Concepto, Monto) VALUES (?,?,?)";
 		
 		PreparedStatement pt;
@@ -472,9 +492,16 @@ public class DBEngine {
 	 * 
 	 * 
 	 * OBS IMPORTANTE: el parametro efectivo no debe ser cambiado a mano, en lugar de eso se debe usar el método 'efectivizarPresupuesto'.
+	 * @throws InvalidBudgetException 
 	 */
 	//TODO: limitar la edicion a presupuestos no efectivos
-	public boolean editarPresupuesto(Presupuesto p){
+	public boolean editarPresupuesto(Presupuesto p) throws InvalidBudgetException{
+		if (!p.hasValidNumber())
+			throw new InvalidBudgetException("El presupuesto no existe en la base de datos");
+		if (p.efectivo())
+			throw new InvalidBudgetException("El presupuesto ya es efectivo, no puede ser modificado.");
+		// TODO chequear que el presupuesto no sea efectivo!!!
+		// ===========================================================================================================================================
 		boolean toReturn = false;
 		String query = "UPDATE Presupuesto SET Codigo_Cliente = ?, Fecha = ?, Efectivo = ?, Alicuota = ?, Monto_total = ? WHERE Nro_Presupuesto = ?";
 	    PreparedStatement preparedStmt;
@@ -498,7 +525,9 @@ public class DBEngine {
 			actualizarConceptos(p);
 		return toReturn;
 	}
-	private void actualizarConceptos(Presupuesto p){
+	private void actualizarConceptos(Presupuesto p) throws InvalidBudgetException{
+		if (! p.hasValidNumber())
+			throw new InvalidBudgetException("Presupuesto no creado en base de datos");
 		//borrarlos y cargarlos de nuevo..
 		boolean eliminados = false;
 		String query = "DELETE FROM Concepto_presupuesto WHERE Nro_Presupuesto = ?";
@@ -559,11 +588,16 @@ public class DBEngine {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		for(Cliente c : clientes)
-			this.facturarBorrador(c);
+		for(Cliente c : clientes){
+			try {
+				this.facturarBorrador(c);
+			} catch (InvalidClientException e) {// TODO 
+				e.printStackTrace();}
+			}
+		
 
 	}
-	private void facturarBorrador(Cliente cliente){
+	private void facturarBorrador(Cliente cliente) throws InvalidClientException{
 		Presupuesto ultimo = this.verUltimoPresupuesto(cliente);
 		Presupuesto nuevo = new Presupuesto(ultimo.getConceptos()	,cliente ,false, ultimo.getAlicuota(),ultimo.getMontoTotal(), Calendar.getInstance().getTime()) ; 
 		this.agregarPresupuesto(nuevo);
@@ -622,8 +656,11 @@ public class DBEngine {
 	 * 		6. Este último cambio es enviado a la base de datos y termina el método.
 	 * @param p
 	 * @return Retorna la Transaccion que se generó al efectiviar el presupuesto
+	 * @throws InvalidBudgetException 
 	 */
-	public Transaccion efectivizarPresupuesto(Presupuesto p){
+	public Transaccion efectivizarPresupuesto(Presupuesto p) throws InvalidBudgetException{
+		if (!p.hasValidNumber())
+			throw new InvalidBudgetException("Presupuesto no creado en base de datos.");
 		// proceso de actualizar las cuentas corrientes.
 		Transaccion t = null;
 		boolean efectivo = false;
@@ -633,7 +670,13 @@ public class DBEngine {
 
 		try {
 			// MODIFICAR CUENTA CORRIENTE
-			double estado_cuenta_corriente = this.obtenerEstadoCuentaCorriente(p.getCliente());
+			double estado_cuenta_corriente = 0;
+			try {
+				estado_cuenta_corriente = this.obtenerEstadoCuentaCorriente(p.getCliente());
+			} catch (InvalidClientException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			double nuevo_estado = estado_cuenta_corriente - p.getMontoTotal();
 			this.actualizarEstadoCuentaCorriente(p.getCliente(), nuevo_estado);
 			// REGISTRAR TRANSACCION
@@ -685,7 +728,11 @@ public class DBEngine {
 		return (efectivo? t : null);//devolvemos la transaccion solo si la logramos guardar en la base de datos
 	}
 	
-	private double obtenerEstadoCuentaCorriente(Cliente C){
+	private double obtenerEstadoCuentaCorriente(Cliente C) throws InvalidClientException{
+		if (!C.esValidoCodigoCliente())
+			throw new InvalidClientException("Cliente no insertado en la base de datos.");
+		
+		
 		String query = "SELECT * FROM Cuenta_corriente WHERE Codigo_Cliente = "+C.getCodigoCliente();
 		double estado = -1;
 	    Statement st;
@@ -731,8 +778,12 @@ public class DBEngine {
 	 * @param monto_pagado importe del monto pagado.
 	 * @param obs Observación sobre el pago.
 	 * @return Retorna la transacción que genero en la base de datos.  Returna null si hay algun problema al insertar en la base de datos. 
+	 * @throws InvalidClientException 
 	 */
-	public Transaccion efectuarPago(Cliente cliente, double monto_pagado, String obs){
+	public Transaccion efectuarPago(Cliente cliente, double monto_pagado, String obs) throws InvalidClientException{
+		if (!cliente.esValidoCodigoCliente())
+			throw new InvalidClientException("Cliente no insertado en la base de datos.");
+		
 		Transaccion toReturn = null;
 		boolean efectivo = false;
 		String query = "INSERT INTO Transaccion (Codigo_Cliente, Fecha, Evento, Monto, Concepto, Estado_cuenta_corriente) VALUES (?,?,?,?,?,?) ";

@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import exception.InvalidClientException;
+
 public class HelloWorld {
 	static DBEngine motor;
 	
@@ -20,7 +22,12 @@ public class HelloWorld {
 		Cliente alberdi = motor.getCliente(1);
 		
 		
-		motor.efectuarPago(alberdi,  459.8 , "Cancelación de deuda generada por error. ");
+		try {
+			motor.efectuarPago(alberdi,  459.8 , "Cancelación de deuda generada por error. ");
+		} catch (InvalidClientException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		// ALBERDI TIENE UNA DEUDA DE 459.8 que esta MAALL
 		// CHEQUEAR!! 				(CHEQUEADO CON ARROQUY, SO TRI MA y  DON MODESTO, SOLO ESTA MAL CON ALBERDI ) 
