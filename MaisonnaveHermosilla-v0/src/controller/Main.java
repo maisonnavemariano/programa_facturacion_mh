@@ -16,6 +16,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 //comentario que hay que borrar luego.
 public class Main extends Application {
 
@@ -43,6 +44,7 @@ public class Main extends Application {
         clienteData.add(new Cliente("77668332442", "Perfumería Best","Responsable Inscripto"));
         clienteData.add(new Cliente("32411325532", "Meier","Exento"));
         clienteData.add(new Cliente("23476786321", "Mueller","Exento"));
+        
     }
     
     /**
@@ -76,10 +78,9 @@ public class Main extends Application {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Maisonnave Hermosilla - Estudio Contable ");
         this.primaryStage.getIcons().add(new Image("file:Resources/Images/piggybank.png"));
-
+      
         initRootLayout();
         
-        showClienteOverview();
     }
 
     /**
@@ -91,7 +92,11 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("view/PanelRaiz.fxml"));
             rootLayout = (BorderPane) loader.load();
-
+        
+            // Brinda acceso a la apilcaciòn principal al controlador particular de la vista
+            PanelRaizController controller = loader.getController();
+            controller.setMainApp(this);
+            
             // Muestra la scene conteniendo el Panel Raiz
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
