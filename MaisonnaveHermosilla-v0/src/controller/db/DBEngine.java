@@ -179,7 +179,7 @@ public class DBEngine {
 
 		try {
 		    PreparedStatement preparedStmt = conn.prepareStatement(query);
-//TODO:  Que oasa si el cliente tiene atributos nulos?
+//TODO:  Que pasa si el cliente tiene atributos nulos?
 		    preparedStmt.setString (1, cliente.getCuit());
 		    preparedStmt.setString (2, cliente.getDenominacion());
 		    preparedStmt.setString (3, cliente.getDireccion());
