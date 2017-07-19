@@ -272,6 +272,30 @@ public class DBEngine {
 		}
 		return false;
 	}
+
+	public void actualizarCliente(Cliente c){
+	    PreparedStatement preparedStmt;
+		if(c.esValidoCodigoCliente()){
+			String update = "UPDATE Cliente SET CUIT = ?, Denominacion = ?, Direccion = ?, "
+					+ "Localidad = ?, Telefono = ?, Email = ?, Habilitado = ?, Condicion_iva = ?  WHERE Codigo_Cliente = ?";
+		    try {
+				preparedStmt = conn.prepareStatement(update);
+				preparedStmt.setString(1, c.getCuit());
+				preparedStmt.setString(2, c.getDenominacion());
+				preparedStmt.setString(3, c.getDireccion());
+				preparedStmt.setString(4, c.getLocalidad());
+				preparedStmt.setString(5, c.getTelefono());
+				preparedStmt.setString(6, c.getCorreoElectronico());
+				preparedStmt.setString(7, c.getHabilitado());
+				preparedStmt.setString(8, c.getCondicionIva());
+				preparedStmt.executeUpdate();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    
+		}
+	}
 	
 	// ==================================================================================================================================
 	//     ** ** ** **                                    PRESUPUESTOS                                              ** ** ** **
