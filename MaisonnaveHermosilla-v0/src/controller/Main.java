@@ -40,7 +40,7 @@ public class Main extends Application {
     public Main() {
     	
     	DBMotor = new DBEngine();
-    	clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente("PRE"));
+    	clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente(""));
     	
     /*	  // Add some sample data
         clienteData.add(new Cliente("27373557469","Virginia Sabando","Monotributista"));
