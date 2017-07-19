@@ -31,7 +31,7 @@ import exception.InvalidClientException;
  */
 public class DBEngine {
 	protected final String myDriver = "com.mysql.jdbc.Driver";
-	protected final String myUrl  = "jdbc:mysql://192.168.3.107/programa_facturacion_mh"; 
+	protected final String myUrl  = "jdbc:mysql://192.168.3.100/programa_facturacion_mh"; 
 	
 	
 	
@@ -42,7 +42,7 @@ public class DBEngine {
 		try{
 
 		    Class.forName(myDriver);
-		    conn = DriverManager.getConnection(myUrl, "root", "maisonnave1");
+		    conn = DriverManager.getConnection(myUrl, "estudio", "estudio123");
 		
 		}catch(Exception e){e.printStackTrace();}
 	}
