@@ -34,7 +34,7 @@ public class PanelRaizController {
     @FXML
     private void handleVerClientes() {
     	
-    	mainApp.showClienteOverview();
+    	mainApp.showClienteVista();
     	
     }
     

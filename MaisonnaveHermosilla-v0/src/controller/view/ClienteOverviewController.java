@@ -6,8 +6,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import controller.Main;
 import controller.db.Cliente;
 
@@ -35,6 +37,12 @@ public class ClienteOverviewController {
     private Label condicionIvaLabel;
     @FXML
     private Label habilitadoLabel;
+    @FXML
+    private RadioButton cuitRadioButton;
+    @FXML
+    private RadioButton denominacionRadioButton;
+    @FXML
+    private TextField busquedaTextField;
 
     // Reference to the main application.
     private Main mainApp;
@@ -134,10 +142,11 @@ public class ClienteOverviewController {
     }
     
     /**
-     * Called when the user clicks on the delete button.
+     * Llamado cuando el usuario aprieta el boton Deshabilitar Cliente
+     * TODO: modificar el codigo, aun corresponde a borrar.
      */
     @FXML
-    private void handleDeleteCliente() {
+    private void handleDisableCliente() {
         int selectedIndex = clienteTable.getSelectionModel().getSelectedIndex();
         if (selectedIndex >= 0) {
             clienteTable.getItems().remove(selectedIndex);
@@ -152,6 +161,20 @@ public class ClienteOverviewController {
             alert.showAndWait();
         }
     }
+    
+    /**
+     * LLamado cuando el usuario tipea en lña caja de texto de busqueda.
+     * Actualiza la listad e clientes segun se haya seleccionado cuit o denominacion
+     * en los radio buttons.
+     */
+    @FXML
+    private void handleSearch() {
+        Cliente tempCliente = new Cliente();
+        boolean okClicked = mainApp.showModificarClienteOverview(tempCliente);
+        if (okClicked) {
+            mainApp.getClienteData().add(tempCliente);
+        }
+    }
 
     /**
      * Is called by the main application to give a reference back to itself.
@@ -164,4 +187,6 @@ public class ClienteOverviewController {
         // Add observable list data to the table
         clienteTable.setItems(mainApp.getClienteData());
     }
+    
+    
 }

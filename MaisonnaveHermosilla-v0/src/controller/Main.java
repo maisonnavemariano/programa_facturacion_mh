@@ -39,10 +39,12 @@ public class Main extends Application {
      */
     public Main() {
     	
-    	DBMotor = new DBEngine();
-    	clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente(""));
+    	//DBMotor = new DBEngine();
+    	//clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente(""));
     	
-    /*	  // Add some sample data
+    	
+    	clienteData = FXCollections.observableArrayList();
+    	//Add some sample data
         clienteData.add(new Cliente("27373557469","Virginia Sabando","Monotributista"));
         clienteData.add(new Cliente("20366984470", "Maisonnave","Responsable Inscripto"));
         clienteData.add(new Cliente("20226579800", "Kurz S.A.","Responsable Inscripto"));
@@ -51,7 +53,7 @@ public class Main extends Application {
         clienteData.add(new Cliente("33462578932", "Kunz Supermercado","Exento"));
         clienteData.add(new Cliente("77668332442", "Perfumería Best","Responsable Inscripto"));
         clienteData.add(new Cliente("32411325532", "Meier","Exento"));
-        clienteData.add(new Cliente("23476786321", "Mueller","Exento"));*/
+        clienteData.add(new Cliente("23476786321", "Mueller","Exento"));
         
     }
     
@@ -115,17 +117,17 @@ public class Main extends Application {
     }
 
     /**
-     * Muestra la vista ClienteOverview dentro del Panel Raiz
+     * Muestra la vista ClienteVista dentro del Panel Raiz
      */
-    public void showClienteOverview() {
+    public void showClienteVista() {
         try {
-            // Carga la vista ClienteOverview desde el archivo .fxml correspondiente
+            // Carga la vista ClienteVista desde el archivo .fxml correspondiente
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("view/ClienteVista.fxml"));
-            AnchorPane clienteOverview = (AnchorPane) loader.load();
+            AnchorPane clienteVista = (AnchorPane) loader.load();
 
             // Setea la vista en el centro del Panel Raiz
-            rootLayout.setCenter(clienteOverview);
+            rootLayout.setCenter(clienteVista);
 
             // Brinda acceso a la apilcaciòn principal al controlador particular de la vista
             ClienteOverviewController controller = loader.getController();
