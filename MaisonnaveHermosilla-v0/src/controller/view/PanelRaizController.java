@@ -43,12 +43,24 @@ public class PanelRaizController {
     /*---------------------------MENU FACTURACION---------------------------*/
     
     /**
-     * Funcionalidad menú EJEMPLO p/ copiar y pegar
+     * Funcionalidad menú Nuevo presupuesto
      */
-    /*  @FXML
-    private void handleOpcionEjemplo() {
+    @FXML
+    private void handleNuevoPresupuesto() {
     	
-    }*/
+    	mainApp.showPresupuestoVista();
+    	
+    }
+    
+    /**
+     * Funcionalidad menú Facturar todos
+     */
+    @FXML
+    private void handleFacturarTodos() {
+    	
+    	mainApp.showFacturacionVista();
+    	
+    }
     
     /*-----------------------MENU CUENTAS CORRIENTES-----------------------*/
     

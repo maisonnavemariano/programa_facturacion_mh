@@ -18,11 +18,11 @@ import controller.db.DBSingleton;
 
 
 /**
- * Diálogo para editar los detalles de un cliente especificado.
+ * Diálogo para editar los detalles de un nuevo cliente.
  * 
  * @author Maria Virginia Sabando
  */
-public class ModificarClienteOverviewController {
+public class NuevoClienteOverviewController {
 
     @FXML
     private TextField cuitField;
@@ -43,7 +43,7 @@ public class ModificarClienteOverviewController {
     @FXML
     private RadioButton NO_habilitadoRadioButton;
     
- //   private String[] posiblesCondicionesIva = {"Responsable Inscripto","Monotributista","Exento","No Responsable","Consumidor Final"};
+//    private String[] posiblesCondicionesIva = {"Responsable Inscripto","Monotributista","Exento","No Responsable","Consumidor Final"};
 
 
     private Stage dialogStage;
@@ -85,15 +85,15 @@ public class ModificarClienteOverviewController {
         correoElectronicoField.setText(cliente.getCorreoElectronico());
         
         String hab = cliente.getHabilitado();
-        if(hab.startsWith("S")){
-        	 SI_habilitadoRadioButton.setSelected(true);
-        	 NO_habilitadoRadioButton.setSelected(false);
+        if (hab.startsWith("N")){
+       	 	SI_habilitadoRadioButton.setSelected(false);
+       	 	NO_habilitadoRadioButton.setSelected(true);
         }
-        else if(hab.startsWith("N")){
-        	 SI_habilitadoRadioButton.setSelected(false);
-        	 NO_habilitadoRadioButton.setSelected(true);
-        } 
-        
+        else{ //valor por defecto: habilitado SI
+       	 	SI_habilitadoRadioButton.setSelected(true);
+       	 	NO_habilitadoRadioButton.setSelected(false);
+        }
+        	
         condicionIvaChoiceBox.setItems(FXCollections.observableArrayList("Responsable Inscripto","Monotributista","Exento","No Responsable","Consumidor Final"));
        
         String ci = cliente.getCondicionIva();
@@ -101,10 +101,10 @@ public class ModificarClienteOverviewController {
         	if(ci.startsWith("RI")){
             	condicionIvaChoiceBox.setValue("Responsable Inscripto");
             }
-            else if(ci.startsWith("EXE")){
+            else if(ci.startsWith("EX")){
             	condicionIvaChoiceBox.setValue("Exento");
             }
-            else if(ci.startsWith("MONO")){
+            else if(ci.startsWith("MO")){
             	condicionIvaChoiceBox.setValue("Monotributista");
             }
             else if(ci.startsWith("NR")){
@@ -177,7 +177,7 @@ public class ModificarClienteOverviewController {
                     ButtonType.OK, 
                     ButtonType.CANCEL);
             alert.initOwner(dialogStage);
-            alert.setTitle("Aceptar: Modificar cliente");
+            alert.setTitle("Aceptar: Nuevo cliente");
             alert.setHeaderText("¿Desea guardar los cambios realizados?");
             alert.setContentText("Pulse Aceptar para guardar los cambios realizados.");
 
@@ -186,9 +186,9 @@ public class ModificarClienteOverviewController {
 
             if (result.get() == ButtonType.OK) {
             	 okClicked = true;
-                 
+                 System.out.println(cliente.getCondicionIva());
                  //Actualizo el cliente en la base de datos
-                 DBMotor.actualizarCliente(cliente);
+                 DBMotor.agregarCliente(cliente);
                  dialogStage.close();
             }
         }
@@ -205,7 +205,7 @@ public class ModificarClienteOverviewController {
     	                     ButtonType.OK, 
     	                     ButtonType.CANCEL);
           alert.initOwner(dialogStage);
-          alert.setTitle("Cancelar: Modificar cliente");
+          alert.setTitle("Cancelar: Nuevo cliente");
           alert.setHeaderText("¿Desea descartar los cambios realizados?");
           alert.setContentText("Pulse Aceptar para descartar los cambios realizados.");
          
@@ -217,7 +217,7 @@ public class ModificarClienteOverviewController {
     }
 
     /**
-     * Valida las entradas de datos en la pantalla de modificacion del cliente.
+     * Valida las entradas de datos en la pantalla de nuevo cliente.
      * 
      * @return true si la entrada es válida
      */
@@ -242,7 +242,7 @@ public class ModificarClienteOverviewController {
         if (denominacionField.getText() == null || denominacionField.getText().length() <= 0) {
             errorMessage += "La denominación de cliente es un campo obligatorio.\n"; 
         }
-        if(denominacionField.getText().length() > 60){
+        if (denominacionField.getText().length() > 60){
         	errorMessage += "La denominación no puede contener más de 60 caracteres.\n";
         }
         if (condicionIvaChoiceBox.getValue() == null || condicionIvaChoiceBox.getValue().length() <= 0) {

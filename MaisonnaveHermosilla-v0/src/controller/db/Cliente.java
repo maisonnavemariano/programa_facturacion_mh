@@ -25,7 +25,6 @@ public class Cliente {
     private final StringProperty correoElectronico;
     private final StringProperty condicionIva;
     private final StringProperty habilitado;
-   // private final ObjectProperty<LocalDate> birthday;
 
     public Cliente(int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
     		String telefono, String correoElectronico, String condicionIva, String habilitado){
@@ -62,10 +61,10 @@ public class Cliente {
         this.codigoCliente = new SimpleIntegerProperty(CODIGO_INVALIDO);
         
         // el resto de los campos se completa con información por defecto.
-        this.direccion = new SimpleStringProperty("Calle Falsa 123");
-        this.localidad = new SimpleStringProperty("Coronel Suarez");
-        this.telefono = new SimpleStringProperty("02926435738");
-        this.correoElectronico = new SimpleStringProperty("ejemplo@gmail.com");
+        this.direccion = new SimpleStringProperty("");
+        this.localidad = new SimpleStringProperty("");
+        this.telefono = new SimpleStringProperty("");
+        this.correoElectronico = new SimpleStringProperty("");
         
      
         

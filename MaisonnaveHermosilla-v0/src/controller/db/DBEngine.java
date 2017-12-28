@@ -31,7 +31,7 @@ import exception.InvalidClientException;
  */
 public class DBEngine {
 	protected final String myDriver = "com.mysql.jdbc.Driver";
-	protected final String myUrl  = "jdbc:mysql://192.168.3.60/programa_facturacion_mh"; 
+	protected final String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
 	
 	
 	
@@ -42,7 +42,7 @@ public class DBEngine {
 		try{
 
 		    Class.forName(myDriver);
-		    conn = DriverManager.getConnection(myUrl, "estudio", "estudio123");
+		    conn = DriverManager.getConnection(myUrl, "virginia", "lospiojos");
 		
 		}catch(Exception e){e.printStackTrace();}
 	}
@@ -180,6 +180,7 @@ public class DBEngine {
 				+ "( CUIT, Denominacion, Direccion, Localidad, Telefono, Email, Habilitado, Condicion_iva ) "
 				+ "VALUES (?,?,?,?,?,?,?,?)";
 		
+		System.out.println("en la DB" + cliente.getCondicionIva());
 
 		try {
 		    PreparedStatement preparedStmt = conn.prepareStatement(query);
@@ -219,7 +220,7 @@ public class DBEngine {
 	 * @param Codigo_Cliente Código del cliente buscado para ser eliminado, cada código representa a un único cliente. 
 	 * @return Retorna el cliente eliminado, si no encontró ningún cliente con el código pasado por parámetro retorna null.
 	 */
-	public Cliente eliminarCliente(int Codigo_Cliente){
+	private Cliente eliminarCliente(int Codigo_Cliente){
 		Cliente toReturn = this.getCliente(Codigo_Cliente);
 		if(toReturn != null){
 			String query = "DELETE FROM Cliente "
@@ -238,7 +239,7 @@ public class DBEngine {
 		return toReturn;
 	}
 	
-	public boolean inhabilitarCliente(Cliente c){
+	private boolean inhabilitarCliente(Cliente c){
 	    PreparedStatement preparedStmt;
 		if(c.esValidoCodigoCliente()){
 			String update = "UPDATE Cliente SET Habilitado = 'N' WHERE Codigo_Cliente = ?";
@@ -255,7 +256,7 @@ public class DBEngine {
 		}
 		return false;
 	}
-	public boolean habilitarCliente(Cliente c){
+	private boolean habilitarCliente(Cliente c){
 	    PreparedStatement preparedStmt;
 		if(c.esValidoCodigoCliente()){
 			String update = "UPDATE Cliente SET Habilitado = 'S' WHERE Codigo_Cliente = ?";
@@ -288,6 +289,7 @@ public class DBEngine {
 				preparedStmt.setString(6, c.getCorreoElectronico());
 				preparedStmt.setString(7, c.getHabilitado());
 				preparedStmt.setString(8, c.getCondicionIva());
+				preparedStmt.setInt(9, c.getCodigoCliente());
 				preparedStmt.executeUpdate();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block

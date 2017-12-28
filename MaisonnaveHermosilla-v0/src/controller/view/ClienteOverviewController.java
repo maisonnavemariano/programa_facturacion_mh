@@ -1,7 +1,8 @@
 package controller.view;
 
-import controller.util.*;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -12,6 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import controller.Main;
 import controller.db.Cliente;
+import controller.db.DBEngine;
 
 public class ClienteOverviewController {
     @FXML
@@ -43,15 +45,25 @@ public class ClienteOverviewController {
     private RadioButton denominacionRadioButton;
     @FXML
     private TextField busquedaTextField;
+    
+    //Variables booleanas de control
+    private boolean cuitPresionado = true;
+    private boolean denomPresionado = false;
 
     // Reference to the main application.
     private Main mainApp;
+    
+    /**
+     * Motor de la base de datos.
+     */
+    private DBEngine DBMotor;
 
     /**
      * The constructor.
      * The constructor is called before the initialize() method.
      */
     public ClienteOverviewController() {
+    	
     }
     
     /**
@@ -69,8 +81,38 @@ public class ClienteOverviewController {
             localidadLabel.setText(cliente.getLocalidad());
             telefonoLabel.setText(cliente.getTelefono());
             correoElectronicoLabel.setText(cliente.getCorreoElectronico());
-            condicionIvaLabel.setText(cliente.getTelefono());
-            habilitadoLabel.setText(cliente.getCorreoElectronico());
+            
+            String ci = cliente.getCondicionIva();
+            if(ci.startsWith("RI")){
+            	condicionIvaLabel.setText("Responsable Inscripto");
+            }
+            else if(ci.startsWith("EX")){
+            	condicionIvaLabel.setText("Exento");
+            }
+            else if(ci.startsWith("MO")){
+            	condicionIvaLabel.setText("Monotributista");
+            }
+            else if(ci.startsWith("NR")){
+            	condicionIvaLabel.setText("No Responsable");
+            }
+            else if(ci.startsWith("CF")){
+            	condicionIvaLabel.setText("Consumidor Final");
+            }
+            else{
+            	condicionIvaLabel.setText("Sin información");
+            }
+            
+            String hab = cliente.getHabilitado();
+            if(hab.startsWith("S")){
+            	habilitadoLabel.setText("SI");
+            }
+            else if(hab.startsWith("N")){
+            	habilitadoLabel.setText("NO");
+            }
+            else{
+            	habilitadoLabel.setText("Sin información");
+            }
+            
 
         } else {
             // Cliente is null, remove all the text.
@@ -80,25 +122,27 @@ public class ClienteOverviewController {
             localidadLabel.setText("");
             telefonoLabel.setText("");
             correoElectronicoLabel.setText("");
+            condicionIvaLabel.setText("");
+            habilitadoLabel.setText("");
         }
     }
     
     /**
-     * Called when the user clicks the new button. Opens a dialog to edit
-     * details for a new cliente.
+     * LLamado cuando el usuario hace click en el boton Nuevo. Abre un 
+     * diálogo para crear un nuevo cliente.
      */
     @FXML
     private void handleNewCliente() {
         Cliente tempCliente = new Cliente();
-        boolean okClicked = mainApp.showModificarClienteOverview(tempCliente);
+        boolean okClicked = mainApp.showNuevoClienteOverview(tempCliente);
         if (okClicked) {
             mainApp.getClienteData().add(tempCliente);
         }
     }
 
     /**
-     * Called when the user clicks the edit button. Opens a dialog to edit
-     * details for the selected cliente.
+     * LLamado cuando el usuario hace click en el boton Editar. Abre un 
+     * diálogo para editar el cliente seleccionado.
      */
     @FXML
     private void handleEditCliente() {
@@ -113,17 +157,17 @@ public class ClienteOverviewController {
             // Nothing selected.
             Alert alert = new Alert(AlertType.WARNING);
             alert.initOwner(mainApp.getPrimaryStage());
-            alert.setTitle("No Selection");
-            alert.setHeaderText("No Cliente Selected");
-            alert.setContentText("Please select a cliente in the table.");
+            alert.setTitle("Seleccionar cliente");
+            alert.setHeaderText("No se ha seleccionado un cliente");
+            alert.setContentText("Por favor, seleccione un cliente en la tabla.");
 
             alert.showAndWait();
         }
     }
 
     /**
-     * Initializes the controller class. This method is automatically called
-     * after the fxml file has been loaded. USA EXPRESIONES LAMBDA.
+     * Inicializa la clase controller. Este metodo es automaticamente llamado
+     * luego de que fue cargado el archivo fxml. Usa expresiones lambda.
      */
     @FXML
     private void initialize() {
@@ -141,48 +185,55 @@ public class ClienteOverviewController {
                 (observable, oldValue, newValue) -> showClienteDetails(newValue));
     }
     
+   
     /**
-     * Llamado cuando el usuario aprieta el boton Deshabilitar Cliente
-     * TODO: modificar el codigo, aun corresponde a borrar.
-     */
-    @FXML
-    private void handleDisableCliente() {
-        int selectedIndex = clienteTable.getSelectionModel().getSelectedIndex();
-        if (selectedIndex >= 0) {
-            clienteTable.getItems().remove(selectedIndex);
-        } else {
-            // Nothing selected.
-            Alert alert = new Alert(AlertType.WARNING);
-            alert.initOwner(mainApp.getPrimaryStage());
-            alert.setTitle("No Selection");
-            alert.setHeaderText("No Cliente Selected");
-            alert.setContentText("Please select a cliente in the table.");
-
-            alert.showAndWait();
-        }
-    }
-    
-    /**
-     * LLamado cuando el usuario tipea en lña caja de texto de busqueda.
+     * LLamado cuando el usuario tipea en la caja de texto de busqueda.
      * Actualiza la listad e clientes segun se haya seleccionado cuit o denominacion
      * en los radio buttons.
      */
     @FXML
     private void handleSearch() {
-        Cliente tempCliente = new Cliente();
-        boolean okClicked = mainApp.showModificarClienteOverview(tempCliente);
-        if (okClicked) {
-            mainApp.getClienteData().add(tempCliente);
-        }
+    	if(cuitPresionado){
+    		String busqueda = busquedaTextField.getText();
+    		ObservableList<Cliente> listaClientes = FXCollections.observableArrayList(DBMotor.buscarCUIT(busqueda));
+    		mainApp.setClienteData(listaClientes);
+    		clienteTable.setItems(mainApp.getClienteData());
+    	}
+    	if(denomPresionado){
+    		String busqueda = busquedaTextField.getText();
+    		ObservableList<Cliente> listaClientes = FXCollections.observableArrayList(DBMotor.buscarCliente(busqueda));
+    		mainApp.setClienteData(listaClientes);
+    		clienteTable.setItems(mainApp.getClienteData());
+    	}
     }
+    
+    /**
+    * LLamado cuando el usuario selecciona el radiobutton cuit
+    */
+   @FXML
+   private void handleCuitRadioButton() {
+	   cuitPresionado = true;
+	   denomPresionado = false;
+   }
+   
+   /**
+    * LLamado cuando el usuario selecciona el radiobutton cuit
+    */
+   @FXML
+   private void handleDenomRadioButton() {
+	   cuitPresionado = false;
+	   denomPresionado = true;
+   }
+    
 
     /**
      * Is called by the main application to give a reference back to itself.
      * 
      * @param mainApp
      */
-    public void setMainApp(Main mainApp) {
+    public void setMainApp(Main mainApp, DBEngine motor) {
         this.mainApp = mainApp;
+        this.DBMotor = motor;
 
         // Add observable list data to the table
         clienteTable.setItems(mainApp.getClienteData());

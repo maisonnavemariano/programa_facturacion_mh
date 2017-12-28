@@ -14,7 +14,11 @@
               <MenuItem mnemonicParsing="false" onAction="#handleVerClientes" text="Ver clientes" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Facturación" />
+          <Menu mnemonicParsing="false" text="Facturación">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleVerClientes" text="Nuevo presupuesto" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleVerClientes" text="Facturar todos" />
+               </items></Menu>
           <Menu mnemonicParsing="false" text="Cuentas Corrientes" />
             <Menu mnemonicParsing="false" text="Ayuda" />
         </menus>
