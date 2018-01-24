@@ -25,7 +25,7 @@ public class Main extends Application {
     private BorderPane rootLayout;
     
     /**
-     * The data as an observable list of Clientes.
+     * Los datos es una lista observable de clientes.
      */
     private ObservableList<Cliente> clienteData;
  
@@ -53,7 +53,7 @@ public class Main extends Application {
     }
     
     /**
-     * Returns the data as an observable list of Clientes. 
+     * Retorna la informacion como una lista observable de Clientes. 
      * @return
      */
     public ObservableList<Cliente> getClienteData() {
@@ -110,6 +110,8 @@ public class Main extends Application {
             e.printStackTrace();
         }
     }
+    
+    //---------------------CLIENTES-------------------------------------------
 
     /**
      * Muestra la vista ClienteVista dentro del Panel Raiz
@@ -132,20 +134,6 @@ public class Main extends Application {
             e.printStackTrace();
         }
     }
-    
-    /**
-     * Muestra la vista PresupuestoVista dentro del Panel Raiz
-     */
-    //TODO: programar contenido e este metodo, similar a showClienteVista
-    public void showPresupuestoVista(){}
-    
-    
-    /**
-     * Muestra la vista FacturacionVista dentro del Panel Raiz
-     */
-    //TODO: programar contenido e este metodo, similar a showClienteVista
-    public void showFacturacionVista(){}
-    
     
     /**
      * Muestra la vista ModificarClienteOverview dentro del Panel Raiz
@@ -213,6 +201,68 @@ public class Main extends Application {
         }
     }
 
+    //---------------------PRESUPUESTOS-------------------------------------------------
+    
+    /**
+     * Muestra la vista AreaDeTrabajoVista dentro del Panel Raiz
+     * TODO: programar contenido e este metodo, similar a showClienteVista
+     * TODO: ver si le cambio el nombre a este menu y a sus controllers
+     */
+    
+    public void showAreaDeTrabajoVista(){
+    	try {
+            // Carga la vista AreaDeTrabajoVista desde el archivo .fxml correspondiente
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Main.class.getResource("view/AreaDeTrabajoVista.fxml"));
+            AnchorPane areaTrabajoVista = (AnchorPane) loader.load();
+
+            // Setea la vista en el centro del Panel Raiz
+            rootLayout.setCenter(areaTrabajoVista);
+
+            // Brinda acceso a la apilcaciòn principal al controlador particular de la vista
+            //TODO: Asignar controlador a la vista, y programarlo. por ahora muestra una ventana boba.
+            //ClienteOverviewController controller = loader.getController();
+            //controller.setMainApp(this, DBMotor);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }    	
+    	
+    }
+    
+    
+    /**
+     * Muestra la vista BuscarPresupuestosVista dentro del Panel Raiz
+     * TODO: programar contenido e este metodo, similar a showClienteVista
+     * TODO: ver si le cambio el nombre a este menu y a sus controllers
+     */
+    public void showBuscarPresupuestosVista(){
+    	try {
+            // Carga la vista BuscarPresupuestosVista desde el archivo .fxml correspondiente
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Main.class.getResource("view/BuscarPresupuestosVista.fxml"));
+            AnchorPane buscarPrespuestosVista = (AnchorPane) loader.load();
+
+            // Setea la vista en el centro del Panel Raiz
+            rootLayout.setCenter(buscarPrespuestosVista);
+
+            // Brinda acceso a la apilcaciòn principal al controlador particular de la vista
+            //TODO: Asignar controlador a la vista, y programarlo. por ahora muestra una ventana boba.
+            //ClienteOverviewController controller = loader.getController();
+            //controller.setMainApp(this, DBMotor);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }    	
+    }
+    
+    /** 
+     * TODO
+     * 
+     */
+    public boolean showModificarPresupuestoOverview(Presupuesto presupuesto){
+    	return true;
+    }
     
     
 }

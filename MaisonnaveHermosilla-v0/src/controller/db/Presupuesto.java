@@ -4,6 +4,7 @@ import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+//TODO: hacer con properties como esta hecho el cliente.
 public class Presupuesto {
 	protected final int PRESUPUESTO_INVALIDO = -1;
 	protected final int NRO_TRANSACCION_INVALIDO = -1;
