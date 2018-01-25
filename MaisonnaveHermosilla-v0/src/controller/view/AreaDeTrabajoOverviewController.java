@@ -92,7 +92,7 @@ public class AreaDeTrabajoOverviewController  {
         	
             // Completa los labels con info de la instancia presupuesto.
 
-            numeroLabel.setText(presupuesto.getNroPresupuesto());
+            numeroLabel.setText(String.valueOf(presupuesto.getNroPresupuesto()));
             cuitLabel.setText(cliente.getCuit());
             denominacionLabel.setText(cliente.getDenominacion());
             fechaLabel.setText(presupuesto.getFecha());
@@ -117,10 +117,10 @@ public class AreaDeTrabajoOverviewController  {
             	ivaLabel.setText("Sin información");
             }
             
-            alicuotaLabel.setText(presupuesto.getAlicuota());
-            montoLabel.setText(presupuesto.getMontoTotal());
+            alicuotaLabel.setText(String.valueOf(presupuesto.getAlicuota()));
+            montoLabel.setText(String.valueOf(presupuesto.getMontoTotal()));
           
-            //Falta la lista de conceptos
+            //Falta la lista de conceptos: TODO
 
         } else {
         	
@@ -188,7 +188,7 @@ public class AreaDeTrabajoOverviewController  {
     private void initialize() {
         // Inicializa la tabla de presupuestos con los valores de las 4 columnas.
     	numeroColumn.setCellValueFactory(
-    			cellData -> cellData.getValue().numeroProperty());
+    			cellData -> cellData.getValue().NroPresupuestoStringProperty());
     	fechaColumn.setCellValueFactory(
     			cellData -> cellData.getValue().fechaProperty());
         cuitColumn.setCellValueFactory(

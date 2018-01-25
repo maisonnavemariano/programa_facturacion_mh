@@ -354,6 +354,7 @@ public class DBEngine {
 		
 		return lista;
 	}
+	
 	/**
 	 * Retorna una lista de todos los prespuestos existentes en la base de datos que fueron realizados al cliente 'cliente'. 
 	 * @param cliente Cliente al cual se le quieren pedir todos los presupuestos. La busqueda se realiza mediante su código de cliente.
@@ -442,7 +443,7 @@ public class DBEngine {
 		boolean toReturn = false;
 		String query = "INSERT INTO Presupuesto (Codigo_Cliente, Fecha, Efectivo, Alicuota, Monto_total) VALUES ('"+p.getCliente().getCodigoCliente()+"', "
 				+ "'"+p.getFecha()+"', "
-				+ "'"+(p.efectivo()?"S":"N") +"', "
+				+ "'"+(p.getEfectivo()?"S":"N") +"', "
 				+ "'"+p.getAlicuota()+"', "
 				+ "'"+p.getMontoTotal()+"' ) ; ";
 		PreparedStatement pt;
@@ -524,7 +525,7 @@ public class DBEngine {
 	public boolean editarPresupuesto(Presupuesto p) throws InvalidBudgetException{
 		if (!p.hasValidNumber())
 			throw new InvalidBudgetException("El presupuesto no existe en la base de datos");
-		if (p.efectivo())
+		if (p.getEfectivo())
 			throw new InvalidBudgetException("El presupuesto ya es efectivo, no puede ser modificado.");
 		// TODO chequear que el presupuesto no sea efectivo!!!
 		// ===========================================================================================================================================
@@ -535,7 +536,7 @@ public class DBEngine {
 			preparedStmt = conn.prepareStatement(query);
 			preparedStmt.setInt(1, p.getCliente().getCodigoCliente());
 			preparedStmt.setString(2,  p.getFecha());
-			preparedStmt.setString(3, (p.efectivo? "S":"N"));
+			preparedStmt.setString(3, (p.getEfectivo()? "S":"N"));
 			preparedStmt.setFloat(4, p.getAlicuota() );
 			preparedStmt.setDouble(5, p.getMontoTotal());
 			preparedStmt.setInt(6, p.getNroPresupuesto());
@@ -579,13 +580,13 @@ public class DBEngine {
 	 */
 	public void facturarTodos(){
 		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
-		// 																			TRABAJO POR HACER
+		// 																			lo que hace
 		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
 		/*
 		 * PASOS:
 		 * 		1 - Para cada Cliente habilitado hacer:
 		 * 			I   - Recuperar ultimo presupuesto (método verUltimoPresupuesto(Cliente cliente) ).
-		 * 			II  - Crear un nuevo presupuesto idéntco, pero con un nuevo número de presupuesto, fecha nueva, efectivo en NO y número de transacción NULL (porq aún no es efectivo) (ver 'facturarBorrador').
+		 * 			II  - Crear un nuevo presupuesto idéntco, pero con un nuevo número de presupuesto, fecha nueva, efectivo en NO y número de transacción -1 (porq aún no es efectivo) (ver 'facturarBorrador').
 		 * 			III - Insertar nuevo presupuesto en la base de datos (método: agregarPresupuesto(Presupuesto p).
 		 */
 		String query = "SELECT * FROM Cliente WHERE Habilitado = 'S'";
