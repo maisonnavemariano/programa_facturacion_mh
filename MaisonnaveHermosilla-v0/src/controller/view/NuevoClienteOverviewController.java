@@ -186,7 +186,7 @@ public class NuevoClienteOverviewController {
 
             if (result.get() == ButtonType.OK) {
             	 okClicked = true;
-                 System.out.println(cliente.getCondicionIva());
+                 //System.out.println(cliente.getCondicionIva());
                  //Actualizo el cliente en la base de datos
                  DBMotor.agregarCliente(cliente);
                  dialogStage.close();

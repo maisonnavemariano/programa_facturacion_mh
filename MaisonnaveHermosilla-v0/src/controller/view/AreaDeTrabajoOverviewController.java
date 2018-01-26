@@ -1,6 +1,6 @@
 package controller.view;
 
-
+import javafx.scene.control.ListCell;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -25,7 +25,6 @@ public class AreaDeTrabajoOverviewController  {
     private TableView<Presupuesto> presupuestosTable;
     @FXML
     private TableColumn<Presupuesto, String> numeroColumn;
-    //TODO: ver si la fecha es un DateUtil 
     @FXML
     private TableColumn<Presupuesto, String> fechaColumn;
     @FXML
@@ -33,6 +32,13 @@ public class AreaDeTrabajoOverviewController  {
     @FXML
     private TableColumn<Presupuesto, String> denominacionColumn;
 
+    //Lista de Conceptos
+    @FXML
+    private TableView<Concepto> conceptosTable;
+    @FXML
+    private TableColumn<Concepto, String> conceptoColumn;
+    @FXML
+    private TableColumn<Concepto, String> montoConceptoColumn;
 
     @FXML
     private Label numeroLabel;
@@ -52,8 +58,8 @@ public class AreaDeTrabajoOverviewController  {
     private RadioButton cuitRadioButton;
     @FXML
     private RadioButton denominacionRadioButton;
-    @FXML
-    private ListView<Concepto> conceptosListView;
+//    @FXML
+//    private ListView<Concepto> conceptosListView;
     
     //Variables booleanas de control
     private boolean cuitPresionado = true;
@@ -82,7 +88,6 @@ public class AreaDeTrabajoOverviewController  {
      * Si no se ha seleccionado ningun presupuesto (presupuesto null), todos los labels son clareados.
      * 
      * @param presupuesto o null
-     * TODO: Arreglar metodos aca y/o en presupuesto
      * TODO: faltan actualizar la lista de conceptos
      */
     private void showPresupuestoDetails(Presupuesto presupuesto) {
@@ -121,6 +126,15 @@ public class AreaDeTrabajoOverviewController  {
             montoLabel.setText(String.valueOf(presupuesto.getMontoTotal()));
           
             //Falta la lista de conceptos: TODO
+            //conceptosListView.setItems(presupuesto.getConceptosObservables());
+            
+            ///*
+            conceptosTable.setItems(presupuesto.getConceptosObservables());
+            conceptoColumn.setCellValueFactory(
+    			cellData -> cellData.getValue().getConceptoProperty());
+    		montoConceptoColumn.setCellValueFactory(
+    			cellData -> cellData.getValue().getMontoConceptoStringProperty());
+            //*/
 
         } else {
         	
@@ -190,7 +204,7 @@ public class AreaDeTrabajoOverviewController  {
     	numeroColumn.setCellValueFactory(
     			cellData -> cellData.getValue().NroPresupuestoStringProperty());
     	fechaColumn.setCellValueFactory(
-    			cellData -> cellData.getValue().fechaProperty());
+    			cellData -> cellData.getValue().fecha_ARGProperty());
         cuitColumn.setCellValueFactory(
                 cellData -> cellData.getValue().getCliente().cuitProperty());
         denominacionColumn.setCellValueFactory(
@@ -216,15 +230,16 @@ public class AreaDeTrabajoOverviewController  {
     private void handleSearch() {
 
 		String busqueda = busquedaTextField.getText();
+		
     	if(cuitPresionado){
-    		ObservableList<Cliente> listaClientes = FXCollections.observableArrayList(DBMotor.buscarCUIT(busqueda));
+    		ObservableList<Presupuesto> listaPresupuestos = FXCollections.observableArrayList(DBMotor.verPresupuestosNoEfectivosPorCuit(busqueda));
+    		mainApp.setPresupuestosNoEfectivosData(listaPresupuestos);
     	}
     	if(denomPresionado){
-    		ObservableList<Cliente> listaClientes = FXCollections.observableArrayList(DBMotor.buscarCliente(busqueda));
+    		ObservableList<Presupuesto> listaPresupuestos = FXCollections.observableArrayList(DBMotor.verPresupuestosNoEfectivosPorDenominacion(busqueda));
+    		mainApp.setPresupuestosNoEfectivosData(listaPresupuestos);
     	}
-    	//Esto no! tengo que hacer una lista de presupuestos con esta info
-    	mainApp.setClienteData(listaClientes);
-		presupuestosTable.setItems(mainApp.getClienteData());
+    	presupuestosTable.setItems(mainApp.getPresupuestosNoEfectivosData());
     }
     
     /**
@@ -247,7 +262,7 @@ public class AreaDeTrabajoOverviewController  {
     
 
     /**
-     * Is called by the main application to give a reference back to itself.
+     * Llamado por la aplicacion principal para dar una autorreferencia
      * 
      * @param mainApp
      */
@@ -257,7 +272,7 @@ public class AreaDeTrabajoOverviewController  {
 
         // Add observable list data to the table
         //TODO: ver si es necesario esto
-       presupuestosTable.setItems(mainApp.getClienteData());
+       presupuestosTable.setItems(mainApp.getPresupuestosNoEfectivosData());
     }
     
     

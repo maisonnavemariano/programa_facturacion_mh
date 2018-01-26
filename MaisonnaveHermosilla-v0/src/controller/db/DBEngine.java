@@ -180,7 +180,7 @@ public class DBEngine {
 				+ "( CUIT, Denominacion, Direccion, Localidad, Telefono, Email, Habilitado, Condicion_iva ) "
 				+ "VALUES (?,?,?,?,?,?,?,?)";
 		
-		System.out.println("en la DB" + cliente.getCondicionIva());
+		//System.out.println("en la DB" + cliente.getCondicionIva());
 
 		try {
 		    PreparedStatement preparedStmt = conn.prepareStatement(query);
@@ -220,7 +220,7 @@ public class DBEngine {
 	 * @param Codigo_Cliente Código del cliente buscado para ser eliminado, cada código representa a un único cliente. 
 	 * @return Retorna el cliente eliminado, si no encontró ningún cliente con el código pasado por parámetro retorna null.
 	 */
-	private Cliente eliminarCliente(int Codigo_Cliente){
+	public Cliente eliminarCliente(int Codigo_Cliente){
 		Cliente toReturn = this.getCliente(Codigo_Cliente);
 		if(toReturn != null){
 			String query = "DELETE FROM Cliente "
@@ -692,6 +692,7 @@ public class DBEngine {
 	}
 	private void facturarBorrador(Cliente cliente) throws InvalidClientException{
 		Presupuesto ultimo = this.verUltimoPresupuesto(cliente);
+	//	System.out.println(ultimo==null);
 		Presupuesto nuevo = new Presupuesto(ultimo.getConceptos()	,cliente ,false, ultimo.getAlicuota(),ultimo.getMontoTotal(), Calendar.getInstance().getTime()) ; 
 		this.agregarPresupuesto(nuevo);
 		
@@ -707,7 +708,7 @@ public class DBEngine {
 		// 																			TRABAJO POR HACER
 		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
 		String query = "SELECT * "
-				+ "FROM Presupuesto"
+				+ "FROM Presupuesto "
 				+ "WHERE Efectivo = 'N'";
 		
 		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();

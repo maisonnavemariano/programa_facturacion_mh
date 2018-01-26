@@ -5,6 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javafx.beans.property.*;
+//import javafx.collections.ObservableList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * Clase modelo para la entidad Presupuesto
@@ -17,15 +20,6 @@ public class Presupuesto {
 	protected static final int PRESUPUESTO_INVALIDO = -1;
 	protected static final int NRO_TRANSACCION_INVALIDO = -1;
 	
-	/*protected int Nro_Presupuesto;
-	protected List<Concepto> conceptos;
-	protected Cliente cliente;
-	protected boolean efectivo;
-	protected float alicuota;
-	protected double monto_total;
-	protected String fecha;
-	*/
-	
 	private IntegerProperty Nro_Presupuesto;
 	private List<Concepto> conceptos;  			//VER! NO SON PROPERTY TODO
 	private Cliente cliente;					//VER! NO SON PROPERTY TODO
@@ -33,6 +27,7 @@ public class Presupuesto {
 	private FloatProperty alicuota;
 	private DoubleProperty monto_total;
 	private StringProperty fecha;
+	private StringProperty fecha_ARG;
 	
 	
 	// :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: ::::::::::
@@ -44,14 +39,22 @@ public class Presupuesto {
 	
 	public Presupuesto(List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double monto_total, Date fecha){
 
-		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
 		Nro_Presupuesto = new SimpleIntegerProperty(PRESUPUESTO_INVALIDO);
 		this.conceptos = conceptos;
 		this.cliente = cliente;
 		this.efectivo = new SimpleBooleanProperty(efectivo);
 		this.alicuota = new SimpleFloatProperty(alicuota);
 		this.monto_total = new SimpleDoubleProperty(monto_total);
-		this.fecha = new SimpleStringProperty( format1.format(fecha));
+		
+		//Format1: lo que se usa en sql
+		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+		this.fecha = new SimpleStringProperty(format1.format(fecha));
+		
+		//Format2: lo que se muestra por pantallas (formato argentino)
+		//Solo para mostrarlo en la aplicacion cuando sea necesario
+		SimpleDateFormat format2 = new SimpleDateFormat("dd-MM-yyyy");
+		this.fecha_ARG = new SimpleStringProperty(format2.format(fecha));
+		
 		this.transaccion_asociado =new SimpleIntegerProperty(NRO_TRANSACCION_INVALIDO);
 	}
 	
@@ -93,7 +96,7 @@ public class Presupuesto {
     }
 	
     public StringProperty NroPresupuestoStringProperty(){
-    	 StringProperty aux = new SimpleStringProperty(String.valueOf(Nro_Presupuesto));
+    	 StringProperty aux = new SimpleStringProperty(String.valueOf(Nro_Presupuesto.get()));
     	 return aux;
     	
     }
@@ -173,7 +176,7 @@ public class Presupuesto {
 	}
 	
 	public StringProperty montoTotalStringProperty(){
-		StringProperty aux = new SimpleStringProperty(String.valueOf(monto_total));
+		StringProperty aux = new SimpleStringProperty(String.valueOf(monto_total.get()));
 		return aux;
 	}
 
@@ -190,8 +193,14 @@ public class Presupuesto {
 		return conceptos;
 	}
 	
+	public ObservableList<Concepto> getConceptosObservables(){
+		ObservableList<Concepto> listaObservableConceptos = FXCollections.observableArrayList(conceptos);
+		return listaObservableConceptos;
+	}
+	
+		
 	/**
-     * fecha: tiene un getter que retorna String,
+     * fecha y fecha_ARG: tiene un getter que retorna String,
      * y un getter que retorna un StringProperty
      * 
      * */
@@ -202,5 +211,13 @@ public class Presupuesto {
 	
     public StringProperty fechaProperty() {
         return fecha;
+    }
+    
+    public String getFecha_ARG(){
+		return fecha_ARG.get();
+	}
+	
+    public StringProperty fecha_ARGProperty() {
+        return fecha_ARG;
     }
 }

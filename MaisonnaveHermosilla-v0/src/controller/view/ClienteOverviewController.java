@@ -5,12 +5,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+
+import java.util.Optional;
+
 import controller.Main;
 import controller.db.Cliente;
 import controller.db.DBEngine;
@@ -155,7 +159,7 @@ public class ClienteOverviewController {
 
         } else {
             // Nothing selected.
-            Alert alert = new Alert(AlertType.WARNING);
+            Alert alert = new Alert(AlertType.INFORMATION);
             alert.initOwner(mainApp.getPrimaryStage());
             alert.setTitle("Seleccionar cliente");
             alert.setHeaderText("No se ha seleccionado un cliente");
@@ -164,14 +168,67 @@ public class ClienteOverviewController {
             alert.showAndWait();
         }
     }
-
+    
     /**
+     * LLamado cuando el usuario hace click en el boton Eliminar Cliente. Abre un 
+     * diálogo para confirmar la eliminacion del cliente seleccionado.
+     */
+    @FXML
+    private void handleEliminarCliente() {
+        Cliente selectedCliente = clienteTable.getSelectionModel().getSelectedItem();
+        if (selectedCliente != null) {
+        	 // Se procede a alertar al usuario
+             Alert alert = new Alert(AlertType.WARNING, 
+		  			 "",
+                   ButtonType.YES, 
+                   ButtonType.NO);
+             alert.initOwner(mainApp.getPrimaryStage());
+             alert.setTitle("Eliminar cliente");
+             alert.setHeaderText("Cliente seleccionado: "+ selectedCliente.getDenominacion());
+             alert.setContentText("¿Desea eliminar al cliente de la base de datos?");
+
+
+             Optional<ButtonType> result = alert.showAndWait();
+
+             if (result.get() == ButtonType.YES) {
+            	 //Elimino al cliente de la base de datos
+            	 selectedCliente = DBMotor.eliminarCliente(selectedCliente.getCodigoCliente());
+            	 //Actualizo contenido tabla en la vista
+            	 handleSearch();
+            	// Se informa al usuario que termino el proceso
+                 alert = new Alert(AlertType.INFORMATION, 
+    		  			 "",
+                       ButtonType.OK);
+                 alert.initOwner(mainApp.getPrimaryStage());
+                 alert.setTitle("Eliminar cliente");
+                 alert.setHeaderText("Cliente: "+ selectedCliente.getDenominacion());
+                 alert.setContentText("Se ha eliminado al cliente de la base de datos.");
+                 alert.showAndWait();
+             }
+             else{
+            	 //No hago nada y cierro
+             }
+
+        } 
+        else {
+            // No se seleccionó ningún cliente
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.initOwner(mainApp.getPrimaryStage());
+            alert.setTitle("Seleccionar cliente");
+            alert.setHeaderText("No se ha seleccionado un cliente");
+            alert.setContentText("Por favor, seleccione un cliente en la tabla.");
+
+            alert.showAndWait();
+        }
+    }
+    
+     /**
      * Inicializa la clase controller. Este metodo es automaticamente llamado
      * luego de que fue cargado el archivo fxml. Usa expresiones lambda.
      */
     @FXML
     private void initialize() {
-        // Initialize the cliente table with the two columns.
+        //Inicializa la tabla de clientes con los valores correspondientes a las columnas
         cuitColumn.setCellValueFactory(
                 cellData -> cellData.getValue().cuitProperty());
         denominacionColumn.setCellValueFactory(
@@ -193,18 +250,17 @@ public class ClienteOverviewController {
      */
     @FXML
     private void handleSearch() {
+
+		String busqueda = busquedaTextField.getText();
     	if(cuitPresionado){
-    		String busqueda = busquedaTextField.getText();
     		ObservableList<Cliente> listaClientes = FXCollections.observableArrayList(DBMotor.buscarCUIT(busqueda));
-    		mainApp.setClienteData(listaClientes);
-    		clienteTable.setItems(mainApp.getClienteData());
+    		mainApp.setClienteData(listaClientes);    		
     	}
     	if(denomPresionado){
-    		String busqueda = busquedaTextField.getText();
     		ObservableList<Cliente> listaClientes = FXCollections.observableArrayList(DBMotor.buscarCliente(busqueda));
     		mainApp.setClienteData(listaClientes);
-    		clienteTable.setItems(mainApp.getClienteData());
     	}
+    	clienteTable.setItems(mainApp.getClienteData());
     }
     
     /**

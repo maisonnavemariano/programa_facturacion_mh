@@ -18,16 +18,22 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-//comentario que hay que borrar luego.
+
 public class Main extends Application {
 
     private Stage primaryStage;
     private BorderPane rootLayout;
     
     /**
-     * Los datos es una lista observable de clientes.
+     * lista observable de clientes.
      */
     private ObservableList<Cliente> clienteData;
+    
+    /**
+     * lista observable de presupuestos no efectivos para el area de trabajo.
+     */
+    private ObservableList<Presupuesto> presupuestosNoEfectivosData;
+    
  
     /**
      * Motor de la base de datos.
@@ -35,13 +41,15 @@ public class Main extends Application {
     private DBEngine DBMotor;
    
     /**
-     * Constructor vacío
+     * Constructor de la clase principal. Inicializa las listas de clientes y 
+     * presupuestos que se cargan en las tablas en cada vista.
      */
     public Main() {
     	
     	DBMotor = DBSingleton.getInstance();
     	clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente(""));
-    	
+    	presupuestosNoEfectivosData = FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos());
+    	//DBMotor.facturarTodos(); Solo con propositos de prueba.
     }
     
     /**
@@ -53,7 +61,7 @@ public class Main extends Application {
     }
     
     /**
-     * Retorna la informacion como una lista observable de Clientes. 
+     * Retorna la informacion de clientes como una lista observable de Clientes. 
      * @return
      */
     public ObservableList<Cliente> getClienteData() {
@@ -66,6 +74,23 @@ public class Main extends Application {
      */
     public void setClienteData(ObservableList<Cliente> listaClientes) {
        clienteData = listaClientes;
+    }
+    
+    
+    /**
+     * Retorna la informacion de presupuestos no efectivos como una lista observable de Clientes. 
+     * @return
+     */
+    public ObservableList<Presupuesto> getPresupuestosNoEfectivosData() {
+        return presupuestosNoEfectivosData;
+    }
+    
+    /**
+     * Setea lista observable de presupuestos no efectivos 
+     * @return
+     */
+    public void setPresupuestosNoEfectivosData(ObservableList<Presupuesto> listaPresupuestos) {
+       presupuestosNoEfectivosData = listaPresupuestos;
     }
     
      /**
@@ -221,8 +246,8 @@ public class Main extends Application {
 
             // Brinda acceso a la apilcaciòn principal al controlador particular de la vista
             //TODO: Asignar controlador a la vista, y programarlo. por ahora muestra una ventana boba.
-            //ClienteOverviewController controller = loader.getController();
-            //controller.setMainApp(this, DBMotor);
+            AreaDeTrabajoOverviewController controller = loader.getController();
+            controller.setMainApp(this, DBMotor);
 
         } catch (IOException e) {
             e.printStackTrace();

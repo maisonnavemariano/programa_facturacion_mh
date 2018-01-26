@@ -95,10 +95,11 @@
                                     <Label fx:id="habilitadoLabel" text="                    " GridPane.columnIndex="1" GridPane.rowIndex="7" />
                                  </children>
                               </GridPane>
-                              <ButtonBar buttonMinWidth="60.0" layoutX="78.0" layoutY="218.0" prefHeight="40.0" prefWidth="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="78.0" AnchorPane.rightAnchor="10.0">
+                              <ButtonBar buttonMinWidth="60.0" layoutY="218.0" prefHeight="40.0" prefWidth="397.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="10.0">
                                 <buttons>
                                   <Button maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleNewCliente" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Nuevo Cliente" />
                                     <Button layoutX="125.0" layoutY="17.0" maxWidth="113.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEditCliente" prefHeight="26.0" text="Editar Cliente" />
+                                    <Button layoutX="170.0" layoutY="17.0" maxWidth="125.0" minWidth="125.0" mnemonicParsing="false" onAction="#handleEliminarCliente" pickOnBounds="false" prefHeight="26.0" prefWidth="125.0" text="Eliminar Cliente" />
                                 </buttons>
                               </ButtonBar>
                            </children>
