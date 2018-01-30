@@ -53,7 +53,7 @@
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
                               </TableView>
-                              <Button layoutX="164.0" layoutY="410.0" mnemonicParsing="false" onAction="#handleEfectivizarTodos" text="Efectivizar Todo" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="50.0" />
+                              <Button fx:id="efectivizarTodos" layoutX="164.0" layoutY="410.0" mnemonicParsing="false" onAction="#handleEfectivizarTodos" text="Efectivizar Todo" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="50.0" />
                               <ProgressBar fx:id="barraProgreso" layoutX="209.0" layoutY="413.0" prefWidth="200.0" progress="0.0" AnchorPane.bottomAnchor="11.0" />
                            </children>
                         </AnchorPane>
@@ -80,9 +80,9 @@
                               <Label fx:id="montoLabel" layoutX="99.0" layoutY="180.0" text="monto" />
                               <ButtonBar buttonMinWidth="60.0" layoutY="218.0" prefHeight="40.0" prefWidth="328.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="10.0">
                                 <buttons>
-                                  <Button maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Editar" />
-                                    <Button layoutX="125.0" layoutY="17.0" maxWidth="113.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEfectivizarUno" prefHeight="26.0" text="Efectivizar" />
-                                    <Button layoutX="101.0" layoutY="17.0" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleVistaPrevia" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Vista Previa" />
+                                  <Button fx:id="editar" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Editar" />
+                                    <Button fx:id="efectivizarUno" layoutX="125.0" layoutY="17.0" maxWidth="113.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEfectivizarUno" prefHeight="26.0" text="Efectivizar" />
+                                    <Button fx:id="vistaPrevia" layoutX="101.0" layoutY="17.0" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleVistaPrevia" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Vista Previa" />
                                 </buttons>
                               </ButtonBar>
                               <TableView fx:id="conceptosTable" layoutX="20.0" layoutY="244.0" prefHeight="151.0" prefWidth="300.0" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="17.0" AnchorPane.rightAnchor="23.0" AnchorPane.topAnchor="244.0">

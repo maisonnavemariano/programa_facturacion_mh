@@ -7,16 +7,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.scene.layout.StackPane;
+import javafx.application.Platform;
 
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ import controller.db.Presupuesto;
 import exception.InvalidBudgetException;
 
 public class AreaDeTrabajoOverviewController  {
-	
+
 	//Lista de presupuestos
     @FXML
     private TableView<Presupuesto> presupuestosTable;
@@ -71,12 +70,19 @@ public class AreaDeTrabajoOverviewController  {
     private RadioButton cuitRadioButton;
     @FXML
     private RadioButton denominacionRadioButton;
+    @FXML
+    private Button editar;
+    @FXML
+    private Button efectivizarUno;
+    @FXML
+    private Button efectivizarTodos;
+    @FXML
+    private Button vistaPrevia;
     
     //Usados solamente en el metodo: efectivizar todos
     @FXML
     private ProgressBar barraProgreso;
-    @FXML
-    private IntegerProperty cantEfectivos;
+    
     
     //Variables booleanas de control
     private boolean cuitPresionado = true;
@@ -95,7 +101,6 @@ public class AreaDeTrabajoOverviewController  {
      * Constructor llamado antes del metodo initialize().
      */
     public AreaDeTrabajoOverviewController() {
-    	cantEfectivos = new SimpleIntegerProperty(0);
     }
     
     /**
@@ -188,8 +193,7 @@ public class AreaDeTrabajoOverviewController  {
         presupuestosTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> showPresupuestoDetails(newValue));
         
-        
-   	 	
+       
     }
     
     /**
@@ -297,50 +301,76 @@ public class AreaDeTrabajoOverviewController  {
 
              
              if (result.get() == ButtonType.YES) {
+            	
             	 //Efectivizo TODOS los presupuestos en la base de datos.
+            	 
               	 Task<Void> task = new Task<Void>() {
             		    @Override
             		    protected Void call() throws Exception {
             		    	        	
             		    	for (int i=0; i<= lista.size(); i++){
-            		    		System.out.println(""+i);
                 		    	updateProgress(i, lista.size());
-                   			 	Thread.sleep(100);
+                   			 	Thread.sleep(115);
             		    	}
             		    	return null;
             		    };
             	 };
+            	 
+            	 Task<Void> task_efectivizar = new Task<Void>() {
+         		    @Override
+         		    protected Void call() throws Exception {
+         		    	
+         		    	//Efectivizo cada item de la lista
+                        for (Presupuesto p : lista){
+        		    		try{
+        		    			
+                   			 	DBMotor.efectivizarPresupuesto(p);
+                   			 	
+        		    		}
+                        	catch(InvalidBudgetException e){
+                        		e.printStackTrace();
+                        		System.out.println("La efectivización del presupuesto "+ p.getNroPresupuesto() + " tiro error.");
+                        	}
+        		    	}
+                        
+                        //Vuelvo a habilitar componentes de la ventana.
+                        deshabilitarComponentes(false);
+                                                
+                     	//Actualizo contenido tabla en la vista: deberia no retornar nada
+                        handleSearch();
+                        
+                        //Muestro alerta de finalizacion
+         		    	 Platform.runLater(() -> {
+         		    		
+         		    		//Se informa al usuario que termino el proceso
+         		           Alert alert = new Alert(AlertType.INFORMATION, 
+         		  	  			 "",
+         		                 ButtonType.OK);
+         		           alert.initOwner(mainApp.getPrimaryStage());
+         		           alert.setTitle("Efectivizar todo");
+         		           alert.setHeaderText("Se han efectivizado "+ lista.size() + " presupuestos.");
+         		           alert.setContentText("Puede consultar los presupuestos efectivos en el menú Buscar Presupuestos.");
+         		           alert.showAndWait();
+         		           barraProgreso.progressProperty().unbind();
+         		           barraProgreso.progressProperty().set(0);
+         		           
+                         });
+         		    	return null;
+         		    };
+         	 };
             		
             	//Bindea la barra de progreso con la property de presupuestos efectivizados so far
                 barraProgreso.progressProperty().unbind();
                 barraProgreso.progressProperty().bind(task.progressProperty());
-                new Thread(task).start();
-            	
+              
+                //Primero pongo como disabled los elementos graficos de la 
+ 		    	//ventana: botones, lista, etc.
+ 		    	deshabilitarComponentes(true);
                 
-                for (Presupuesto p : lista){
-		    		try{
-		    			
-           			 	DBMotor.efectivizarPresupuesto(p);
-           			 	
-		    		}
-                	catch(InvalidBudgetException e){
-                		e.printStackTrace();
-                		System.out.println("La efectivización del presupuesto "+ p.getNroPresupuesto() + " tiro error.");
-                	}
-		    	}
-                
-             	 //Actualizo contenido tabla en la vista: deberia no retornar nada
-             // handleSearch();
-             	 
-             	 //Se informa al usuario que termino el proceso
-                 alert = new Alert(AlertType.INFORMATION, 
-     		  			 "",
-                        ButtonType.OK);
-                  alert.initOwner(mainApp.getPrimaryStage());
-                  alert.setTitle("Efectivizar todo");
-                  alert.setHeaderText("Se han efectivizado "+ lista.size() + " presupuestos.");
-                  alert.setContentText("Puede consultar los presupuestos efectivos en el menú Buscar Presupuestos.");
-                  alert.showAndWait();
+ 		    	//Arranco la efectivizacion de todos los presupuestos
+ 		    	new Thread(task).start();;
+                new Thread(task_efectivizar).start();
+               
              }
              else{
             	 //No hago nada: el usuario eligió el botón NO.
@@ -437,6 +467,36 @@ public class AreaDeTrabajoOverviewController  {
      private void handleDenomRadioButton() {
  	   cuitPresionado = false;
  	   denomPresionado = true;
+    }
+     
+    private void deshabilitarComponentes(boolean value){
+    	//Tablas
+    	this.conceptosTable.setDisable(value);
+    	this.presupuestosTable.setDisable(value);
+    	
+    	//Botones
+    	this.editar.setDisable(value);
+    	this.vistaPrevia.setDisable(value);
+    	this.efectivizarTodos.setDisable(value);
+    	this.efectivizarUno.setDisable(value);
+    	
+    	//Radiobutton
+    	this.cuitRadioButton.setDisable(value);
+    	this.denominacionRadioButton.setDisable(value);
+    	
+    	//Textfield
+    	this.busquedaTextField.setDisable(value);
+    	    	
+    	//Label
+    	this.alicuotaLabel.setDisable(value);
+    	this.cuitLabel.setDisable(value);
+    	this.denominacionLabel.setDisable(value);
+    	this.fechaLabel.setDisable(value);
+    	this.ivaLabel.setDisable(value);
+    	this.montoLabel.setDisable(value);
+    	this.numeroLabel.setDisable(value);
+    	
+    	
     }
      
     
