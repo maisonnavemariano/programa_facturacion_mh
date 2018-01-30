@@ -220,4 +220,23 @@ public class Presupuesto {
     public StringProperty fecha_ARGProperty() {
         return fecha_ARG;
     }
+    
+    /**
+     * NroTransaccion: tiene un getter que retorna String,
+     * y un getter que retorna un StringProperty
+     * 
+     * */
+	
+	public int getNroTransaccion(){
+		return transaccion_asociado.get();
+	}
+	
+    public IntegerProperty transaccionProperty() {
+        return transaccion_asociado;
+    }
+    
+    public StringProperty transaccionStringProperty() {
+        StringProperty aux = new SimpleStringProperty(String.valueOf(getNroTransaccion()));
+        return aux;
+    }
 }

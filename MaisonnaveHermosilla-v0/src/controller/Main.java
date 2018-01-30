@@ -48,8 +48,9 @@ public class Main extends Application {
     	
     	DBMotor = DBSingleton.getInstance();
     	clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente(""));
+    	DBMotor.facturarTodos(); //Solo con propositos de prueba.
     	presupuestosNoEfectivosData = FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos());
-    	//DBMotor.facturarTodos(); Solo con propositos de prueba.
+    	
     }
     
     /**
@@ -91,6 +92,15 @@ public class Main extends Application {
      */
     public void setPresupuestosNoEfectivosData(ObservableList<Presupuesto> listaPresupuestos) {
        presupuestosNoEfectivosData = listaPresupuestos;
+    }
+    
+    /**
+     * Setea lista observable de presupuestos no efectivos desde la DB
+     * @return
+     */
+    public void setPresupuestosNoEfectivosData_DB() {
+    	presupuestosNoEfectivosData = FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos());
+    	
     }
     
      /**

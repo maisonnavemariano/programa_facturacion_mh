@@ -816,8 +816,21 @@ public class DBEngine {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			p.setEfectivo(true);
-			this.editarPresupuesto(p);			
+			
+			//HACEMOS EFECTIVO EL PRESU EN LA BASE DE DATOS
+			query = "UPDATE Presupuesto SET Efectivo = 'S' WHERE Nro_Presupuesto = ? ";
+			PreparedStatement pt;
+			
+			try {
+				pt = conn.prepareStatement(query);
+				pt.setInt(1, p.getNroPresupuesto());
+				pt.execute();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// HACEMOS EFECTIVO EL PRESU EN EL OBJETO
+			p.setEfectivo(true);		
 		}
 		return (efectivo? t : null);//devolvemos la transaccion solo si la logramos guardar en la base de datos
 	}
