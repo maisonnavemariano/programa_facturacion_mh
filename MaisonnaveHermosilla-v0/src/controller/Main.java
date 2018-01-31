@@ -48,7 +48,7 @@ public class Main extends Application {
     	
     	DBMotor = DBSingleton.getInstance();
     	clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente(""));
-    	DBMotor.facturarTodos(); //Solo con propositos de prueba.
+    	//DBMotor.facturarTodos(); //Solo con propositos de prueba.
     	presupuestosNoEfectivosData = FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos());
     	
     }

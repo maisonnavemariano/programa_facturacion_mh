@@ -240,6 +240,8 @@ public class ClienteOverviewController {
         // Listen for selection changes and show the cliente details when changed.
         clienteTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> showClienteDetails(newValue));
+        
+        clienteTable.setPlaceholder(new Label("No hay clientes para mostrar."));
     }
     
    

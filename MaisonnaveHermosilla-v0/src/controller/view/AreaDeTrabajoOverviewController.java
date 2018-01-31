@@ -11,10 +11,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.util.Callback;
 import javafx.application.Platform;
 
 import java.util.Optional;
@@ -149,6 +153,7 @@ public class AreaDeTrabajoOverviewController  {
             conceptosTable.setItems(presupuesto.getConceptosObservables());
             conceptoColumn.setCellValueFactory(
     			cellData -> cellData.getValue().getConceptoProperty());
+            
     		montoConceptoColumn.setCellValueFactory(
     			cellData -> cellData.getValue().getMontoConceptoStringProperty());
             
@@ -192,6 +197,11 @@ public class AreaDeTrabajoOverviewController  {
         // y muestra los detalles del presupuesto seleccionado.
         presupuestosTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> showPresupuestoDetails(newValue));
+        presupuestosTable.setPlaceholder(new Label("No hay presupuestos para mostrar."));
+        presupuestosTable.getColumns().forEach(this::addTooltipToColumnCells_Presupuesto);
+        
+        conceptosTable.getColumns().forEach(this::addTooltipToColumnCells_Concepto);
+        conceptosTable.setPlaceholder(new Label("No hay conceptos."));
         
        
     }
@@ -230,7 +240,7 @@ public class AreaDeTrabajoOverviewController  {
               alert.setHeaderText("Presupuesto seleccionado: "+ selectedPresupuesto.getNroPresupuesto()+ " - "
             		  			  + selectedPresupuesto.getCliente().getDenominacion());
               alert.setContentText("¿Desea efectivizar el presupuesto seleccionado?");
-             
+              alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
               Optional<ButtonType> result = alert.showAndWait();
 
               if (result.get() == ButtonType.YES) {
@@ -253,6 +263,7 @@ public class AreaDeTrabajoOverviewController  {
                   alert.setTitle("Efectivizar presupuesto");
                   alert.setHeaderText("Se ha efectivizado el presupuesto nº "+ selectedPresupuesto.NroPresupuestoStringProperty().get());
                   alert.setContentText("Transacción nº "+ selectedPresupuesto.transaccionStringProperty().get());
+                  alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                   alert.showAndWait();
               }
               else{
@@ -266,7 +277,7 @@ public class AreaDeTrabajoOverviewController  {
              alert.setTitle("Seleccionar presupuesto");
              alert.setHeaderText("No se ha seleccionado un presupuesto");
              alert.setContentText("Por favor, seleccione un presupuesto en la tabla.");
-
+             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
              alert.showAndWait();
          }
      }
@@ -274,7 +285,7 @@ public class AreaDeTrabajoOverviewController  {
      /**
       * LLamado cuando el usuario hace click en el boton Efectivizar Todos.
       * Abre un alerta donde dice cuantos presupuestos se harán efectivos, y pide confirmación.
-      * TODO: agregar un cartel de "espere" o "cargando"
+      * 
       */
      @FXML
      private void handleEfectivizarTodos() {
@@ -296,7 +307,7 @@ public class AreaDeTrabajoOverviewController  {
              alert.setTitle("Efectivizar todo");
              alert.setHeaderText("Cantidad total de presupuestos: " + lista.size());
              alert.setContentText("¿Desea efectivizar TODOS los presupuestos no efectivos?");
-             
+             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
              Optional<ButtonType> result = alert.showAndWait();
 
              
@@ -335,13 +346,14 @@ public class AreaDeTrabajoOverviewController  {
                         
                         //Vuelvo a habilitar componentes de la ventana.
                         deshabilitarComponentes(false);
-                                                
-                     	//Actualizo contenido tabla en la vista: deberia no retornar nada
-                        handleSearch();
-                        
-                        //Muestro alerta de finalizacion
-         		    	 Platform.runLater(() -> {
+                        try{           
+                        	
+                        	//Actualizo tabla y muestro alerta de finalizacion
+                        	Platform.runLater(() -> {
          		    		
+                        		//Actualizo contenido tabla en la vista: deberia no retornar nada
+                            	clarearTablaYLista();
+                            	
          		    		//Se informa al usuario que termino el proceso
          		           Alert alert = new Alert(AlertType.INFORMATION, 
          		  	  			 "",
@@ -350,11 +362,16 @@ public class AreaDeTrabajoOverviewController  {
          		           alert.setTitle("Efectivizar todo");
          		           alert.setHeaderText("Se han efectivizado "+ lista.size() + " presupuestos.");
          		           alert.setContentText("Puede consultar los presupuestos efectivos en el menú Buscar Presupuestos.");
+         		           alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
          		           alert.showAndWait();
          		           barraProgreso.progressProperty().unbind();
          		           barraProgreso.progressProperty().set(0);
          		           
                          });
+         		    	 }
+                         catch(IllegalStateException e){
+                        	System.out.println("El problema esta aca");
+                         }
          		    	return null;
          		    };
          	 };
@@ -384,7 +401,7 @@ public class AreaDeTrabajoOverviewController  {
              alert.setTitle("Efectivizar todo");
              alert.setHeaderText("No existen presupuestos no efectivos.");
              alert.setContentText("");
-
+             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
              alert.showAndWait();
          }
      }
@@ -412,7 +429,7 @@ public class AreaDeTrabajoOverviewController  {
              alert.setTitle("Seleccionar presupuesto");
              alert.setHeaderText("No se ha seleccionado un presupuesto");
              alert.setContentText("Por favor, seleccione un presupuesto en la tabla.");
-
+             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
              alert.showAndWait();
          }
      }
@@ -428,6 +445,8 @@ public class AreaDeTrabajoOverviewController  {
         if (selectedPresupuesto != null) {
     	 System.out.println(selectedPresupuesto.getEfectivo());}
      }
+    
+    //------------------------BUSQUEDA-----------------------------------
 
      /**
       * LLamado cuando el usuario tipea en la caja de texto de busqueda.
@@ -451,6 +470,12 @@ public class AreaDeTrabajoOverviewController  {
      	presupuestosTable.setItems(mainApp.getPresupuestosNoEfectivosData());
      }
      
+     private void clarearTablaYLista(){
+    	 ObservableList<Presupuesto> listaPresupuestos = FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos());
+    	 mainApp.setPresupuestosNoEfectivosData(listaPresupuestos);
+    	 presupuestosTable.setItems(mainApp.getPresupuestosNoEfectivosData());
+     }
+     
      /**
      * LLamado cuando el usuario selecciona el radiobutton cuit
      */
@@ -469,7 +494,9 @@ public class AreaDeTrabajoOverviewController  {
  	   denomPresionado = true;
     }
      
-    private void deshabilitarComponentes(boolean value){
+     //-----------------------------OTROS----------------------------------
+   
+     private void deshabilitarComponentes(boolean value){
     	//Tablas
     	this.conceptosTable.setDisable(value);
     	this.presupuestosTable.setDisable(value);
@@ -499,6 +526,41 @@ public class AreaDeTrabajoOverviewController  {
     	
     }
      
-    
+     private <T> void addTooltipToColumnCells_Concepto(TableColumn<Concepto,T> column) {
+
+    	    Callback<TableColumn<Concepto, T>, TableCell<Concepto,T>> existingCellFactory 
+    	        = column.getCellFactory();
+
+    	    column.setCellFactory(c -> {
+    	        TableCell<Concepto, T> cell = existingCellFactory.call(c);
+
+    	        Tooltip tooltip = new Tooltip();
+    	        // can use arbitrary binding here to make text depend on cell
+    	        // in any way you need:
+    	        tooltip.textProperty().bind(cell.itemProperty().asString());
+
+    	        cell.setTooltip(tooltip);
+    	        return cell;
+    	    });
+    	}
+     
+
+     private <T> void addTooltipToColumnCells_Presupuesto(TableColumn<Presupuesto,T> column) {
+
+ 	    Callback<TableColumn<Presupuesto, T>, TableCell<Presupuesto,T>> existingCellFactory 
+ 	        = column.getCellFactory();
+
+ 	    column.setCellFactory(c -> {
+ 	        TableCell<Presupuesto, T> cell = existingCellFactory.call(c);
+
+ 	        Tooltip tooltip = new Tooltip();
+ 	        // can use arbitrary binding here to make text depend on cell
+ 	        // in any way you need:
+ 	        tooltip.textProperty().bind(cell.itemProperty().asString());
+
+ 	        cell.setTooltip(tooltip);
+ 	        return cell;
+ 	    });
+ 	}
     
 }
