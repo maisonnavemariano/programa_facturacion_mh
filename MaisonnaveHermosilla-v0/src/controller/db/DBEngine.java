@@ -31,7 +31,7 @@ import exception.InvalidClientException;
  */
 public class DBEngine {
 	protected final String myDriver = "com.mysql.jdbc.Driver";
-	protected final String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
+	protected final String myUrl  = "jdbc:mysql://192.168.1.118/programa_facturacion_mh"; 
 	
 	
 	
@@ -693,7 +693,12 @@ public class DBEngine {
 	private void facturarBorrador(Cliente cliente) throws InvalidClientException{
 		Presupuesto ultimo = this.verUltimoPresupuesto(cliente);
 	//	System.out.println(ultimo==null);
-		Presupuesto nuevo = new Presupuesto(ultimo.getConceptos()	,cliente ,false, ultimo.getAlicuota(),ultimo.getMontoTotal(), Calendar.getInstance().getTime()) ; 
+		//Calculo para obtener el monto total nuevo (fix para el caso donde el ultimo presupuesto fue realizado con el
+		// sistema viejo y el monto total y la suma de los montos da distinto.
+		float montoTotal = 0;
+		for (Concepto c: ultimo.getConceptos())
+			montoTotal += c.getMonto()*(1+ultimo.getAlicuota()/100.0);
+		Presupuesto nuevo = new Presupuesto(ultimo.getConceptos()	,cliente ,false, ultimo.getAlicuota(),montoTotal, Calendar.getInstance().getTime()) ; 
 		this.agregarPresupuesto(nuevo);
 		
 	}
