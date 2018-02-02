@@ -296,7 +296,33 @@ public class Main extends Application {
      * 
      */
     public boolean showModificarPresupuestoOverview(Presupuesto presupuesto){
-    	return true;
+    	try {
+            // Carga el archivo .fxml y crea un nuevo stage para el diálogo pop-up
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Main.class.getResource("view/ModificarPresupuestoOverview.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+
+            // Crea el Stage para el diálogo
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Editar presupuesto");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(primaryStage);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // Setear los parametros del controlador       
+            ModificarPresupuestoOverviewController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setPresupuesto(presupuesto);
+
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
+
+            return controller.isOkClicked();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
     
     

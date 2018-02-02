@@ -40,5 +40,9 @@ public class Concepto {
 	public void setConcepto(String c ){
 		concepto = c;
 	}
+	
+	public void setMonto(double m ){
+		monto = m;
+	}
 
 }

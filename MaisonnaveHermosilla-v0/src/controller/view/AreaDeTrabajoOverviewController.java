@@ -17,7 +17,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import javafx.application.Platform;
 
@@ -124,7 +123,7 @@ public class AreaDeTrabajoOverviewController  {
             numeroLabel.setText(String.valueOf(presupuesto.getNroPresupuesto()));
             cuitLabel.setText(cliente.getCuit());
             denominacionLabel.setText(cliente.getDenominacion());
-            fechaLabel.setText(presupuesto.getFecha());
+            fechaLabel.setText(presupuesto.getFecha_ARG());
                        
             String ci = cliente.getCondicionIva();
             if(ci.startsWith("RI")){
@@ -146,10 +145,25 @@ public class AreaDeTrabajoOverviewController  {
             	ivaLabel.setText("Sin información");
             }
             
-            alicuotaLabel.setText(String.valueOf(presupuesto.getAlicuota()));
+            
+            Float ali = presupuesto.getAlicuota();
+            if(ali!= null){
+            	if(ali == 0.0){
+            		alicuotaLabel.setText("0%");
+                }
+                else if(ali == 10.5){
+                	alicuotaLabel.setText("10,5%");
+                }
+                else if(ali == 21.0){
+                	alicuotaLabel.setText("21%");
+                }
+                else{
+                	alicuotaLabel.setText("");
+                }
+            }
+            
             montoLabel.setText(String.valueOf(presupuesto.getMontoTotal()));
           
-            //conceptosListView.setItems(presupuesto.getConceptosObservables());
             conceptosTable.setItems(presupuesto.getConceptosObservables());
             conceptoColumn.setCellValueFactory(
     			cellData -> cellData.getValue().getConceptoProperty());
@@ -419,7 +433,7 @@ public class AreaDeTrabajoOverviewController  {
          if (selectedPresupuesto != null) {
              boolean okClicked = mainApp.showModificarPresupuestoOverview(selectedPresupuesto);
              if (okClicked) {
-                 //showClienteDetails(selectedPresupuesto);
+                 showPresupuestoDetails(selectedPresupuesto);
              }
          } 
          else{

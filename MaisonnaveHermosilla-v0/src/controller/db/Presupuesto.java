@@ -21,8 +21,8 @@ public class Presupuesto {
 	protected static final int NRO_TRANSACCION_INVALIDO = -1;
 	
 	private IntegerProperty Nro_Presupuesto;
-	private List<Concepto> conceptos;  			//VER! NO SON PROPERTY TODO
-	private Cliente cliente;					//VER! NO SON PROPERTY TODO
+	private List<Concepto> conceptos;  			
+	private Cliente cliente;					
 	private BooleanProperty efectivo;
 	private FloatProperty alicuota;
 	private DoubleProperty monto_total;
@@ -145,6 +145,9 @@ public class Presupuesto {
      * y un getter que retorna un FloatProperty
      * 
      * */
+	public void setAlicuota(float a){
+		this.alicuota.set(a);
+	}
 	
 	public float getAlicuota(){
 		return alicuota.get();
@@ -205,6 +208,18 @@ public class Presupuesto {
      * 
      * */
 	
+	//TODO
+	public void setFecha(Date f){
+		//Format1: lo que se usa en sql
+		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+		this.fecha = new SimpleStringProperty(format1.format(f));
+				
+		//Format2: lo que se muestra por pantallas (formato argentino)
+		//Solo para mostrarlo en la aplicacion cuando sea necesario
+		SimpleDateFormat format2 = new SimpleDateFormat("dd-MM-yyyy");
+		this.fecha_ARG = new SimpleStringProperty(format2.format(f));
+	}
+	
 	public String getFecha(){
 		return fecha.get();
 	}
@@ -220,6 +235,7 @@ public class Presupuesto {
     public StringProperty fecha_ARGProperty() {
         return fecha_ARG;
     }
+   
     
     /**
      * NroTransaccion: tiene un getter que retorna String,
