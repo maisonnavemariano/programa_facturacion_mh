@@ -31,7 +31,7 @@ import exception.InvalidClientException;
  */
 public class DBEngine {
 	protected final String myDriver = "com.mysql.jdbc.Driver";
-	protected final String myUrl  = "jdbc:mysql://192.168.1.118/programa_facturacion_mh"; 
+	protected final String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
 	
 	
 	
@@ -87,7 +87,7 @@ public class DBEngine {
 		    }
 		    st.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		return toReturn;
@@ -127,7 +127,6 @@ public class DBEngine {
 		    }
 		    st.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return lista;
@@ -511,7 +510,7 @@ public class DBEngine {
 				+ "'"+p.getFecha()+"', "
 				+ "'"+(p.getEfectivo()?"S":"N") +"', "
 				+ "'"+p.getAlicuota()+"', "
-				+ "'"+p.getMontoTotal()+"' ) ; ";
+				+ "'"+p.getSubtotal()+"' ) ; ";
 		PreparedStatement pt;
 		
 		try {
@@ -604,7 +603,7 @@ public class DBEngine {
 			preparedStmt.setString(2,  p.getFecha());
 			preparedStmt.setString(3, (p.getEfectivo()? "S":"N"));
 			preparedStmt.setFloat(4, p.getAlicuota() );
-			preparedStmt.setDouble(5, p.getMontoTotal());
+			preparedStmt.setDouble(5, p.getSubtotal());
 			preparedStmt.setInt(6, p.getNroPresupuesto());
 			
 			// execute the java preparedstatement
@@ -697,7 +696,7 @@ public class DBEngine {
 		// sistema viejo y el monto total y la suma de los montos da distinto.
 		float montoTotal = 0;
 		for (Concepto c: ultimo.getConceptos())
-			montoTotal += c.getMonto()*(1+ultimo.getAlicuota()/100.0);
+			montoTotal += c.getMonto();
 		Presupuesto nuevo = new Presupuesto(ultimo.getConceptos()	,cliente ,false, ultimo.getAlicuota(),montoTotal, Calendar.getInstance().getTime()) ; 
 		this.agregarPresupuesto(nuevo);
 		
@@ -776,17 +775,17 @@ public class DBEngine {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			double nuevo_estado = estado_cuenta_corriente - p.getMontoTotal();
+			double nuevo_estado = estado_cuenta_corriente - p.getSubtotal();
 			this.actualizarEstadoCuentaCorriente(p.getCliente(), nuevo_estado);
 			// REGISTRAR TRANSACCION
-			t = new Transaccion(p.getCliente(), Calendar.getInstance().getTime(), 'D', p.getMontoTotal(),"",nuevo_estado);
+			t = new Transaccion(p.getCliente(), Calendar.getInstance().getTime(), 'D', p.getSubtotal(),"",nuevo_estado);
 			
 			
 			preparedStmt = conn.prepareStatement(query);
 			preparedStmt.setInt(1, p.getCliente().getCodigoCliente());
 			preparedStmt.setString(2, t.getFecha());
 			preparedStmt.setString(3, "P");
-			preparedStmt.setDouble(4, p.getMontoTotal());
+			preparedStmt.setDouble(4, p.getSubtotal());
 			preparedStmt.setString(5, "Efectivización de presupuesto");
 			preparedStmt.setDouble(6, nuevo_estado);
 			

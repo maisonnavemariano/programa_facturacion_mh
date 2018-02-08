@@ -25,7 +25,8 @@ public class Presupuesto {
 	private Cliente cliente;					
 	private BooleanProperty efectivo;
 	private FloatProperty alicuota;
-	private DoubleProperty monto_total;
+	private DoubleProperty subtotal;
+	private DoubleProperty monto;
 	private StringProperty fecha;
 	private StringProperty fecha_ARG;
 	
@@ -37,14 +38,15 @@ public class Presupuesto {
 	
 	
 	
-	public Presupuesto(List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double monto_total, Date fecha){
+	public Presupuesto(List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double sub_total, Date fecha){
 
 		Nro_Presupuesto = new SimpleIntegerProperty(PRESUPUESTO_INVALIDO);
 		this.conceptos = conceptos;
 		this.cliente = cliente;
 		this.efectivo = new SimpleBooleanProperty(efectivo);
 		this.alicuota = new SimpleFloatProperty(alicuota);
-		this.monto_total = new SimpleDoubleProperty(monto_total);
+		this.subtotal = new SimpleDoubleProperty(sub_total);
+		this.monto = new SimpleDoubleProperty(calcularMontoTotal());
 		
 		//Format1: lo que se usa en sql
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
@@ -71,9 +73,7 @@ public class Presupuesto {
 		return getNroPresupuesto() != PRESUPUESTO_INVALIDO;
 	}
 	
-	public String toString(){
-		return "Nro_Prespuesto: "+Nro_Presupuesto+" cliente: "+cliente.toString()+" Monto total: "+monto_total+ " fecha: "+fecha.toString()+" conceptos: "+conceptos.toString();
-	}
+	
 	
 	/*-------------------------------------------------------------------------------------
 	 * --------------------------------------ATRIBUTOS-------------------------------------
@@ -163,28 +163,28 @@ public class Presupuesto {
 	}
 	
 	/**
-     * montototal: tiene un getter que retorna double,
+     * subtotal: tiene un getter que retorna double,
      * un getter que retorna un StringProperty
      * un getter que retorna un DoubleProperty
      * y un setter que pide double
      * 
      * */
 	
-	public double getMontoTotal(){
-		return monto_total.get();
+	public double getSubtotal(){
+		return subtotal.get();
 	}
 	
-	public DoubleProperty montoTotalProperty(){
-		return monto_total;
+	public DoubleProperty subtotalProperty(){
+		return subtotal;
 	}
 	
-	public StringProperty montoTotalStringProperty(){
-		StringProperty aux = new SimpleStringProperty(String.valueOf(monto_total.get()));
+	public StringProperty subtotalStringProperty(){
+		StringProperty aux = new SimpleStringProperty(String.valueOf(subtotal.get()));
 		return aux;
 	}
 
-	public void setMontoTotal(double mt){
-		monto_total.set(mt);
+	public void setSubtotal(double st){
+		subtotal.set(st);
 	}
 	
 	/**
@@ -208,7 +208,6 @@ public class Presupuesto {
      * 
      * */
 	
-	//TODO
 	public void setFecha(Date f){
 		//Format1: lo que se usa en sql
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
@@ -254,5 +253,17 @@ public class Presupuesto {
     public StringProperty transaccionStringProperty() {
         StringProperty aux = new SimpleStringProperty(String.valueOf(getNroTransaccion()));
         return aux;
+    }
+    
+    public double calcularMontoTotal(){
+
+        double monto_calculado = 0;
+        for(Concepto c : conceptos){
+        	monto_calculado= monto_calculado + c.getMonto();
+        }
+        float ali = getAlicuota();
+        monto_calculado = monto_calculado * (1.0 + ali/100);
+        monto_calculado = Math.round(monto_calculado * 20.0) / 20.0;
+        return monto_calculado;
     }
 }

@@ -9,18 +9,20 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
+            <Menu mnemonicParsing="false" onAction="#handleAreaDeTrabajo" text="Área de trabajo" />
+          <Menu mnemonicParsing="false" text="Presupuestos">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleVerPresupuestos" text="Ver presupuestos" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleNuevoPresupuesto" text="Nuevo presupuesto" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleAnularPresupuesto" text="Anular presupuesto" />
+               </items></Menu>
+          <Menu mnemonicParsing="false" text="Cuentas Corrientes" />
           <Menu mnemonicParsing="false" text="Clientes">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#handleAdministrarClientes" text="Administrar clientes" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleEliminarCliente" text="Eliminar Cliente " />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Presupuestos">
-               <items>
-                  <MenuItem mnemonicParsing="false" onAction="#handleGenerarPresupuestosMensuales" text="Generar presupuestos mensuales" />
-                  <MenuItem mnemonicParsing="false" onAction="#handleAreaDeTrabajo" text="Area de trabajo" />
-                  <MenuItem mnemonicParsing="false" onAction="#handleBuscarPresupuestos" text="Buscar presupuestos" />
-               </items></Menu>
-          <Menu mnemonicParsing="false" text="Cuentas Corrientes" />
             <Menu mnemonicParsing="false" text="Ayuda" />
         </menus>
       </MenuBar>

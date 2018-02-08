@@ -170,10 +170,59 @@ public class ClienteOverviewController {
     }
     
     /**
+     * LLamado cuando el usuario hace click en el boton Habilitar/Deshabilitar. Abre un 
+     * diálogo para informar al usuario de la accion a realizar.
+     */
+    @FXML
+    private void handleHabilitarDeshabilitarCliente() {
+        Cliente selectedCliente = clienteTable.getSelectionModel().getSelectedItem();
+        if (selectedCliente != null) {
+            boolean valor = selectedCliente.getHabilitado().equals("S");
+            Alert alert = new Alert(AlertType.CONFIRMATION,"",ButtonType.OK, ButtonType.CANCEL);
+            alert.initOwner(mainApp.getPrimaryStage());
+            if(valor){
+            	alert.setTitle("Deshabilitar cliente");
+            	alert.setHeaderText("¿Desea deshabilitar el cliente seleccionado?");
+            }
+            else{
+            	alert.setTitle("Habilitar cliente");
+            	alert.setHeaderText("¿Desea habilitar el cliente seleccionado?");
+            }
+            alert.setContentText(null);
+            Optional<ButtonType> result = alert.showAndWait();
+            
+            if(result.get() == ButtonType.OK){
+            	if(valor)
+            		selectedCliente.setHabilitado("N");
+            	else
+            		selectedCliente.setHabilitado("S");
+            	
+            	//Actualizo el cliente en la base de datos
+                DBMotor.actualizarCliente(selectedCliente);
+            	showClienteDetails(selectedCliente);
+            }
+            else{
+            	//No hacer nada
+            }
+        } 
+        else {
+            // Nothing selected.
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.initOwner(mainApp.getPrimaryStage());
+            alert.setTitle("Seleccionar cliente");
+            alert.setHeaderText("No se ha seleccionado un cliente");
+            alert.setContentText("Por favor, seleccione un cliente en la tabla.");
+
+            alert.showAndWait();
+        }
+    }
+   
+    
+    /**
      * LLamado cuando el usuario hace click en el boton Eliminar Cliente. Abre un 
      * diálogo para confirmar la eliminacion del cliente seleccionado.
      */
-    @FXML
+   /* @FXML
     private void handleEliminarCliente() {
         Cliente selectedCliente = clienteTable.getSelectionModel().getSelectedItem();
         if (selectedCliente != null) {
@@ -220,7 +269,7 @@ public class ClienteOverviewController {
 
             alert.showAndWait();
         }
-    }
+    }*/
     
      /**
      * Inicializa la clase controller. Este metodo es automaticamente llamado

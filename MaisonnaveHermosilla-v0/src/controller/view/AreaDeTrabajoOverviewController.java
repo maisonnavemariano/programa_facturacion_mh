@@ -41,8 +41,6 @@ public class AreaDeTrabajoOverviewController  {
     @FXML
     private TableColumn<Presupuesto, String> numeroColumn;
     @FXML
-    private TableColumn<Presupuesto, String> fechaColumn;
-    @FXML
     private TableColumn<Presupuesto, String> cuitColumn;
     @FXML
     private TableColumn<Presupuesto, String> denominacionColumn;
@@ -62,13 +60,13 @@ public class AreaDeTrabajoOverviewController  {
     @FXML
     private Label denominacionLabel;
     @FXML
-    private Label fechaLabel;
-    @FXML
     private Label ivaLabel;
     @FXML
     private Label alicuotaLabel;
     @FXML
     private Label montoLabel;
+    @FXML
+    private Label subtotalLabel;
     @FXML
     private RadioButton cuitRadioButton;
     @FXML
@@ -123,7 +121,6 @@ public class AreaDeTrabajoOverviewController  {
             numeroLabel.setText(String.valueOf(presupuesto.getNroPresupuesto()));
             cuitLabel.setText(cliente.getCuit());
             denominacionLabel.setText(cliente.getDenominacion());
-            fechaLabel.setText(presupuesto.getFecha_ARG());
                        
             String ci = cliente.getCondicionIva();
             if(ci.startsWith("RI")){
@@ -162,7 +159,8 @@ public class AreaDeTrabajoOverviewController  {
                 }
             }
             
-            montoLabel.setText(String.valueOf(presupuesto.getMontoTotal()));
+            subtotalLabel.setText(String.valueOf(presupuesto.getSubtotal()));
+            montoLabel.setText(String.valueOf(presupuesto.calcularMontoTotal()));
           
             conceptosTable.setItems(presupuesto.getConceptosObservables());
             conceptoColumn.setCellValueFactory(
@@ -178,9 +176,9 @@ public class AreaDeTrabajoOverviewController  {
         	numeroLabel.setText("");
             cuitLabel.setText("");
             denominacionLabel.setText("");
-            fechaLabel.setText("");
             ivaLabel.setText("");
             alicuotaLabel.setText("");
+            subtotalLabel.setText("");
             montoLabel.setText("");
             conceptosTable.setItems(null);
             
@@ -197,8 +195,6 @@ public class AreaDeTrabajoOverviewController  {
         // Inicializa la tabla de presupuestos con los valores de las 4 columnas.
     	numeroColumn.setCellValueFactory(
     			cellData -> cellData.getValue().NroPresupuestoStringProperty());
-    	fechaColumn.setCellValueFactory(
-    			cellData -> cellData.getValue().fecha_ARGProperty());
         cuitColumn.setCellValueFactory(
                 cellData -> cellData.getValue().getCliente().cuitProperty());
         denominacionColumn.setCellValueFactory(
@@ -217,6 +213,7 @@ public class AreaDeTrabajoOverviewController  {
         conceptosTable.getColumns().forEach(this::addTooltipToColumnCells_Concepto);
         conceptosTable.setPlaceholder(new Label("No hay conceptos."));
         
+          
        
     }
     
@@ -276,7 +273,7 @@ public class AreaDeTrabajoOverviewController  {
                   alert.initOwner(mainApp.getPrimaryStage());
                   alert.setTitle("Efectivizar presupuesto");
                   alert.setHeaderText("Se ha efectivizado el presupuesto nº "+ selectedPresupuesto.NroPresupuestoStringProperty().get());
-                  alert.setContentText("Transacción nº "+ selectedPresupuesto.transaccionStringProperty().get());
+                  alert.setContentText(null);
                   alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                   alert.showAndWait();
               }
@@ -384,7 +381,7 @@ public class AreaDeTrabajoOverviewController  {
                          });
          		    	 }
                          catch(IllegalStateException e){
-                        	System.out.println("El problema esta aca");
+                        	System.out.println("El problema esta en el Efectivizar todos: illegal state exception");
                          }
          		    	return null;
          		    };
@@ -424,7 +421,7 @@ public class AreaDeTrabajoOverviewController  {
      /**
       * LLamado cuando el usuario hace click en el boton Editar. Abre un 
       * diálogo para editar el presupuesto seleccionado.
-      * TODO: terminar metodo: ver que pasa si aprieto ok despues de editar presupuesto.
+      * 
       * (tal vez debo solo mostrar los resultados, al igual que en la vista cliente. en ese caso descomentar)
       */
      @FXML
@@ -532,8 +529,8 @@ public class AreaDeTrabajoOverviewController  {
     	this.alicuotaLabel.setDisable(value);
     	this.cuitLabel.setDisable(value);
     	this.denominacionLabel.setDisable(value);
-    	this.fechaLabel.setDisable(value);
     	this.ivaLabel.setDisable(value);
+    	this.subtotalLabel.setDisable(value);
     	this.montoLabel.setDisable(value);
     	this.numeroLabel.setDisable(value);
     	
@@ -571,7 +568,7 @@ public class AreaDeTrabajoOverviewController  {
  	        // can use arbitrary binding here to make text depend on cell
  	        // in any way you need:
  	        tooltip.textProperty().bind(cell.itemProperty().asString());
-
+ 	       
  	        cell.setTooltip(tooltip);
  	        return cell;
  	    });

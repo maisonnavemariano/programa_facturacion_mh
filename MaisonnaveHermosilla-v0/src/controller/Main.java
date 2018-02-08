@@ -6,15 +6,24 @@ import controller.view.*;
 import controller.db.*;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -117,6 +126,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Maisonnave Hermosilla - Estudio Contable ");
+        this.primaryStage.setMaximized(true);
         //this.primaryStage.getIcons().add(new Image("file:Resources/Images/piggybank.png"));
       
         initRootLayout();
@@ -325,5 +335,71 @@ public class Main extends Application {
         }
     }
     
+    public void handleNuevoPresupuestoVista(){
+    	
+    	//Primero instancio al cliente cuyo presupuesto se fabricará
+    	Cliente cliente;
+    	
+    	//Creo un diálogo con una lista de clientes ordenados por denominación
+    	//para seleccionar el cliente
+    	Dialog<ButtonType> dialog = new Dialog<>();
+    	dialog.setTitle("Nuevo presupuesto");
+    	dialog.setHeaderText(null);
+    	dialog.setResizable(true); //ver por que no me entran los botones
+
+    	Label label1 = new Label("Seleccione un cliente de la lista:");
+    	
+    	//Creo la lista de clientes
+    	ChoiceBox<String> clientesChoiceBox = new ChoiceBox<String>();
+    	ObservableList<String> listaDenominaciones = FXCollections.observableArrayList();
+    	for(Cliente c : this.getClienteData()){
+    		listaDenominaciones.add(c.getDenominacion());
+    	}
+    	clientesChoiceBox.setItems(listaDenominaciones);
+    	
+    	//Agrego listener para que se cargue el cliente seleccionado
+    	clientesChoiceBox.setValue(listaDenominaciones.get(0));
+    	//clientesChoiceBox jhbhbhvgvjgvcj TODO
+    	cliente = this.getClienteData().get(0);
+        
+    	//Creo la grilla de componentes para el dialogo    	
+    	GridPane grid = new GridPane();
+    	grid.add(label1, 1, 1);
+    	grid.add(clientesChoiceBox, 1, 2);
+    	dialog.getDialogPane().setContent(grid);
+    			
+    	//genero los dos botones : generar presupuesto (OK) y cancelar.
+    	ButtonType buttonTypeOk = new ButtonType("Generar presupuesto", ButtonData.OK_DONE);
+    	dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+    	
+    	ButtonType buttonTypeCancel = new ButtonType("Cancelar", ButtonData.CANCEL_CLOSE);
+    	dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
+
+    	Optional<ButtonType> result = dialog.showAndWait();
+    	
+    	//Si el usuario elige Generar Presupuesto
+    	if (result.get() == buttonTypeOk) {
+    		
+    		//Chequeo que el cliente no sea nulo
+    		if (cliente != null){
+    			//genero un presupuesto nuevo para ese cliente por medio del motor de DB
+    			//TODO
+    			//Presupuesto presupuesto = DBMotor.facturarBorrador();
+    			//con ese presupuesto voy a la vista de modificar presupuesto
+    			//this.showModificarPresupuestoOverview(presupuesto);
+    			System.out.println("Hasta ahora todo ok");
+    			
+    		}
+    		//Si el cliente es nulo, le aviso que no puede ser nulo
+    		else{
+    			//TODO: dialog apropiado
+    			//por defecto ya tiene un cliente cargado al arranque, 
+    			//entonces no deberia jamas poder ser nulo 
+    		}
+    	}
+    	else{
+    		//apretó cancelar, no hago nada y cierro
+    	}
+    }
     
 }

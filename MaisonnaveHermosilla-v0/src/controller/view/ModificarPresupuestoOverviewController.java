@@ -1,6 +1,7 @@
 package controller.view;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -12,16 +13,15 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Region;
 import javafx.stage.Stage;
-import javafx.util.Callback;
+import javafx.stage.WindowEvent;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -50,11 +50,11 @@ public class ModificarPresupuestoOverviewController {
     @FXML
     private Label denominacionField;
     @FXML
-    private DatePicker	fechaDatePicker;
-    @FXML
     private Label condicionIvaField;
     @FXML
     private ChoiceBox<String> alicuotaChoiceBox = new ChoiceBox<String>();
+    @FXML
+    private Label subtotalField;
     @FXML
     private Label montoTotalField;
     @FXML
@@ -88,6 +88,16 @@ public class ModificarPresupuestoOverviewController {
         borrarButton.disableProperty().bind(Bindings.isEmpty(conceptosTable.getSelectionModel().getSelectedItems()));
             	
     	conceptosTable.setPlaceholder(new Label("No hay conceptos para mostrar."));
+    	
+    	alicuotaChoiceBox.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                	
+                	newValue = newValue.replace(',','.');
+                	newValue = newValue.replace('%', ' ');
+                	this.montoTotalField.setText(
+                	String.valueOf(recalcularMonto(Double.parseDouble(newValue))));
+
+                });
     }
 
     /**
@@ -97,6 +107,9 @@ public class ModificarPresupuestoOverviewController {
      */
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
+        this.dialogStage.setOnCloseRequest((WindowEvent event1) -> {
+            handleCancelar();
+        });
     }
 
     /**
@@ -111,7 +124,6 @@ public class ModificarPresupuestoOverviewController {
         nroPresupuestoField.setText(String.valueOf(presupuesto.getNroPresupuesto()));
         cuitField.setText(cliente.getCuit());
         denominacionField.setText(cliente.getDenominacion());
-        fechaDatePicker.setValue(pasarLocalDate(presupuesto.getFecha_ARG()));
         String ci = cliente.getCondicionIva();
         if(ci!= null){
         	if(ci.startsWith("RI")){
@@ -149,7 +161,8 @@ public class ModificarPresupuestoOverviewController {
             }
         }
         
-        montoTotalField.setText(String.valueOf(presupuesto.getMontoTotal()));
+        subtotalField.setText(String.valueOf(presupuesto.getSubtotal()));
+        montoTotalField.setText(String.valueOf(recalcularMonto(presupuesto.getAlicuota())));
         
         conceptosTable.setItems(presupuesto.getConceptosObservables());
         conceptoColumn.setCellValueFactory(
@@ -176,50 +189,50 @@ public class ModificarPresupuestoOverviewController {
      */
     @FXML
     private void handleOk() {
-        if (isInputValid()) {
-        	//TODO
-        	Date date = Date.from(fechaDatePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-        	presupuesto.setFecha(date);
-        	
-            String ali = alicuotaChoiceBox.getValue();
-            if(ali!= null){
-            	if(ali.startsWith("0%")){
-            		presupuesto.setAlicuota(0);
-                }
-                else if(ali.startsWith("10,5%")){
-                	presupuesto.setAlicuota((float)10.5);
-                }
-                else if(ali.startsWith("21%")){
-                	presupuesto.setAlicuota((float)21.0);
-                }
+    	       	
+    	//ALICUOTA
+    	String ali = alicuotaChoiceBox.getValue();
+        if(ali!= null){
+            if(ali.startsWith("0%")){
+            	presupuesto.setAlicuota(0);
             }
+            else if(ali.startsWith("10,5%")){
+                presupuesto.setAlicuota((float)10.5);
+            }
+            else if(ali.startsWith("21%")){
+               	presupuesto.setAlicuota((float)21.0);
+            }
+        }
             
-            //TODO: editar conceptos en el objeto presupuesto
-                        
-            Alert alert = new Alert(AlertType.INFORMATION, 
-		  			 "",
-                    ButtonType.OK, 
-                    ButtonType.CANCEL);
-            alert.initOwner(dialogStage);
-            alert.setTitle("Aceptar: Editar presupuesto");
-            alert.setHeaderText("¿Desea guardar los cambios realizados?");
-            alert.setContentText("Pulse Aceptar para guardar los cambios realizados.");
+        //CONCEPTOS: se editan solos en el presupuesto
+        
+        //subtotal: hay que recalcular y setearlo en el presupuesto
+        presupuesto.setSubtotal(recalcularSubtotal());
+        
+        Alert alert = new Alert(AlertType.INFORMATION,
+        		"",
+        		ButtonType.OK, 
+                ButtonType.CANCEL);
+        alert.initOwner(dialogStage);
+        alert.setTitle("Aceptar: Editar presupuesto");
+        alert.setHeaderText("¿Desea guardar los cambios realizados?");
+        alert.setContentText("Pulse Aceptar para guardar los cambios realizados.");
 
 
-            Optional<ButtonType> result = alert.showAndWait();
+        Optional<ButtonType> result = alert.showAndWait();
 
-            if (result.get() == ButtonType.OK) {
-            	 okClicked = true;
-                 /*
-                 //Actualizo el presupuesto en la base de datos
-                 try {
-					DBMotor.editarPresupuesto(presupuesto);
-				} catch (InvalidBudgetException e) {
-					e.printStackTrace();
-					System.out.println("El presupuesto es inválido, y no lo puedo editar.");
-				}*/
-                 dialogStage.close();
-            }
+        if (result.get() == ButtonType.OK) {
+        	okClicked = true;
+            // /*
+            //Actualizo el presupuesto en la base de datos
+            try {
+				DBMotor.editarPresupuesto(presupuesto);
+			} catch (InvalidBudgetException e) {
+				e.printStackTrace();
+				System.out.println("El presupuesto es inválido, y no lo puedo editar.");
+			}
+			// */
+            dialogStage.close();
         }
     }
     
@@ -247,76 +260,6 @@ public class ModificarPresupuestoOverviewController {
     }
 
     
-    /**
-     * Valida las entradas de datos en la pantalla de modificacion del presupuesto.
-     * 
-     * @return true si la entrada es válida
-     * TODO
-     */
-    private boolean isInputValid() {
-       /* String errorMessage = "";
-
-        //Chequeo formato del numero de CUIT ingresado
-        String numeroCuit = cuitField.getText();
-        numeroCuit = numeroCuit.replace("-","");
-        numeroCuit = numeroCuit.replace(".","");
-        boolean cuitIsNumeric = numeroCuit.chars().allMatch( Character::isDigit );
-        
-        if (numeroCuit == null || numeroCuit.length() <= 0) {
-            errorMessage += "El número de CUIT es un campo obligatorio.\n"; 
-        }
-        if(numeroCuit.length() > 11){
-        	errorMessage += "El número de CUIT debe estar formado por 11 dígitos como máximo.\n"; 
-        }
-        if(!cuitIsNumeric){
-        	errorMessage += "Se han ingresado caracteres inválidos en el campo CUIT.\n"; 
-        }
-        if (denominacionField.getText() == null || denominacionField.getText().length() <= 0) {
-            errorMessage += "La denominación de cliente es un campo obligatorio.\n"; 
-        }
-        if(denominacionField.getText().length() > 60){
-        	errorMessage += "La denominación no puede contener más de 60 caracteres.\n";
-        }
-        if (condicionIvaChoiceBox.getValue() == null || condicionIvaChoiceBox.getValue().length() <= 0) {
-            errorMessage += "La condición de IVA del cliente es un campo obligatorio.\n"; 
-        }
-        if (direccionField.getText() != null && direccionField.getText().length() > 100){
-        	errorMessage += "La dirección no puede contener más de 100 caracteres.\n"; 
-        }
-        if (localidadField.getText() != null && localidadField.getText().length() > 45){
-        	errorMessage += "La localidad no puede contener más de 45 caracteres.\n"; 
-        }
-        if (telefonoField.getText() != null && telefonoField.getText().length() > 25){
-        	errorMessage += "El número de teléfono no puede contener más de 25 caracteres.\n"; 
-        }
-        if (correoElectronicoField.getText() != null && correoElectronicoField.getText().length() > 60){
-        	errorMessage += "El correo electrónico no puede contener más de 60 caracteres.\n"; 
-        }
-        
-
-        if (errorMessage.length() == 0) {
-            return true;
-        } else {
-            // Show the error message.
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.initOwner(dialogStage);
-            alert.setTitle("Campos Inválidos");
-            alert.setHeaderText("Por favor, complete correctamente los campos.");
-            alert.setContentText(errorMessage);
-
-            alert.showAndWait();
-
-            return false;
-        }*/
-    	return true;
-    }
-    
-    private static final LocalDate pasarLocalDate (String dateString){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate localDate = LocalDate.parse(dateString, formatter);
-        return localDate;
-    }
-    
     public void handleNuevoConcepto(){
     	
     	Concepto nuevo;
@@ -326,8 +269,8 @@ public class ModificarPresupuestoOverviewController {
     	dialog.setHeaderText(null);
     	dialog.setResizable(true);
 
-    	Label label1 = new Label("Concepto: ");
-    	Label label2 = new Label("Monto: $");
+    	Label label1 = new Label("Descripción: ");
+    	Label label2 = new Label("Importe: $");
     	TextField text1 = new TextField();
     	TextField text2 = new TextField();
     	text1.setPromptText("Nuevo concepto");
@@ -342,7 +285,7 @@ public class ModificarPresupuestoOverviewController {
     	 
      	 
      	 text2.textProperty().addListener((obs, oldText, newText) -> {
-     		 if (newText.matches("\\d+\\.|\\d*(\\.\\d+)?")) {
+     		 if (newText.matches("(\\-)?\\d+\\.|(\\-)?\\d*(\\.\\d+)?")) {
      			 text2.setText(newText);
      		 }
      		 else
@@ -370,17 +313,15 @@ public class ModificarPresupuestoOverviewController {
     		double m;
     		//Chequeo si las cajas de texto quedaron vacías:
     		//en ese caso creo un concepto por default
-    		if (text1.getText()==null || text1.getText()==""){
+    		if (text1.getText().length()==0){
     			cs="Concepto nuevo";
-    			System.out.println("entre aqui cs "+ cs);
     		}
     		else{
     			cs = text1.getText();
     		}
     		
-    		if (text2.getText()==null || text2.getText()==""){
+    		if (text2.getText().length()==0){
     			m=0.0;
-    			System.out.println("entre aqui monto " + m);
     		}
     		else{
     			m = Double.parseDouble(text2.getText());
@@ -390,7 +331,14 @@ public class ModificarPresupuestoOverviewController {
             nuevo = new Concepto(cs, m);
             //agrego el concepto nuevo a la lista de conceptos del presupuesto
             presupuesto.getConceptos().add(nuevo);
-            //System.out.println(nuevo);
+            
+            //Recalculo el subtotal con el nuevo concepto
+            presupuesto.setSubtotal(recalcularSubtotal());
+            
+            //seteo nuevo valor en los label
+            this.subtotalField.setText(String.valueOf(presupuesto.getSubtotal()));
+            this.montoTotalField.setText(String.valueOf(recalcularMonto(presupuesto.getAlicuota())));
+          
             //Actualizo contenido tabla en la vista
        	 	conceptosTable.setItems(presupuesto.getConceptosObservables());
         	
@@ -398,8 +346,6 @@ public class ModificarPresupuestoOverviewController {
          else{
         	 //No hago nada y cierro
          }
-    	
-    	
     }
     
     public void handleEditarConcepto(){
@@ -411,23 +357,30 @@ public class ModificarPresupuestoOverviewController {
     	dialog.setHeaderText(null);
     	dialog.setResizable(true);
 
-    	Label label1 = new Label("Concepto: ");
-    	Label label2 = new Label("Monto: $");
+    	Label label1 = new Label("Descripción: ");
+    	Label label2 = new Label("Importe: $");
     	TextField text1 = new TextField(concepto.getConcepto());
     	TextField text2 = new TextField(String.valueOf(concepto.getMonto()));
-    	
-    	 text1.textProperty().addListener((obs, oldText, newText) -> {
-            if (oldText.length() < 150 && newText.length() >= 150) {
-                     text2.requestFocus();
-            }
-         });
-    	 
-    	 text2.textProperty().addListener((obs, oldText, newText) -> {
-    		 if (!newText.matches("\\d+\\.|\\d+(\\.\\d+)?")) {
-    			 text2.setText(newText.replaceAll("[^\\d]", ""));//("[^\\d]", ""));
-    		 }
-    	 });
+    	text1.setPromptText("Editar concepto");
+    	text2.setPromptText("0.0");
     			
+    	//Validacion de campos
+    	 text1.textProperty().addListener((obs, oldText, newText) -> {
+             if (oldText.length() < 150 && newText.length() >= 150) {
+                      text2.requestFocus();
+             }
+          });
+    	 
+     	 
+     	 text2.textProperty().addListener((obs, oldText, newText) -> {
+     		 if (newText.matches("(\\-)?\\d+\\.|(\\-)?\\d*(\\.\\d+)?")) {
+     			 text2.setText(newText);
+     		 }
+     		 else
+     			 text2.setText(oldText);
+     		 
+     	 });
+    	    			
     	GridPane grid = new GridPane();
     	grid.add(label1, 1, 1);
     	grid.add(text1, 2, 1);
@@ -444,16 +397,40 @@ public class ModificarPresupuestoOverviewController {
     	Optional<ButtonType> result = dialog.showAndWait();
     	
     	if (result.get() == buttonTypeOk) {
+    		String cs;
+    		double m;
+    		//Chequeo si las cajas de texto quedaron vacías:
+    		//en ese caso creo un concepto por default
+    		if (text1.getText().length()==0){
+    			cs="Concepto nuevo";
+    		}
+    		else{
+    			cs = text1.getText();
+    		}
+    		
+    		if (text2.getText().length()==0){
+    			m=0.0;
+    		}
+    		else{
+    			m = Double.parseDouble(text2.getText());
+    		}
+    		
+    		//Creo nuevo concepto con los datos ingresados
+            Concepto nuevo = new Concepto(cs, m);
+           
     		//borro el concepto viejo de la lista
     		presupuesto.getConceptos().remove(concepto);
     		
-    		//cambio los parametros del concepto
-    		double m = Double.parseDouble(text2.getText());
-        	Concepto nuevo = new Concepto(text1.getText(),m);
-        	
         	//agrego el concepto nuevo a la lista de nuevo
         	presupuesto.getConceptos().add(nuevo);
-    		
+        	
+        	//recalculo el monto con el concepto nuevo
+       	 	presupuesto.setSubtotal(recalcularSubtotal());
+       	 	
+       	 	//seteo nuevo valor en su label
+       	 	this.subtotalField.setText(String.valueOf(presupuesto.getSubtotal()));
+            this.montoTotalField.setText(String.valueOf(recalcularMonto(presupuesto.getAlicuota())));
+        	
             //Actualizo contenido tabla en la vista
        	 	conceptosTable.setItems(presupuesto.getConceptosObservables());
         	
@@ -494,6 +471,14 @@ public class ModificarPresupuestoOverviewController {
              if (result.get() == ButtonType.YES) {
             	 //Elimino el concepto de la lista de conceptos del presupuesto
             	 presupuesto.getConceptos().remove(selectedConcepto);
+            	 
+            	 //Recalculo el monto sin el concepto eliminado
+            	 presupuesto.setSubtotal(recalcularSubtotal());
+            	 
+            	//seteo nuevo valor en su label
+            	 this.subtotalField.setText(String.valueOf(presupuesto.getSubtotal()));
+                 this.montoTotalField.setText(String.valueOf(recalcularMonto(presupuesto.getAlicuota())));
+             	                 
             	 //Actualizo contenido tabla en la vista
             	 conceptosTable.setItems(presupuesto.getConceptosObservables());
                 
@@ -514,6 +499,22 @@ public class ModificarPresupuestoOverviewController {
             alert.showAndWait();
         }
     }
+    
+    private double  recalcularMonto(double ali){
 
-   
+        double monto_calculado = recalcularSubtotal();
+        monto_calculado = monto_calculado * (1.0 + ali/100);
+        monto_calculado = Math.round(monto_calculado * 20.0) / 20.0;
+        return monto_calculado;
+    }
+    
+    private double recalcularSubtotal(){
+    	double monto_calculado = 0;
+        for(Concepto c : presupuesto.getConceptos()){
+        	monto_calculado= monto_calculado + c.getMonto();
+        }
+        return monto_calculado;
+    }
+
+    
 }

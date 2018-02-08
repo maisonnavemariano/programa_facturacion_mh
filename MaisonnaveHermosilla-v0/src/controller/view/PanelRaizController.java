@@ -29,13 +29,20 @@ public class PanelRaizController {
     /*---------------------------MENU CLIENTES---------------------------*/
 
     /**
-     * Funcionalidad menú Ver clientes
+     * Funcionalidad menú Administrar Clientes
      */
     @FXML
     private void handleAdministrarClientes() {
-    	
     	mainApp.showClienteVista();
     	
+    }
+    
+    /**
+     * Funcionalidad menú Eliminar cliente
+     */
+    @FXML
+    private void handleEliminarCliente() {
+    	    	
     }
     
    
@@ -43,13 +50,35 @@ public class PanelRaizController {
     /*---------------------------MENU PRESUPUESTOS---------------------------*/
     
     /**
-     * Funcionalidad menú Generar Presupuestos mensuales
-     * TODO: ver si le cambio el nombre a este menu y a su controllers
-     * TODO: IMPLEMENTAR, ESTE VA A SER UN QUILOMBO.
+     * Funcionalidad menú Ver presupuestos
+     * TODO
      */
     @FXML
-    private void handleGenerarPresupuestosMensuales() {    	
+    private void handleVerPresupuestos() {   
+    	
     }
+    
+    /**
+     * Funcionalidad menú Nuevo Presupuesto
+     * TODO
+     */
+    @FXML
+    private void handleNuevoPresupuesto() {  
+    	
+    	mainApp.handleNuevoPresupuestoVista();
+    	
+    }
+    
+    /**
+     * Funcionalidad menú Anular presupuestos
+     * TODO
+     */
+    @FXML
+    private void handleAnularPresupuesto() {   
+    	
+    }
+    
+    /*---------------------------MENU AREA DE TRABAJO---------------------------*/
     
     /**
      * Funcionalidad menú Area de trabajo
@@ -62,16 +91,6 @@ public class PanelRaizController {
     	
     }
     
-    /**
-     * Funcionalidad menú Buscar Presupuestos
-     * TODO: ver si le cambio el nombre a este menu y sus controllers
-     */
-    @FXML
-    private void handleBuscarPresupuestos() {
-    	
-    	mainApp.showBuscarPresupuestosVista();
-    	
-    }
     
     /*-----------------------MENU CUENTAS CORRIENTES-----------------------*/
     

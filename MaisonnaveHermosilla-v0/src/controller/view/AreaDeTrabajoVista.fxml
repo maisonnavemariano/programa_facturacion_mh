@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
@@ -13,11 +14,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.view.AreaDeTrabajoOverviewController">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.view.AreaDeTrabajoOverviewController">
    <children>
-      <SplitPane dividerPositions="0.0963855421686747" orientation="VERTICAL" prefHeight="500.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.09036144578313253" orientation="VERTICAL" prefHeight="500.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane maxHeight="78.0" minHeight="30.0" prefHeight="78.0" prefWidth="798.0" stylesheets="@DarkTheme.css">
+          <AnchorPane maxHeight="40.0" minHeight="40.0" prefHeight="40.0" prefWidth="798.0" stylesheets="@DarkTheme.css">
                <children>
                   <Label layoutX="14.0" layoutY="14.0" text="Buscar por:" />
                   <RadioButton fx:id="cuitRadioButton" layoutX="112.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleCuitRadioButton" selected="true" text="CUIT">
@@ -34,18 +35,18 @@
                      </font>
                   </RadioButton>
                   <TextField fx:id="busquedaTextField" layoutX="326.0" layoutY="6.0" onKeyReleased="#handleSearch" />
+                  <Button layoutX="548.0" layoutY="9.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="242.0" text="Generar presupuestos mensuales" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="9.0" />
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
                   <SplitPane dividerPositions="0.5703517587939698" prefHeight="446.0" prefWidth="798.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="270.0" prefWidth="450.0">
+                      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="750.0" minHeight="270.0" minWidth="450.0" prefHeight="270.0" prefWidth="750.0">
                            <children>
                               <TableView fx:id="presupuestosTable" layoutX="-26.0" layoutY="14.0" prefHeight="396.0" prefWidth="450.0" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <columns>
                                   <TableColumn fx:id="numeroColumn" editable="false" maxWidth="200.0" minWidth="-Infinity" prefWidth="62.0" text="Nº" />
-                                    <TableColumn fx:id="fechaColumn" editable="false" maxWidth="250.0" minWidth="-Infinity" prefWidth="79.0" text="Fecha" />
                                   <TableColumn fx:id="cuitColumn" editable="false" maxWidth="250.0" minWidth="-Infinity" prefWidth="117.0" text="CUIT" />
                                     <TableColumn fx:id="denominacionColumn" editable="false" maxWidth="400.0" minWidth="-Infinity" prefWidth="220.0" text="Denominación" />
                                 </columns>
@@ -53,8 +54,9 @@
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
                               </TableView>
-                              <Button fx:id="efectivizarTodos" layoutX="164.0" layoutY="410.0" mnemonicParsing="false" onAction="#handleEfectivizarTodos" text="Efectivizar Todo" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="50.0" />
-                              <ProgressBar fx:id="barraProgreso" layoutX="209.0" layoutY="413.0" prefWidth="200.0" progress="0.0" AnchorPane.bottomAnchor="11.0" />
+                              <Button fx:id="efectivizarTodos" layoutX="198.0" layoutY="814.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleEfectivizarTodos" prefHeight="26.0" prefWidth="128.0" text="Efectivizar Todo" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="168.0" />
+                              <ProgressBar fx:id="barraProgreso" layoutX="343.0" layoutY="817.0" prefWidth="200.0" progress="0.0" AnchorPane.bottomAnchor="11.0" AnchorPane.leftAnchor="316.0" AnchorPane.rightAnchor="30.0" />
+                              <Button fx:id="efectivizarTodos1" layoutX="52.0" layoutY="814.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleEfectivizarTodos" prefHeight="26.0" prefWidth="118.0" text="Descartar Todo" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="30.0" />
                            </children>
                         </AnchorPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="444.0" prefWidth="319.0" stylesheets="@DarkTheme.css">
@@ -63,37 +65,41 @@
                                  <font>
                                     <Font size="18.0" />
                                  </font></Label>
-                              <Label layoutX="15.0" layoutY="47.0" text="Nº" AnchorPane.leftAnchor="15.0" />
-                              <Label layoutX="149.0" layoutY="47.0" text="CUIT" />
-                              <Label layoutX="15.0" layoutY="79.0" text="Denominación" AnchorPane.leftAnchor="15.0" />
-                              <Label layoutX="15.0" layoutY="112.0" text="Fecha" AnchorPane.leftAnchor="15.0" />
-                              <Label layoutX="20.0" layoutY="145.0" text="IVA" AnchorPane.leftAnchor="15.0" />
-                              <Label layoutX="217.0" layoutY="145.0" text="Alicuota" />
-                              <Label layoutX="15.0" layoutY="180.0" text="Monto Total" AnchorPane.leftAnchor="15.0" />
-                              <Label layoutX="17.0" layoutY="214.0" text="Conceptos" AnchorPane.leftAnchor="17.0" AnchorPane.topAnchor="214.0" />
-                              <Label fx:id="numeroLabel" layoutX="37.0" layoutY="47.0" text="numero" />
+                              <Label layoutX="15.0" layoutY="47.0" text="Nº: " AnchorPane.leftAnchor="15.0" />
+                              <Label layoutX="149.0" layoutY="47.0" text="CUIT:" />
+                              <Label layoutX="15.0" layoutY="79.0" text="Denominación:" AnchorPane.leftAnchor="15.0" />
+                              <Label layoutX="14.0" layoutY="114.0" text="IVA:" AnchorPane.leftAnchor="14.0" />
+                              <Label layoutX="220.0" layoutY="114.0" text="Alicuota:" AnchorPane.leftAnchor="220.0" />
+                              <Label layoutX="14.0" layoutY="149.0" text="Subtotal: $" AnchorPane.leftAnchor="14.0" />
+                              <Label layoutX="16.0" layoutY="183.0" text="Conceptos:" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="183.0" />
+                              <Label fx:id="numeroLabel" layoutX="44.0" layoutY="47.0" text="numero" />
                               <Label fx:id="cuitLabel" layoutX="192.0" layoutY="47.0" text="cuit" />
                               <Label fx:id="denominacionLabel" layoutX="124.0" layoutY="79.0" text="denominacion" />
-                              <Label fx:id="fechaLabel" layoutX="62.0" layoutY="112.0" text="fecha" />
-                              <Label fx:id="ivaLabel" layoutX="44.0" layoutY="145.0" text="iva" />
-                              <Label fx:id="alicuotaLabel" layoutX="282.0" layoutY="145.0" text="ali" />
-                              <Label fx:id="montoLabel" layoutX="99.0" layoutY="180.0" text="monto" />
-                              <ButtonBar buttonMinWidth="60.0" layoutY="218.0" prefHeight="40.0" prefWidth="328.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="10.0">
+                              <Label fx:id="ivaLabel" layoutX="43.0" layoutY="114.0" text="iva" />
+                              <Label fx:id="alicuotaLabel" layoutX="284.0" layoutY="114.0" text="ali" />
+                              <Label fx:id="subtotalLabel" layoutX="86.0" layoutY="149.0" text="monto" />
+                              <ButtonBar buttonMinWidth="60.0" layoutY="218.0" prefHeight="40.0" prefWidth="538.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                 <buttons>
-                                  <Button fx:id="editar" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEditarPresupuesto" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Editar" />
-                                    <Button fx:id="efectivizarUno" layoutX="125.0" layoutY="17.0" maxWidth="113.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEfectivizarUno" prefHeight="26.0" text="Efectivizar" />
+                                    <Button fx:id="editar1" layoutX="192.0" layoutY="17.0" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEditarPresupuesto" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Editar" />
                                     <Button fx:id="vistaPrevia" layoutX="101.0" layoutY="17.0" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleVistaPrevia" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Vista Previa" />
+                                  <Button fx:id="descartar" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Descartar" />
+                                    <Button fx:id="efectivizarUno" layoutX="125.0" layoutY="17.0" maxWidth="113.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEfectivizarUno" prefHeight="26.0" text="Efectivizar" />
                                 </buttons>
+                                 <padding>
+                                    <Insets right="40.0" />
+                                 </padding>
                               </ButtonBar>
-                              <TableView fx:id="conceptosTable" layoutX="20.0" layoutY="244.0" prefHeight="151.0" prefWidth="300.0" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="17.0" AnchorPane.rightAnchor="23.0" AnchorPane.topAnchor="244.0">
+                              <TableView fx:id="conceptosTable" layoutX="20.0" layoutY="208.0" prefHeight="188.0" prefWidth="298.0" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="17.0" AnchorPane.rightAnchor="23.0" AnchorPane.topAnchor="208.0">
                                 <columns>
-                                  <TableColumn fx:id="conceptoColumn" editable="false" minWidth="-Infinity" prefWidth="220.0" text="Concepto" />
-                                  <TableColumn fx:id="montoConceptoColumn" editable="false" maxWidth="2000.0" minWidth="-Infinity" prefWidth="90.0" text="Monto" />
+                                  <TableColumn fx:id="conceptoColumn" editable="false" minWidth="-Infinity" prefWidth="220.0" text="Descripción" />
+                                  <TableColumn fx:id="montoConceptoColumn" editable="false" maxWidth="2000.0" minWidth="-Infinity" prefWidth="90.0" text="Importe" />
                                 </columns>
                                  <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
                               </TableView>
+                              <Label layoutX="170.0" layoutY="149.0" text="Monto total: $" AnchorPane.leftAnchor="170.0" />
+                              <Label fx:id="montoLabel" layoutX="260.0" layoutY="149.0" text="monto" />
                            </children>
                         </AnchorPane>
                     </items>

@@ -4,11 +4,13 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.Region;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.util.Optional;
 
@@ -42,10 +44,8 @@ public class NuevoClienteOverviewController {
     private RadioButton	SI_habilitadoRadioButton;
     @FXML
     private RadioButton NO_habilitadoRadioButton;
+ 
     
-//    private String[] posiblesCondicionesIva = {"Responsable Inscripto","Monotributista","Exento","No Responsable","Consumidor Final"};
-
-
     private Stage dialogStage;
     private Cliente cliente;
     private boolean okClicked = false;
@@ -58,6 +58,56 @@ public class NuevoClienteOverviewController {
      */
     @FXML
     private void initialize() {
+    	
+    	//Validacion de campos: longitudes máximas
+   	 	this.cuitField.textProperty().addListener((obs, oldText, newText) -> {
+            if (oldText.length() < 11 && newText.length() >= 11) {
+                     this.denominacionField.requestFocus();
+            }
+         });
+    	 
+    	this.denominacionField.textProperty().addListener((obs, oldText, newText) -> {
+    		if (oldText.length() < 60 && newText.length() >= 60) {
+                this.direccionField.requestFocus();
+    		}
+    	 });
+    	
+    	this.direccionField.textProperty().addListener((obs, oldText, newText) -> {
+    		if (oldText.length() < 100 && newText.length() >= 100) {
+                this.localidadField.requestFocus();
+    		}
+    	 });
+    	
+    	this.localidadField.textProperty().addListener((obs, oldText, newText) -> {
+    		if (oldText.length() < 45 && newText.length() >= 45) {
+                this.telefonoField.requestFocus();
+    		}
+    	 });
+    	
+    	this.telefonoField.textProperty().addListener((obs, oldText, newText) -> {
+    		if (oldText.length() < 25 && newText.length() >= 25) {
+                this.correoElectronicoField.requestFocus();
+    		}
+    	 });
+    	
+    	this.correoElectronicoField.textProperty().addListener((obs, oldText, newText) -> {
+    		if (oldText.length() < 60 && newText.length() >= 60) {
+                this.condicionIvaChoiceBox.requestFocus();
+    		}
+    	 });
+    	
+    	//Validacion de campos: formato
+    	 
+    	
+    	cuitField.textProperty().addListener((obs, oldText, newText) -> {
+    		   		
+    		 if (newText.matches("\\d*")) {
+    			 cuitField.setText(newText);
+    		 }
+    		 else
+    			 cuitField.setText(oldText);
+    		 
+    	 });    
     }
 
     /**
@@ -67,6 +117,9 @@ public class NuevoClienteOverviewController {
      */
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
+        this.dialogStage.setOnCloseRequest((WindowEvent event1) -> {
+            handleCancelar();
+        });
     }
 
     /**
@@ -77,46 +130,21 @@ public class NuevoClienteOverviewController {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
 
-        cuitField.setText(cliente.getCuit());
-        denominacionField.setText(cliente.getDenominacion());
-        direccionField.setText(cliente.getDireccion());
-        localidadField.setText(cliente.getLocalidad());
-        telefonoField.setText(cliente.getTelefono());
-        correoElectronicoField.setText(cliente.getCorreoElectronico());
+        cuitField.setText("");
+        denominacionField.setText("");
+        direccionField.setText("");
+        localidadField.setText("");
+        telefonoField.setText("");
+        correoElectronicoField.setText("");
         
-        String hab = cliente.getHabilitado();
-        if (hab.startsWith("N")){
-       	 	SI_habilitadoRadioButton.setSelected(false);
-       	 	NO_habilitadoRadioButton.setSelected(true);
-        }
-        else{ //valor por defecto: habilitado SI
-       	 	SI_habilitadoRadioButton.setSelected(true);
-       	 	NO_habilitadoRadioButton.setSelected(false);
-        }
-        	
+        //valor por defecto: habilitado SI
+       	SI_habilitadoRadioButton.setSelected(true);
+       	NO_habilitadoRadioButton.setSelected(false);
+        
         condicionIvaChoiceBox.setItems(FXCollections.observableArrayList("Responsable Inscripto","Monotributista","Exento","No Responsable","Consumidor Final"));
-       
-        String ci = cliente.getCondicionIva();
-        if(ci!= null){
-        	if(ci.startsWith("RI")){
-            	condicionIvaChoiceBox.setValue("Responsable Inscripto");
-            }
-            else if(ci.startsWith("EX")){
-            	condicionIvaChoiceBox.setValue("Exento");
-            }
-            else if(ci.startsWith("MO")){
-            	condicionIvaChoiceBox.setValue("Monotributista");
-            }
-            else if(ci.startsWith("NR")){
-            	condicionIvaChoiceBox.setValue("No Responsable");
-            }
-            else if(ci.startsWith("CF")){
-            	condicionIvaChoiceBox.setValue("Consumidor Final");
-            }
-            else{
-            	condicionIvaChoiceBox.setValue("");
-            }
-        }
+        //valor por defecto: Responsable inscripto
+        condicionIvaChoiceBox.setValue("Responsable Inscripto");
+        
         
     }
 
@@ -134,12 +162,30 @@ public class NuevoClienteOverviewController {
      */
     @FXML
     private void handleOk() {
-        if (isInputValid()) {
-            String numeroCuit = cuitField.getText();
-            numeroCuit = numeroCuit.replace("-","");
-            numeroCuit = numeroCuit.replace(".","");
-            cliente.setCuit(numeroCuit);
-            cliente.setDenominacion(denominacionField.getText());
+    	
+    	//Primero recupero los tres campos obligatorios
+    	String cuit_valor = cuitField.getText();
+    	String denominacion_valor = denominacionField.getText();
+    	String iva_valor = condicionIvaChoiceBox.getValue();
+    	
+    	//Si faltan campos obligatorios mostrar alerta
+    	if (cuit_valor == null || cuit_valor.length() <=0 
+    		|| denominacion_valor == null || denominacion_valor.length() <=0
+    		|| iva_valor == null || iva_valor.length() <=0){
+    		
+    	    Alert alert = new Alert(AlertType.ERROR);
+            alert.initOwner(dialogStage);
+            alert.setTitle("Campos obligatorios");
+            alert.setHeaderText(null);
+            alert.setContentText("Por favor, complete los campos obligatorios (*).");
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            alert.showAndWait();
+    		
+    	}
+    	
+    	else{
+    	    cliente.setCuit(cuit_valor);
+            cliente.setDenominacion(denominacion_valor);
             cliente.setDireccion(direccionField.getText());
             cliente.setLocalidad(localidadField.getText());
             cliente.setTelefono(telefonoField.getText());
@@ -179,20 +225,20 @@ public class NuevoClienteOverviewController {
             alert.initOwner(dialogStage);
             alert.setTitle("Aceptar: Nuevo cliente");
             alert.setHeaderText("¿Desea guardar los cambios realizados?");
-            alert.setContentText("Pulse Aceptar para guardar los cambios realizados.");
-
+            //alert.setContentText("Pulse Aceptar para guardar los cambios realizados.");
 
             Optional<ButtonType> result = alert.showAndWait();
 
             if (result.get() == ButtonType.OK) {
             	 okClicked = true;
-                 //System.out.println(cliente.getCondicionIva());
                  //Actualizo el cliente en la base de datos
                  DBMotor.agregarCliente(cliente);
                  dialogStage.close();
             }
+            
         }
     }
+    
 
     /**
      * LLamado cuando el usuario presiona el botón Cancelar
@@ -221,28 +267,32 @@ public class NuevoClienteOverviewController {
      * 
      * @return true si la entrada es válida
      */
-    private boolean isInputValid() {
+   /* private boolean isInputValid() {
         String errorMessage = "";
 
         //Chequeo formato del numero de CUIT ingresado
         String numeroCuit = cuitField.getText();
-        numeroCuit = numeroCuit.replace("-","");
-        numeroCuit = numeroCuit.replace(".","");
-        boolean cuitIsNumeric = numeroCuit.chars().allMatch( Character::isDigit );
-        
+                
         if (numeroCuit == null || numeroCuit.length() <= 0) {
             errorMessage += "El número de CUIT es un campo obligatorio.\n"; 
         }
-        if(numeroCuit.length() > 11){
-        	errorMessage += "El número de CUIT debe estar formado por 11 dígitos como máximo.\n"; 
-        }
-        if(!cuitIsNumeric){
-        	errorMessage += "Se han ingresado caracteres inválidos en el campo CUIT.\n"; 
+        else{
+        	 //aca chequear si no es nulo primero!!!
+            numeroCuit = numeroCuit.replace("-","");
+            numeroCuit = numeroCuit.replace(".","");
+            boolean cuitIsNumeric = numeroCuit.chars().allMatch( Character::isDigit );
+            
+            if(numeroCuit.length() > 11){
+            	errorMessage += "El número de CUIT debe estar formado por 11 dígitos como máximo.\n"; 
+            }
+            if(!cuitIsNumeric){
+            	errorMessage += "Se han ingresado caracteres inválidos en el campo CUIT.\n"; 
+            }
         }
         if (denominacionField.getText() == null || denominacionField.getText().length() <= 0) {
             errorMessage += "La denominación de cliente es un campo obligatorio.\n"; 
         }
-        if (denominacionField.getText().length() > 60){
+        else if (denominacionField.getText().length() > 60){
         	errorMessage += "La denominación no puede contener más de 60 caracteres.\n";
         }
         if (condicionIvaChoiceBox.getValue() == null || condicionIvaChoiceBox.getValue().length() <= 0) {
@@ -265,16 +315,9 @@ public class NuevoClienteOverviewController {
         if (errorMessage.length() == 0) {
             return true;
         } else {
-            // Show the error message.
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.initOwner(dialogStage);
-            alert.setTitle("Campos Inválidos");
-            alert.setHeaderText("Por favor, complete correctamente los campos.");
-            alert.setContentText(errorMessage);
-
-            alert.showAndWait();
+            
 
             return false;
         }
-    }
+    }*/
 }
