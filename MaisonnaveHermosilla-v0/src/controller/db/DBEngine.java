@@ -326,6 +326,62 @@ public class DBEngine {
 	//     ** ** ** **                                    PRESUPUESTOS                                              ** ** ** **
 	// ==================================================================================================================================
 	
+	public void eliminarNoEfectivo(Presupuesto p) throws InvalidBudgetException {
+		if (!p.hasValidNumber())
+			throw new InvalidBudgetException("El presupuesto no existe en la base de datos");
+		if (p.getEfectivo())
+			throw new InvalidBudgetException("Para eliminar un presupuesto tiene que ser no efectivo.");
+		int nro_presu = p.getNroPresupuesto();
+		// * * * ELIMINAMOS EL PRESUPUESTO DE LA TABLA DE PRESUPUESTOS * * * 	
+		try {
+			String query = "DELETE FROM Presupuesto WHERE Nro_Presupuesto = ?";
+			PreparedStatement preparedStmt;
+			preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setInt(1, nro_presu);
+			preparedStmt.execute();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	public void desefectivizar(Presupuesto p) throws InvalidBudgetException {
+		if ((!p.hasValidNumber()) || !(p.getEfectivo()) )
+			throw new InvalidBudgetException("Presupuesto no existente en base de datos, o no ha sido efectivizado aún.");
+		
+		int nro_transaccion = p.getNroTransaccion();
+		int nro_presupuesto = p.getNroPresupuesto();
+		
+		double monto_a_restar = p.calcularMontoTotal();
+		
+		double estado_cta_corriente;
+		try {
+			// * * * ACTUALIZAMOS CUENTA CORRIENTE * * * 
+			estado_cta_corriente = this.obtenerEstadoCuentaCorriente(p.getCliente());
+			this.actualizarEstadoCuentaCorriente(p.getCliente(), estado_cta_corriente+monto_a_restar);
+			
+			// * * * ELIMINAMOS TRANSACCION DE TABLA DE TRANSACCIONES * * * 		
+			String query = "DELETE FROM Transaccion WHERE Nro_Transaccion = ?";
+			PreparedStatement preparedStmt;
+			preparedStmt = conn.prepareStatement(query);
+			preparedStmt.setInt(1, nro_transaccion);
+			preparedStmt.execute();
+				
+				
+			// * * * MARCAMOS PRESUPUESTO COMO NO EFECTIVO. * * * 
+			query = "UPDATE Presupuesto SET Efectivo = 'N' WHERE Nro_Presupuesto = ? "; // lo hacemos no efectivo
+			PreparedStatement pt;
+			pt = conn.prepareStatement(query);
+			pt.setInt(1, nro_presupuesto);
+			pt.execute();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		} catch (InvalidClientException e) {
+			// No debería entrar acá
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	/**
 	 * Método que recibe un nro_presupuesto y consulta a la base de datos por el presupuesto que se corresponde con dicho numero. Como el número es único en la base de datos, solo retorna uno, o ninguno (null) si 
 	 * no existe tal presupuesto. 
@@ -724,6 +780,9 @@ public class DBEngine {
 		float montoTotal = 0;
 		for (Concepto c: ultimo.getConceptos())
 			montoTotal += c.getMonto();
+		// El presupuesto se guarda con una fecha por default que es la fecha del borrador, pero al efectivizarse se cambia
+		// por la fecha de efectivización, la vista no debería mostrar la fecha de un presupuesto borrador porque no es la
+		// fecha que quedará, la que queda es la del día de efectivización.
 		Presupuesto nuevo = new Presupuesto(ultimo.getConceptos()	,cliente ,false, ultimo.getAlicuota(),montoTotal, Calendar.getInstance().getTime()) ; 
 		this.agregarPresupuesto(nuevo);
 		return nuevo;
@@ -788,7 +847,7 @@ public class DBEngine {
 		if (!p.hasValidNumber())
 			throw new InvalidBudgetException("Presupuesto no creado en base de datos.");
 
-		double montoTotal = p.getSubtotal() * (1 + (p.getAlicuota()/100.0));
+		double montoTotal = p.calcularMontoTotal();
 		// proceso de actualizar las cuentas corrientes.
 		Transaccion t = null;
 		boolean efectivo = false;
@@ -851,19 +910,25 @@ public class DBEngine {
 				e.printStackTrace();
 			}
 			
+			p.setFecha(Calendar.getInstance().getTime()); // Ponemos la fecha en que se efectivizo en el objeto y posteriormente
+															// la corregimos en la base de datos
 			//HACEMOS EFECTIVO EL PRESU EN LA BASE DE DATOS
-			query = "UPDATE Presupuesto SET Efectivo = 'S' WHERE Nro_Presupuesto = ? ";
+			query = "UPDATE Presupuesto SET Efectivo = 'S', Fecha = ? WHERE Nro_Presupuesto = ? "; // lo hacemos efectivo
+																									// y colocamos la fecha
+																									//de efectivizacion
 			PreparedStatement pt;
 			
 			try {
 				pt = conn.prepareStatement(query);
-				pt.setInt(1, p.getNroPresupuesto());
+				pt.setString(1, p.getFecha());
+				pt.setInt(2, p.getNroPresupuesto());
 				pt.execute();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			// HACEMOS EFECTIVO EL PRESU EN EL OBJETO
+		
 			p.setEfectivo(true);		
 		}
 		return (efectivo? t : null);//devolvemos la transaccion solo si la logramos guardar en la base de datos
