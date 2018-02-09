@@ -11,14 +11,18 @@ import java.io.IOException;
 import java.util.Optional;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Alert;
@@ -304,7 +308,10 @@ public class Main extends Application {
     }
     
     /** 
-     * 
+     * Muestra al usuario para modificar un presupuesto determinado. 
+     * Si el método es invocado desde la clase Main (en el curso de confección
+     * de un nuevo presupuesto individual), le da opción al usuario de efectivizar
+     * el presupuesto indicado.
      * 
      */
     public boolean showModificarPresupuestoOverview(Presupuesto presupuesto, Object propietario){
@@ -338,6 +345,12 @@ public class Main extends Application {
         }
     }
     
+    /**
+     * Muestra un dialogo para elegir a que cliente realizarle el presupuesto
+     * y luego la vista para editar dicho presupuesto. Por último, consulta
+     * al usuario por si quiere efectivizar el presupuesto.
+     * 
+     */
     public void handleNuevoPresupuestoVista(){
     	
     	//Primero instancio al cliente cuyo presupuesto se fabricará
@@ -429,5 +442,103 @@ public class Main extends Application {
     	}
     }
   
-    
+    /**
+     * Permite al usuario realizar la facturación en borrador para todo los clientes
+     * habilitados, si y solo si no existe actualmente ningún presupuesto no efectivo 
+     * en la DB.
+     * 
+     */
+    public void handleGenerarPresupuestosMensuales(){
+    	
+    	//Primero, pregunto si ya hay no efectivos en la DB
+    	boolean noHay = (DBMotor.obtenerPresupuestosNoEfectivos().size() == 0);
+    	//Si no hay no efectivos, procedo con el método.
+    	if (noHay){
+    		//Creo una alerta para pedir confirmacion
+    		Alert alert = new Alert(AlertType.CONFIRMATION, 
+		  			 "",
+                   ButtonType.OK,
+                   ButtonType.CANCEL);
+             alert.initOwner(this.getPrimaryStage());
+             alert.setTitle("Generar presupuestos mensuales");
+             alert.setHeaderText("¿Desea generar nuevos presupuestos para los clientes habilitados?");
+             alert.setContentText("Puede ver y editar dichos presupuestos en el menú Área de Trabajo.");
+             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+             Optional<ButtonType> result = alert.showAndWait();
+             
+             //Si el usuario elige Generar Presupuestos mensuales = OK
+         	 if (result.get() == ButtonType.OK) {
+         		 
+         		//Primero averiguo cuantos presupuestos debo generar
+         		int cantidad = DBMotor.cantidadClientesHabilitados();
+         		 
+         		//Generar alert con la barra de progreso 
+         		//Creo la barra de progreso
+          		ProgressBar barraProgreso = new ProgressBar();
+          		barraProgreso.progressProperty().unbind();
+          		barraProgreso.progressProperty().set(0);
+          		
+          		//Creo el dialogo que la va a mostrar
+          		Dialog<ButtonType> dialog = new Dialog<>();
+             	dialog.setTitle("Generando "+cantidad+" presupuestos mensuales...");
+             	dialog.setHeaderText("Operación en proceso. Por favor, aguarde unos instantes.");
+             	dialog.setResizable(true);
+             	
+             	//Creo un grid para insertar la barra y la inserto
+               	GridPane grid = new GridPane();
+             	grid.add(barraProgreso, 1, 1);
+          		
+             	//Luego pongo el grid en el dialogo
+             	dialog.getDialogPane().setContent(grid);
+         		 
+         		//Creo el task para actualizar la barra de progreso
+             	Task<Void> task_barra = new Task<Void>() {
+         		    @Override
+         		    protected Void call() throws Exception {
+         		    	        	
+         		    	for (int i=0; i<= cantidad; i++){
+             		    	updateProgress(i, cantidad);
+                			 	Thread.sleep(115);
+         		    	}
+         		    	return null;
+         		    };
+             	}; //Fin task barra
+             	
+             	//Creo el task para generar los borradores
+             	Task<Void> task_borradores = new Task<Void>() {
+        		    @Override
+        		    protected Void call() throws Exception {
+        		    	DBMotor.facturarTodos();
+        		    	return null;
+        		    };
+             	};//Fin task generar borradores
+             	
+             	//Bindea la barra de progreso 
+                barraProgreso.progressProperty().unbind();
+                barraProgreso.progressProperty().bind(task_barra.progressProperty());
+              
+                //Arranco la efectivizacion de todos los presupuestos
+ 		    	new Thread(task_barra).start();;
+                new Thread(task_borradores).start();
+         		
+         	 }
+         	 //Si no, si el usuario elige Generar Presupuestos mensuales = CANCEL
+         	 else{
+         		 //No hacer nada.
+         	 }
+         	 
+    	}
+    	//sino, es decir, si SI hay no efectivos, aviso al usuario que no se puede proceder.
+    	else{
+    		Alert alert = new Alert(AlertType.INFORMATION, 
+		  			 "",
+                  ButtonType.OK);
+            alert.initOwner(this.getPrimaryStage());
+            alert.setTitle("Generar presupuestos mensuales");
+            alert.setHeaderText("No es posible generar nuevos presupuestos mensuales.");
+            alert.setContentText("Aún existen presupuestos no efectivos en la base de datos. \n\nPuede ver y editar dichos presupuestos en el menú Área de Trabajo.");
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            alert.showAndWait();
+    	}
+    }
 }
