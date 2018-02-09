@@ -44,7 +44,7 @@ public class ModificarClienteOverviewController {
     private RadioButton	SI_habilitadoRadioButton;
     @FXML
     private RadioButton NO_habilitadoRadioButton;
-    
+   
  
     private Stage dialogStage;
     private Cliente cliente;
@@ -300,6 +300,6 @@ public class ModificarClienteOverviewController {
         	  dialogStage.close();
           }   
     }
-
+   
    
 }

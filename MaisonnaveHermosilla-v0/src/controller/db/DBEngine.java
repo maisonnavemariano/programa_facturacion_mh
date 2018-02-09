@@ -689,7 +689,10 @@ public class DBEngine {
 		
 
 	}
-	private void facturarBorrador(Cliente cliente) throws InvalidClientException{
+	
+	//HECHO POR VIRI: CAMBIO DE ENCABEZADO
+	//private void facturarBorrador(Cliente cliente) throws InvalidClientException{
+	public Presupuesto facturarBorrador(Cliente cliente) throws InvalidClientException{
 		Presupuesto ultimo = this.verUltimoPresupuesto(cliente);
 	//	System.out.println(ultimo==null);
 		//Calculo para obtener el monto total nuevo (fix para el caso donde el ultimo presupuesto fue realizado con el
@@ -699,6 +702,7 @@ public class DBEngine {
 			montoTotal += c.getMonto();
 		Presupuesto nuevo = new Presupuesto(ultimo.getConceptos()	,cliente ,false, ultimo.getAlicuota(),montoTotal, Calendar.getInstance().getTime()) ; 
 		this.agregarPresupuesto(nuevo);
+		return nuevo;
 		
 	}
 	/**

@@ -428,7 +428,7 @@ public class AreaDeTrabajoOverviewController  {
      private void handleEditarPresupuesto() {
          Presupuesto selectedPresupuesto = presupuestosTable.getSelectionModel().getSelectedItem();
          if (selectedPresupuesto != null) {
-             boolean okClicked = mainApp.showModificarPresupuestoOverview(selectedPresupuesto);
+             boolean okClicked = mainApp.showModificarPresupuestoOverview(selectedPresupuesto, this);
              if (okClicked) {
                  showPresupuestoDetails(selectedPresupuesto);
              }

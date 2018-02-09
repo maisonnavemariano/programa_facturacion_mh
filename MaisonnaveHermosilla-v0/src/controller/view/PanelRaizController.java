@@ -82,7 +82,6 @@ public class PanelRaizController {
     
     /**
      * Funcionalidad menú Area de trabajo
-     * TODO: ver si le cambio el nombre a este menu y sus controllers
      */
     @FXML
     private void handleAreaDeTrabajo() {

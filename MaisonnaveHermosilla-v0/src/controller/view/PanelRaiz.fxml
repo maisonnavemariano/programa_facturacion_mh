@@ -9,7 +9,10 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
-            <Menu mnemonicParsing="false" onAction="#handleAreaDeTrabajo" text="Área de trabajo" />
+            <Menu mnemonicParsing="false" text="Área de trabajo">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleAreaDeTrabajo" text="Area de trabajo" />
+               </items></Menu>
           <Menu mnemonicParsing="false" text="Presupuestos">
                <items>
                   <MenuItem mnemonicParsing="false" onAction="#handleVerPresupuestos" text="Ver presupuestos" />

@@ -80,9 +80,9 @@
                               <Label fx:id="subtotalLabel" layoutX="86.0" layoutY="149.0" text="monto" />
                               <ButtonBar buttonMinWidth="60.0" layoutY="218.0" prefHeight="40.0" prefWidth="538.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                 <buttons>
-                                    <Button fx:id="editar1" layoutX="192.0" layoutY="17.0" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEditarPresupuesto" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Editar" />
+                                    <Button fx:id="editar" layoutX="192.0" layoutY="17.0" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEditarPresupuesto" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Editar" />
                                     <Button fx:id="vistaPrevia" layoutX="101.0" layoutY="17.0" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleVistaPrevia" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Vista Previa" />
-                                  <Button fx:id="descartar" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Descartar" />
+                                  <Button maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Descartar" />
                                     <Button fx:id="efectivizarUno" layoutX="125.0" layoutY="17.0" maxWidth="113.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEfectivizarUno" prefHeight="26.0" text="Efectivizar" />
                                 </buttons>
                                  <padding>

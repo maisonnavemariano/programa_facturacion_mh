@@ -3,6 +3,8 @@ package controller;
 import controller.db.Cliente;
 //import controller.model.*;
 import controller.view.*;
+import exception.InvalidBudgetException;
+import exception.InvalidClientException;
 import controller.db.*;
 
 import java.io.IOException;
@@ -18,12 +20,15 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -250,8 +255,6 @@ public class Main extends Application {
     
     /**
      * Muestra la vista AreaDeTrabajoVista dentro del Panel Raiz
-     * TODO: programar contenido e este metodo, similar a showClienteVista
-     * TODO: ver si le cambio el nombre a este menu y a sus controllers
      */
     
     public void showAreaDeTrabajoVista(){
@@ -265,7 +268,6 @@ public class Main extends Application {
             rootLayout.setCenter(areaTrabajoVista);
 
             // Brinda acceso a la apilcaciòn principal al controlador particular de la vista
-            //TODO: Asignar controlador a la vista, y programarlo. por ahora muestra una ventana boba.
             AreaDeTrabajoOverviewController controller = loader.getController();
             controller.setMainApp(this, DBMotor);
 
@@ -302,10 +304,10 @@ public class Main extends Application {
     }
     
     /** 
-     * TODO
+     * 
      * 
      */
-    public boolean showModificarPresupuestoOverview(Presupuesto presupuesto){
+    public boolean showModificarPresupuestoOverview(Presupuesto presupuesto, Object propietario){
     	try {
             // Carga el archivo .fxml y crea un nuevo stage para el diálogo pop-up
             FXMLLoader loader = new FXMLLoader();
@@ -324,6 +326,7 @@ public class Main extends Application {
             ModificarPresupuestoOverviewController controller = loader.getController();
             controller.setDialogStage(dialogStage);
             controller.setPresupuesto(presupuesto);
+            controller.setPropietario(propietario);
 
             // Show the dialog and wait until the user closes it
             dialogStage.showAndWait();
@@ -357,11 +360,9 @@ public class Main extends Application {
     	}
     	clientesChoiceBox.setItems(listaDenominaciones);
     	
-    	//Agrego listener para que se cargue el cliente seleccionado
-    	clientesChoiceBox.setValue(listaDenominaciones.get(0));
-    	//clientesChoiceBox jhbhbhvgvjgvcj TODO
-    	cliente = this.getClienteData().get(0);
-        
+    	//Seteo valor por defecto del choice box
+    	clientesChoiceBox.getSelectionModel().selectFirst();
+    	
     	//Creo la grilla de componentes para el dialogo    	
     	GridPane grid = new GridPane();
     	grid.add(label1, 1, 1);
@@ -380,26 +381,53 @@ public class Main extends Application {
     	//Si el usuario elige Generar Presupuesto
     	if (result.get() == buttonTypeOk) {
     		
+    		//Seteo al cliente
+    		int indice = clientesChoiceBox.getItems().indexOf(clientesChoiceBox.getValue());
+        	cliente = this.getClienteData().get(indice);
+                		
     		//Chequeo que el cliente no sea nulo
     		if (cliente != null){
-    			//genero un presupuesto nuevo para ese cliente por medio del motor de DB
-    			//TODO
-    			//Presupuesto presupuesto = DBMotor.facturarBorrador();
-    			//con ese presupuesto voy a la vista de modificar presupuesto
-    			//this.showModificarPresupuestoOverview(presupuesto);
-    			System.out.println("Hasta ahora todo ok");
     			
+    			//antes que nada veo que no haya ya un presupuesto no efectivo para ese cliente
+    			if(DBMotor.verPresupuestosNoEfectivosPorDenominacion(cliente.getDenominacion()).size()==0){
+    			
+    				//genero un presupuesto nuevo para ese cliente por medio del motor de DB
+    				Presupuesto presupuesto = null;
+    				try {
+    					presupuesto = DBMotor.facturarBorrador(cliente);
+    					//actualizo la lista observable desde la DB (en teoria)
+    					this.setPresupuestosNoEfectivosData(FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos()));
+    				} catch (InvalidClientException e) {
+    					System.out.println("falló el facturar borrador: estoy en main");
+    					e.printStackTrace();
+    				}
+    				//con ese presupuesto voy a la vista de modificar presupuesto
+    				this.showModificarPresupuestoOverview(presupuesto, this);
+    			}
+    			//Si habia ya un presupuesto no efectivo para el cliente informo al usuario
+    			else{
+    				 Alert alert = new Alert(AlertType.WARNING, 
+    	 		  			 "",
+    	                    ButtonType.OK);
+    	              alert.initOwner(this.getPrimaryStage());
+    	              alert.setTitle("Nuevo presupuesto");
+    	              alert.setHeaderText("Ya existe un presupuesto no efectivo para el cliente "+cliente.getDenominacion()+".");
+    	              alert.setContentText("Puede editar dicho presupuesto en el menú Área de Trabajo.");
+    	              alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+    	              alert.showAndWait();
+    			}
     		}
-    		//Si el cliente es nulo, le aviso que no puede ser nulo
+    		//Si el cliente es nulo:
     		else{
-    			//TODO: dialog apropiado
+    			System.out.println("cliente nulo en nuevo presupuesto");
     			//por defecto ya tiene un cliente cargado al arranque, 
-    			//entonces no deberia jamas poder ser nulo 
+    			//entonces no deberia jamas poder ser nulo y nunca deberia entrar aca
     		}
     	}
     	else{
     		//apretó cancelar, no hago nada y cierro
     	}
     }
+  
     
 }

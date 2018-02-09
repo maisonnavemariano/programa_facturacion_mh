@@ -17,6 +17,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -74,6 +75,8 @@ public class ModificarPresupuestoOverviewController {
     private Stage dialogStage;
     private Presupuesto presupuesto;
     private boolean okClicked = false;
+    
+    private Object propietario;
     
     private DBEngine DBMotor = DBSingleton.getInstance();
 
@@ -209,6 +212,9 @@ public class ModificarPresupuestoOverviewController {
         //subtotal: hay que recalcular y setearlo en el presupuesto
         presupuesto.setSubtotal(recalcularSubtotal());
         
+        
+        //INICIO
+        //DESEA GUARDAR LOS CAMBIOS?
         Alert alert = new Alert(AlertType.INFORMATION,
         		"",
         		ButtonType.OK, 
@@ -221,9 +227,10 @@ public class ModificarPresupuestoOverviewController {
 
         Optional<ButtonType> result = alert.showAndWait();
 
+        //GUARDAR LOS CAMBIOS = OK
         if (result.get() == ButtonType.OK) {
         	okClicked = true;
-            // /*
+           
             //Actualizo el presupuesto en la base de datos
             try {
 				DBMotor.editarPresupuesto(presupuesto);
@@ -231,10 +238,55 @@ public class ModificarPresupuestoOverviewController {
 				e.printStackTrace();
 				System.out.println("El presupuesto es inválido, y no lo puedo editar.");
 			}
-			// */
-            dialogStage.close();
-        }
-    }
+            //si fue llamado desde Main: preguntar si quiere efectivizar
+			if(this.propietario.getClass().getName().equals("controller.Main")){
+				
+				 //DESEA ADEMÁS EFECTIVIZAR?
+				 Alert alerta = new Alert(AlertType.INFORMATION, 
+	 		  			 "",
+	                    ButtonType.YES, 
+	                    ButtonType.NO);
+	              alerta.initOwner(dialogStage);
+	              alerta.setTitle("Efectivizar presupuesto");
+	              alerta.setHeaderText("Presupuesto seleccionado: "+ presupuesto.getNroPresupuesto()+ " - "
+	            		  			  + presupuesto.getCliente().getDenominacion());
+	              alerta.setContentText("¿Desea efectivizar el presupuesto creado? \n\nSi pulsa \"NO\" el presupuesto estará abierto en el menú Área de trabajo.");
+	              alerta.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+	              Optional<ButtonType> resultado = alerta.showAndWait();
+
+	              //DESEA ADEMAS EFECTIVIZAR = 0K
+	              if (resultado.get() == ButtonType.YES) {
+	             	 //Efectivizo el presupuesto en la base de datos
+	             	 try{
+	             		 DBMotor.efectivizarPresupuesto(presupuesto);
+	                     
+	             	 }
+	             	 catch(InvalidBudgetException e){
+	             		e.printStackTrace();
+	             		System.out.println("La efectivización del presupuesto "+ presupuesto.getNroPresupuesto() + " tiro error.");
+	             	 }
+	             	 //Se informa al usuario que termino el proceso
+	                  alert = new Alert(AlertType.INFORMATION, 
+	     		  			 "",
+	                        ButtonType.OK);
+	                  alert.initOwner(dialogStage);
+	                  alert.setTitle("Efectivizar presupuesto");
+	                  alert.setHeaderText("Se ha efectivizado el presupuesto nº "+ presupuesto.NroPresupuestoStringProperty().get());
+	                  alert.setContentText(null);
+	                  alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+	                  alert.showAndWait();
+	              }
+	              
+	              //DESEA ADEMÁS EFECTIVIZAR = NO
+	              else{
+	             	 //No hago nada y cierro
+	              }
+			}//FIN FUE LLAMADO DESDE MAIN?
+			
+        }//FIN GUARDAR LOS CAMBIOS OK
+			
+        dialogStage.close();
+    }//FIN HANDLE OK
     
 
     /**
@@ -335,9 +387,13 @@ public class ModificarPresupuestoOverviewController {
             //Recalculo el subtotal con el nuevo concepto
             presupuesto.setSubtotal(recalcularSubtotal());
             
-            //seteo nuevo valor en los label
+            //seteo nuevo valor en los label en base a los valores de la vista (alicuota)
             this.subtotalField.setText(String.valueOf(presupuesto.getSubtotal()));
-            this.montoTotalField.setText(String.valueOf(recalcularMonto(presupuesto.getAlicuota())));
+            String ali = this.alicuotaChoiceBox.getValue();
+            ali = ali.replace("%", "");
+            ali = ali.replace(",", ".");
+            double alix = Double.parseDouble(ali);
+            this.montoTotalField.setText(String.valueOf(recalcularMonto(alix)));
           
             //Actualizo contenido tabla en la vista
        	 	conceptosTable.setItems(presupuesto.getConceptosObservables());
@@ -427,10 +483,14 @@ public class ModificarPresupuestoOverviewController {
         	//recalculo el monto con el concepto nuevo
        	 	presupuesto.setSubtotal(recalcularSubtotal());
        	 	
-       	 	//seteo nuevo valor en su label
+       	 	//seteo nuevo valor en su label de acuerdo a los valores de la vista (alicuota)
        	 	this.subtotalField.setText(String.valueOf(presupuesto.getSubtotal()));
-            this.montoTotalField.setText(String.valueOf(recalcularMonto(presupuesto.getAlicuota())));
-        	
+       	 	String ali = this.alicuotaChoiceBox.getValue();
+       	 	ali = ali.replace("%", "");
+       	 	ali = ali.replace(",", ".");
+       	 	double alix = Double.parseDouble(ali);
+       	 	this.montoTotalField.setText(String.valueOf(recalcularMonto(alix)));
+       	 	
             //Actualizo contenido tabla en la vista
        	 	conceptosTable.setItems(presupuesto.getConceptosObservables());
         	
@@ -475,9 +535,13 @@ public class ModificarPresupuestoOverviewController {
             	 //Recalculo el monto sin el concepto eliminado
             	 presupuesto.setSubtotal(recalcularSubtotal());
             	 
-            	//seteo nuevo valor en su label
+            	//seteo nuevo valor en su label de acuerdo a los valores de la vista (alicuota)
             	 this.subtotalField.setText(String.valueOf(presupuesto.getSubtotal()));
-                 this.montoTotalField.setText(String.valueOf(recalcularMonto(presupuesto.getAlicuota())));
+            	 String ali = this.alicuotaChoiceBox.getValue();
+                 ali = ali.replace("%", "");
+                 ali = ali.replace(",", ".");
+                 double alix = Double.parseDouble(ali);
+                 this.montoTotalField.setText(String.valueOf(recalcularMonto(alix)));
              	                 
             	 //Actualizo contenido tabla en la vista
             	 conceptosTable.setItems(presupuesto.getConceptosObservables());
@@ -514,6 +578,10 @@ public class ModificarPresupuestoOverviewController {
         	monto_calculado= monto_calculado + c.getMonto();
         }
         return monto_calculado;
+    }
+
+    public void setPropietario(Object p){
+    	this.propietario = p;
     }
 
     
