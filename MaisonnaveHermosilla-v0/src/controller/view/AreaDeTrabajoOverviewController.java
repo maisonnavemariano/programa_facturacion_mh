@@ -19,6 +19,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 
 import java.util.Optional;
 
@@ -79,6 +81,12 @@ public class AreaDeTrabajoOverviewController  {
     private Button efectivizarTodos;
     @FXML
     private Button vistaPrevia;
+    @FXML
+    private Button descartarTodos;
+    @FXML
+    private Button descartarUno;
+    @FXML
+    private Button generarPresupuestosMensuales;
     
     //Usados solamente en el metodo: efectivizar todos
     @FXML
@@ -212,10 +220,9 @@ public class AreaDeTrabajoOverviewController  {
         
         conceptosTable.getColumns().forEach(this::addTooltipToColumnCells_Concepto);
         conceptosTable.setPlaceholder(new Label("No hay conceptos."));
-        
-          
-       
-    }
+    	
+        //generarPresupuestosMensuales.disableProperty().bind(Bindings.size(presupuestosTable.getItems()).isEqualTo(0));
+     }
     
     /**
      * Llamado por la aplicacion principal para dar una autorreferencia
@@ -517,7 +524,10 @@ public class AreaDeTrabajoOverviewController  {
     	this.vistaPrevia.setDisable(value);
     	this.efectivizarTodos.setDisable(value);
     	this.efectivizarUno.setDisable(value);
-    	
+    	this.descartarTodos.setDisable(value);
+    	this.descartarUno.setDisable(value);
+    	this.generarPresupuestosMensuales.setDisable(value); //TODO: este se configura aparte
+    	    	
     	//Radiobutton
     	this.cuitRadioButton.setDisable(value);
     	this.denominacionRadioButton.setDisable(value);
@@ -573,5 +583,202 @@ public class AreaDeTrabajoOverviewController  {
  	        return cell;
  	    });
  	}
+     
+     /**
+      * Permite al usuario realizar la facturación en borrador para todo los clientes
+      * habilitados, si y solo si no existe actualmente ningún presupuesto no efectivo 
+      * en la DB.
+      * 
+      */
+     public void handleGenerarPresupuestosMensuales(){
+     	
+     	//Primero, pregunto si ya hay no efectivos en la DB
+     	boolean noHay = (DBMotor.obtenerPresupuestosNoEfectivos().size() == 0);
+     	//Si no hay no efectivos, procedo con el método.
+     	if (noHay){
+     		 //Primero averiguo cuantos presupuestos debo generar
+    		int cantidad = DBMotor.cantidadClientesHabilitados();
+    		
+     		//Creo una alerta para pedir confirmacion
+     		Alert alert = new Alert(AlertType.CONFIRMATION, 
+ 		  			 "",
+                    ButtonType.OK,
+                    ButtonType.CANCEL);
+              alert.initOwner(mainApp.getPrimaryStage());
+              alert.setTitle("Generar presupuestos mensuales");
+              alert.setHeaderText(null);
+              alert.setContentText("¿Desea generar "+cantidad+" nuevos presupuestos para los clientes habilitados?");
+              alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+              Optional<ButtonType> result = alert.showAndWait();
+              
+           
+              	//Si el usuario elige Generar Presupuestos mensuales = OK
+          	 	if (result.get() == ButtonType.OK) {
+          		 
+          	 	//Deshabilito componentes
+            	deshabilitarComponentes(true);
+            		
+          		//Generar alert con la barra de progreso 
+          		//Creo la barra de progreso
+           		
+           		barraProgreso.progressProperty().unbind();
+           		barraProgreso.progressProperty().set(0);
+           		
+           		
+           		//Creo el dialogo que la va a mostrar
+           		Alert dialog = new Alert(AlertType.INFORMATION);
+              	dialog.setTitle("Generando "+cantidad+" presupuestos mensuales...");
+              	dialog.setHeaderText(null);
+              	dialog.setContentText("Operación en proceso. Por favor, aguarde unos instantes.");
+              	dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+              	dialog.getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
+              	dialog.show();
+              	
+          		//Creo el task para actualizar la barra de progreso
+              	Task<Void> task_barra = new Task<Void>() {
+          		    @Override
+          		    protected Void call() throws Exception {
+          		    	       		    	
+          		    	
+          		    	for (int i=0; i<= cantidad; i++){
+              		    	updateProgress(i, cantidad);
+                 			 	Thread.sleep(115);
+          		    	}
+          		    
+                    	Platform.runLater(() -> {
+                    		deshabilitarComponentes(false);
+                    		dialog.close();
+                    		barraProgreso.progressProperty().unbind();
+                    		barraProgreso.progressProperty().set(0);
+     		           
+                    	});
+          		    	return null;
+          		    };
+              	}; //Fin task barra
+              	
+              	//Creo el task para generar los borradores
+              	Task<Void> task_borradores = new Task<Void>() {
+         		    @Override
+         		    protected Void call() throws Exception {
+         		    	
+         		    	//Primero hago lo que debo
+         		    	DBMotor.facturarTodos();
+         		    	
+         		    	//Despues actualizo la vista
+         		    	handleSearch();
+         		    	
+         		    	
+         		    	return null;
+         		    };
+              	};//Fin task generar borradores
+              	
+              	//Bindea la barra de progreso 
+                 barraProgreso.progressProperty().unbind();
+                 barraProgreso.progressProperty().bind(task_barra.progressProperty());
+               
+                 //Arranco la efectivizacion de todos los presupuestos
+  		    	 new Thread(task_barra).start();;
+                 new Thread(task_borradores).start();
+          		
+          	 }
+          	 //Si no, si el usuario elige Generar Presupuestos mensuales = CANCEL
+          	 else{
+          		 //No hacer nada.
+          	 }
+          	 
+     	}
+     	//sino, es decir, si SI hay no efectivos, aviso al usuario que no se puede proceder.
+     	else{
+     		Alert alert = new Alert(AlertType.INFORMATION, 
+ 		  			 "",
+                   ButtonType.OK);
+             alert.initOwner(mainApp.getPrimaryStage());
+             alert.setTitle("Generar presupuestos mensuales");
+             alert.setHeaderText("No es posible generar nuevos presupuestos mensuales.");
+             alert.setContentText("Aún existen presupuestos no efectivos en la base de datos. \n\nPuede ver y editar dichos presupuestos en el menú Área de Trabajo.");
+             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+             alert.showAndWait();
+     	}
+     }
+     
+     public void handleDescartarUno(){
+    	 Presupuesto selectedPresupuesto = presupuestosTable.getSelectionModel().getSelectedItem();
+         
+    	 if (selectedPresupuesto != null) {
+    		 Alert alert = new Alert(AlertType.WARNING,
+    				 "",
+    				 ButtonType.OK,
+    				 ButtonType.CANCEL);
+             alert.initOwner(mainApp.getPrimaryStage());
+             alert.setTitle("Descartar presupuesto");
+             alert.setHeaderText(null);
+             alert.setContentText("¿Desea descartar el presupuesto seleccionado?");
+             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+             Optional<ButtonType> result = alert.showAndWait();
+             
+             if(result.get().equals(ButtonType.OK)){
+            	 //Eliminar el presupuesto de todos lados:
+            	 //1: de la DB
+            	 try {
+					DBMotor.eliminarNoEfectivo(selectedPresupuesto);
+				} catch (InvalidBudgetException e) {
+					System.out.println("Error al descartar uno");
+					e.printStackTrace();
+				}
+            	 //2: de la vista
+            	 handleSearch();
+            	 //3: de la lista en mainapp
+            	 mainApp.setPresupuestosNoEfectivosData_DB();
+             }
+         } 
+         else{
+        	 // Nothing selected.
+             Alert alert = new Alert(AlertType.WARNING);
+             alert.initOwner(mainApp.getPrimaryStage());
+             alert.setTitle("Seleccionar presupuesto");
+             alert.setHeaderText("No se ha seleccionado un presupuesto");
+             alert.setContentText("Por favor, seleccione un presupuesto en la tabla.");
+             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+             alert.showAndWait();
+         }
+     }
+     
+     public void handleDescartarTodos(){
+    	 if (presupuestosTable.getItems().size()>0) {
+    		 Alert alert = new Alert(AlertType.WARNING,
+    				 "",
+    				 ButtonType.OK,
+    				 ButtonType.CANCEL);
+             alert.initOwner(mainApp.getPrimaryStage());
+             alert.setTitle("Descartar todos");
+             alert.setHeaderText(null);
+             alert.setContentText("¿Desea descartar todos los presupuestos de la lista?");
+             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+             Optional<ButtonType> result = alert.showAndWait();
+             
+             if(result.get().equals(ButtonType.OK)){
+            	 //Eliminar el presupuesto de todos lados:
+            	 
+            	 //1: de la DB
+            	 DBMotor.eliminarPresupuestosNoEfectivos();
+				
+            	 //2: de la vista
+            	 handleSearch();
+            	 
+            	 //3: de la lista en mainapp
+            	 mainApp.setPresupuestosNoEfectivosData_DB();
+             }
+         } 
+         else{
+        	 // Nothing selected.
+             Alert alert = new Alert(AlertType.WARNING);
+             alert.initOwner(mainApp.getPrimaryStage());
+             alert.setTitle("Descartar todos");
+             alert.setHeaderText(null);
+             alert.setContentText("No existen presupuestos para descartar.");
+             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+             alert.showAndWait();
+         }
+     }
     
 }
