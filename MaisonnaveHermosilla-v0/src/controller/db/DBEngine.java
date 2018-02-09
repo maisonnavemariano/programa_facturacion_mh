@@ -325,7 +325,16 @@ public class DBEngine {
 	// ==================================================================================================================================
 	//     ** ** ** **                                    PRESUPUESTOS                                              ** ** ** **
 	// ==================================================================================================================================
-	
+	public void eliminarPresupuestosNoEfectivos() {
+		try {
+			String query = "DELETE FROM Presupuesto WHERE Efectivo = 'N'";
+			PreparedStatement preparedStmt;
+			preparedStmt = conn.prepareStatement(query);
+			preparedStmt.execute();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	public void eliminarNoEfectivo(Presupuesto p) throws InvalidBudgetException {
 		if (!p.hasValidNumber())
 			throw new InvalidBudgetException("El presupuesto no existe en la base de datos");
