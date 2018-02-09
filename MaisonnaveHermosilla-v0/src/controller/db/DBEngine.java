@@ -57,6 +57,30 @@ public class DBEngine {
 	// ==================================================================================================================================
 	
 	/**
+	 * Método que consulta la db para saber cuantos clientes habilitados hay.
+	 * @return El entero que representa la cantidad de clientes habilitados, -1 uno de haber un problema (el caso donde no haya conexion con la base de datos por ej).
+	 */
+	public int cantidadClientesHabilitados() {
+		int cantidad = -1;
+		String query = "SELECT (COUNT(*)) AS Cant_Clientes_hab from Cliente WHERE Habilitado='S'";
+	    Statement st;
+		try {
+			st = conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    if(rs.next()){
+		    	cantidad = rs.getInt("Cant_Clientes_hab");
+		    }
+		    st.close();
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
+		return cantidad;
+				
+				
+	}
+	
+	/**
 	 * El método consulta a la base de datos por el único cliente que tiene ese dado Codigo_Cliente, si el mismo no aparece retorna un objeto nulo. 
 	 * Si el cliente es encontrado, se recuperan sus atributos de la base de datos y se los retornan a la clase que llamo el método. 
 	 * Obs: Todos los atributos pueden ser nulos, menos el codigo_cliente y el CUIT.
@@ -317,12 +341,12 @@ public class DBEngine {
 		try {
 			st = conn.createStatement();
 			ResultSet rs = st.executeQuery(query);
-			if(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double monto_total, Date fecha
+			if(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
 				toReturn = new Presupuesto(this.getConceptos(nro_presupuesto),
 						this.getCliente(rs.getInt("Codigo_Cliente")),
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
-						rs.getDouble("Monto_total"),
+						rs.getDouble("Subtotal"),
 						rs.getDate("Fecha"));
 			}
 		} catch (SQLException e) {
@@ -374,12 +398,12 @@ public class DBEngine {
 		try {
 			st = conn.createStatement();
 			ResultSet rs = st.executeQuery(query);
-			while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double monto_total, Date fecha
+			while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
 				aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
 						this.getCliente(rs.getInt("Codigo_Cliente")),
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
-						rs.getDouble("Monto_total"),
+						rs.getDouble("Subtotal"),
 						rs.getDate("Fecha"));
 				aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 				lista.add(aux);
@@ -405,12 +429,12 @@ public class DBEngine {
 		try {
 			st = conn.createStatement();
 			ResultSet rs = st.executeQuery(query);
-			while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double monto_total, Date fecha
+			while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
 				aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
 						this.getCliente(rs.getInt("Codigo_Cliente")),
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
-						rs.getDouble("Monto_total"),
+						rs.getDouble("Subtotal"),
 						rs.getDate("Fecha"));
 				aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 				lista.add(aux);
@@ -436,12 +460,12 @@ public class DBEngine {
 		try {
 			st = conn.createStatement();
 			ResultSet rs = st.executeQuery(query);
-			while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double monto_total, Date fecha
+			while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
 				aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
 						this.getCliente(rs.getInt("Codigo_Cliente")),
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
-						rs.getDouble("Monto_total"),
+						rs.getDouble("Subtotal"),
 						rs.getDate("Fecha"));
 				aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 				lista.add(aux);
@@ -484,7 +508,7 @@ public class DBEngine {
 						this.getCliente(rs.getInt("Codigo_Cliente")),
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
-						rs.getDouble("Monto_total"),
+						rs.getDouble("Subtotal"),
 						rs.getDate("Fecha"));
 						toReturn.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 			}
@@ -506,7 +530,7 @@ public class DBEngine {
 	 */
 	public boolean agregarPresupuesto(Presupuesto p){
 		boolean toReturn = false;
-		String query = "INSERT INTO Presupuesto (Codigo_Cliente, Fecha, Efectivo, Alicuota, Monto_total) VALUES ('"+p.getCliente().getCodigoCliente()+"', "
+		String query = "INSERT INTO Presupuesto (Codigo_Cliente, Fecha, Efectivo, Alicuota, Subtotal) VALUES ('"+p.getCliente().getCodigoCliente()+"', "
 				+ "'"+p.getFecha()+"', "
 				+ "'"+(p.getEfectivo()?"S":"N") +"', "
 				+ "'"+p.getAlicuota()+"', "
@@ -579,7 +603,7 @@ public class DBEngine {
 	/**
 	 * Realiza una operacion de UPDATE sobre la base de datos, cambiando los atributos del presupuesto. Para buscar el presupuesto utiliza el nro de presupuesto el cual es único.
 	 *  
-	 * @param p Presupuesto buscado en la base de datos para ser actualizado. Actualiza todos su atributos: Codigo_Cliente, Fecha, Efectivo, Alicuota y Monto_total. 
+	 * @param p Presupuesto buscado en la base de datos para ser actualizado. Actualiza todos su atributos: Codigo_Cliente, Fecha, Efectivo, Alicuota y Subtotal. 
 	 * @return True si se pudo modificar correctamente. False en caso contrario.
 	 * 
 	 * 
@@ -595,7 +619,7 @@ public class DBEngine {
 		// TODO chequear que el presupuesto no sea efectivo!!!
 		// ===========================================================================================================================================
 		boolean toReturn = false;
-		String query = "UPDATE Presupuesto SET Codigo_Cliente = ?, Fecha = ?, Efectivo = ?, Alicuota = ?, Monto_total = ? WHERE Nro_Presupuesto = ?";
+		String query = "UPDATE Presupuesto SET Codigo_Cliente = ?, Fecha = ?, Efectivo = ?, Alicuota = ?, Subtotal = ? WHERE Nro_Presupuesto = ?";
 	    PreparedStatement preparedStmt;
 		try {
 			preparedStmt = conn.prepareStatement(query);
@@ -730,7 +754,7 @@ public class DBEngine {
 						this.getCliente(rs.getInt("Codigo_Cliente")),
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
-						rs.getDouble("Monto_total"),
+						rs.getDouble("Subtotal"),
 						rs.getDate("Fecha"));
 				aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 				toReturn.add(aux);
@@ -763,6 +787,8 @@ public class DBEngine {
 	public Transaccion efectivizarPresupuesto(Presupuesto p) throws InvalidBudgetException{
 		if (!p.hasValidNumber())
 			throw new InvalidBudgetException("Presupuesto no creado en base de datos.");
+
+		double montoTotal = p.getSubtotal() * (1 + (p.getAlicuota()/100.0));
 		// proceso de actualizar las cuentas corrientes.
 		Transaccion t = null;
 		boolean efectivo = false;
@@ -779,17 +805,17 @@ public class DBEngine {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			double nuevo_estado = estado_cuenta_corriente - p.getSubtotal();
+			double nuevo_estado = estado_cuenta_corriente - montoTotal;
 			this.actualizarEstadoCuentaCorriente(p.getCliente(), nuevo_estado);
 			// REGISTRAR TRANSACCION
-			t = new Transaccion(p.getCliente(), Calendar.getInstance().getTime(), 'D', p.getSubtotal(),"",nuevo_estado);
+			t = new Transaccion(p.getCliente(), Calendar.getInstance().getTime(), 'D', montoTotal,"",nuevo_estado);
 			
 			
 			preparedStmt = conn.prepareStatement(query);
 			preparedStmt.setInt(1, p.getCliente().getCodigoCliente());
 			preparedStmt.setString(2, t.getFecha());
 			preparedStmt.setString(3, "P");
-			preparedStmt.setDouble(4, p.getSubtotal());
+			preparedStmt.setDouble(4, montoTotal );
 			preparedStmt.setString(5, "Efectivización de presupuesto");
 			preparedStmt.setDouble(6, nuevo_estado);
 			

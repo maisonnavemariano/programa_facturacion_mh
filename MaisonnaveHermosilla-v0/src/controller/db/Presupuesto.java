@@ -26,7 +26,7 @@ public class Presupuesto {
 	private BooleanProperty efectivo;
 	private FloatProperty alicuota;
 	private DoubleProperty subtotal;
-	private DoubleProperty monto;
+	//private DoubleProperty monto;
 	private StringProperty fecha;
 	private StringProperty fecha_ARG;
 	
@@ -46,7 +46,7 @@ public class Presupuesto {
 		this.efectivo = new SimpleBooleanProperty(efectivo);
 		this.alicuota = new SimpleFloatProperty(alicuota);
 		this.subtotal = new SimpleDoubleProperty(sub_total);
-		this.monto = new SimpleDoubleProperty(calcularMontoTotal());
+		//this.monto = new SimpleDoubleProperty(calcularMontoTotal());
 		
 		//Format1: lo que se usa en sql
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
