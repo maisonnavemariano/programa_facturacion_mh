@@ -54,13 +54,14 @@ public class PanelRaizController {
      * TODO
      */
     @FXML
-    private void handleVerPresupuestos() {   
+    private void handleVerPresupuestos() {  
+    	mainApp.handleVerPresupuestoVista();
     	
     }
     
     /**
      * Funcionalidad menú Nuevo Presupuesto
-     * TODO
+     *
      */
     @FXML
     private void handleNuevoPresupuesto() {  

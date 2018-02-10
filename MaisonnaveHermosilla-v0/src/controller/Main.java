@@ -282,31 +282,6 @@ public class Main extends Application {
     }
     
     
-    /**
-     * Muestra la vista BuscarPresupuestosVista dentro del Panel Raiz
-     * TODO: programar contenido e este metodo, similar a showClienteVista
-     * TODO: ver si le cambio el nombre a este menu y a sus controllers
-     */
-    public void showBuscarPresupuestosVista(){
-    	try {
-            // Carga la vista BuscarPresupuestosVista desde el archivo .fxml correspondiente
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(Main.class.getResource("view/BuscarPresupuestosVista.fxml"));
-            AnchorPane buscarPrespuestosVista = (AnchorPane) loader.load();
-
-            // Setea la vista en el centro del Panel Raiz
-            rootLayout.setCenter(buscarPrespuestosVista);
-
-            // Brinda acceso a la apilcaciòn principal al controlador particular de la vista
-            //TODO: Asignar controlador a la vista, y programarlo. por ahora muestra una ventana boba.
-            //ClienteOverviewController controller = loader.getController();
-            //controller.setMainApp(this, DBMotor);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }    	
-    }
-    
     /** 
      * Muestra al usuario para modificar un presupuesto determinado. 
      * Si el método es invocado desde la clase Main (en el curso de confección
@@ -442,5 +417,29 @@ public class Main extends Application {
     	}
     }
   
+    
+    /**
+     * 
+     * 
+     */
+    public void handleVerPresupuestoVista(){
+    	try {
+            // Carga la vista BuscarPresupuestosVista desde el archivo .fxml correspondiente
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Main.class.getResource("view/VerPresupuestosVista.fxml"));
+            AnchorPane verPrespuestosVista = (AnchorPane) loader.load();
+
+            // Setea la vista en el centro del Panel Raiz
+            rootLayout.setCenter(verPrespuestosVista);
+
+            // Brinda acceso a la apilcaciòn principal al controlador particular de la vista
+            //TODO: Asignar controlador a la vista, y programarlo. por ahora muestra una ventana boba.
+            VerPresupuestosOverviewController controller = loader.getController();
+            controller.setMainApp(this, DBMotor);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }  
+    }
    
 }

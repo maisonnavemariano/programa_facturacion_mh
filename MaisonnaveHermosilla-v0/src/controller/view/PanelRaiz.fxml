@@ -9,24 +9,28 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
-            <Menu mnemonicParsing="false" text="Área de trabajo">
-               <items>
-                  <MenuItem mnemonicParsing="false" onAction="#handleAreaDeTrabajo" text="Area de trabajo" />
-               </items></Menu>
           <Menu mnemonicParsing="false" text="Presupuestos">
                <items>
-                  <MenuItem mnemonicParsing="false" onAction="#handleVerPresupuestos" text="Ver presupuestos" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleAreaDeTrabajo" text="Area de trabajo" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleVerPresupuestos" text="Presupuestos efectivos" />
                   <MenuItem mnemonicParsing="false" onAction="#handleNuevoPresupuesto" text="Nuevo presupuesto" />
-                  <MenuItem mnemonicParsing="false" onAction="#handleAnularPresupuesto" text="Anular presupuesto" />
                </items></Menu>
-          <Menu mnemonicParsing="false" text="Cuentas Corrientes" />
+          <Menu mnemonicParsing="false" text="Cuentas Corrientes">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Registrar pago" />
+                  <MenuItem mnemonicParsing="false" text="Ver estados de cuenta" />
+               </items></Menu>
           <Menu mnemonicParsing="false" text="Clientes">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#handleAdministrarClientes" text="Administrar clientes" />
-                  <MenuItem mnemonicParsing="false" onAction="#handleEliminarCliente" text="Eliminar Cliente " />
+                  <MenuItem mnemonicParsing="false" onAction="#handleEliminarCliente" text="Eliminar cliente " />
             </items>
           </Menu>
-            <Menu mnemonicParsing="false" text="Ayuda" />
+            <Menu mnemonicParsing="false" text="Ayuda">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleEliminarCliente" text="Manual de Usuario" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleEliminarCliente" text="Acerca de MH" />
+               </items></Menu>
         </menus>
       </MenuBar>
    </top>
