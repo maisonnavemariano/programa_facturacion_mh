@@ -325,6 +325,80 @@ public class DBEngine {
 	// ==================================================================================================================================
 	//     ** ** ** **                                    PRESUPUESTOS                                              ** ** ** **
 	// ==================================================================================================================================
+
+	public List<Presupuesto> BuscarDesdeHasta(String denom, String cuit, String desde, String hasta){
+		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();
+		if(denom==null || cuit == null || desde ==null || hasta == null) {
+			System.out.println("[WARNING] Uno de los Strings pasados para la consulta BuscarDesdeHasta son nulos.");
+		}
+		else {
+		
+			Presupuesto aux;
+			Statement st ;
+			
+			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente "
+					+ "WHERE Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
+							+ "Cliente.CUIT LIKE '%"+cuit+"%' AND "
+									+ "Fecha BETWEEN '"+desde+"' AND '"+hasta+"';";
+			
+			try {
+				st = conn.createStatement();
+				ResultSet rs = st.executeQuery(query);
+				while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
+					aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
+							this.getCliente(rs.getInt("Codigo_Cliente")),
+							(rs.getString("Efectivo").equals("S") ? true:false),
+							rs.getFloat("Alicuota"),
+							rs.getDouble("Subtotal"),
+							rs.getDate("Fecha"));
+					aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
+					toReturn.add(aux);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return toReturn;
+	}
+	
+	
+	public List<Presupuesto> BuscarFechaExacta(String denom, String cuit, String fecha_actual){
+		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();
+		if(denom==null || cuit == null || fecha_actual ==null ) {
+			System.out.println("[WARNING] Uno de los Strings pasados para la consulta BuscarDesdeHasta son nulos.");
+		}
+		else {	
+			
+			Presupuesto aux;
+			Statement st ;
+			
+			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente "
+					+ "WHERE Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
+							+ "Cliente.CUIT LIKE '%"+cuit+"%' AND "
+									+ "Fecha = '"+fecha_actual+"';";
+			
+			try {
+				st = conn.createStatement();
+				ResultSet rs = st.executeQuery(query);
+				while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
+					aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
+							this.getCliente(rs.getInt("Codigo_Cliente")),
+							(rs.getString("Efectivo").equals("S") ? true:false),
+							rs.getFloat("Alicuota"),
+							rs.getDouble("Subtotal"),
+							rs.getDate("Fecha"));
+					aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
+					toReturn.add(aux);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return toReturn;
+	}
+	
 	public void eliminarPresupuestosNoEfectivos() {
 		try {
 			String query = "DELETE FROM Presupuesto WHERE Efectivo = 'N'";
