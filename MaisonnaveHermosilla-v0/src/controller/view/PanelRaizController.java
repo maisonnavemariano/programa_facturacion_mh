@@ -50,7 +50,7 @@ public class PanelRaizController {
     /*---------------------------MENU PRESUPUESTOS---------------------------*/
     
     /**
-     * Funcionalidad menú Ver presupuestos
+     * Funcionalidad menú Presupuestos Efectivos
      * TODO
      */
     @FXML

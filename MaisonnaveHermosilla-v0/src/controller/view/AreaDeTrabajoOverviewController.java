@@ -200,7 +200,7 @@ public class AreaDeTrabajoOverviewController  {
      */
     @FXML
     private void initialize() {
-        // Inicializa la tabla de presupuestos con los valores de las 4 columnas.
+        // Inicializa la tabla de presupuestos con los valores de las 3 columnas.
     	numeroColumn.setCellValueFactory(
     			cellData -> cellData.getValue().NroPresupuestoStringProperty());
         cuitColumn.setCellValueFactory(
