@@ -35,7 +35,7 @@
                      </font>
                   </RadioButton>
                   <TextField fx:id="busquedaTextField" layoutX="326.0" layoutY="6.0" onKeyReleased="#handleSearch" />
-                  <Button layoutX="548.0" layoutY="9.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="242.0" text="Generar presupuestos mensuales" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="9.0" />
+                  <Button fx:id="generarPresupuestosMensuales" layoutX="548.0" layoutY="9.0" mnemonicParsing="false" onAction="#handleGenerarPresupuestosMensuales" prefHeight="26.0" prefWidth="242.0" text="Generar presupuestos mensuales" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="9.0" />
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
@@ -56,7 +56,7 @@
                               </TableView>
                               <Button fx:id="efectivizarTodos" layoutX="198.0" layoutY="814.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleEfectivizarTodos" prefHeight="26.0" prefWidth="128.0" text="Efectivizar Todo" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="168.0" />
                               <ProgressBar fx:id="barraProgreso" layoutX="343.0" layoutY="817.0" prefWidth="200.0" progress="0.0" AnchorPane.bottomAnchor="11.0" AnchorPane.leftAnchor="316.0" AnchorPane.rightAnchor="30.0" />
-                              <Button fx:id="efectivizarTodos1" layoutX="52.0" layoutY="814.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleEfectivizarTodos" prefHeight="26.0" prefWidth="118.0" text="Descartar Todo" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="30.0" />
+                              <Button fx:id="descartarTodos" layoutX="52.0" layoutY="814.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleDescartarTodos" prefHeight="26.0" prefWidth="118.0" text="Descartar Todo" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="30.0" />
                            </children>
                         </AnchorPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="444.0" prefWidth="319.0" stylesheets="@DarkTheme.css">
@@ -82,7 +82,7 @@
                                 <buttons>
                                     <Button fx:id="editar" layoutX="192.0" layoutY="17.0" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEditarPresupuesto" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Editar" />
                                     <Button fx:id="vistaPrevia" layoutX="101.0" layoutY="17.0" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleVistaPrevia" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Vista Previa" />
-                                  <Button maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Descartar" />
+                                  <Button fx:id="descartarUno" maxWidth="114.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleDescartarUno" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Descartar" />
                                     <Button fx:id="efectivizarUno" layoutX="125.0" layoutY="17.0" maxWidth="113.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEfectivizarUno" prefHeight="26.0" text="Efectivizar" />
                                 </buttons>
                                  <padding>
