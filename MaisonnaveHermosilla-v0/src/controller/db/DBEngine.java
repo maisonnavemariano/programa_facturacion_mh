@@ -336,7 +336,7 @@ public class DBEngine {
 			Statement st ;
 			
 			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente "
-					+ "WHERE Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
+					+ "WHERE Cliente.Efectivo = 'S' AND Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
 							+ "Cliente.CUIT LIKE '%"+cuit+"%' AND "
 									+ "Fecha BETWEEN '"+desde+"' AND '"+hasta+"';";
 			
@@ -373,7 +373,7 @@ public class DBEngine {
 			Statement st ;
 			
 			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente "
-					+ "WHERE Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
+					+ "WHERE Cliente.Efectivo = 'S' AND Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
 							+ "Cliente.CUIT LIKE '%"+cuit+"%' AND "
 									+ "Fecha = '"+fecha_actual+"';";
 			
