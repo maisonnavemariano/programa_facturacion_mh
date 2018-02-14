@@ -325,7 +325,6 @@ public class DBEngine {
 	// ==================================================================================================================================
 	//     ** ** ** **                                    PRESUPUESTOS                                              ** ** ** **
 	// ==================================================================================================================================
-
 	public List<Presupuesto> BuscarDesdeHasta(String denom, String cuit, String desde, String hasta){
 		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();
 		if(denom==null || cuit == null || desde ==null || hasta == null) {
@@ -337,7 +336,7 @@ public class DBEngine {
 			Statement st ;
 			
 			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente "
-					+ "WHERE Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
+					+ "WHERE Cliente.Efectivo = 'S' AND Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
 							+ "Cliente.CUIT LIKE '%"+cuit+"%' AND "
 									+ "Fecha BETWEEN '"+desde+"' AND '"+hasta+"';";
 			
@@ -374,7 +373,7 @@ public class DBEngine {
 			Statement st ;
 			
 			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente "
-					+ "WHERE Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
+					+ "WHERE Cliente.Efectivo = 'S' AND Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
 							+ "Cliente.CUIT LIKE '%"+cuit+"%' AND "
 									+ "Fecha = '"+fecha_actual+"';";
 			
@@ -398,6 +397,7 @@ public class DBEngine {
 		}
 		return toReturn;
 	}
+	
 	
 	public void eliminarPresupuestosNoEfectivos() {
 		try {
