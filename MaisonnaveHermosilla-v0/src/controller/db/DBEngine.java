@@ -80,6 +80,8 @@ public class DBEngine {
 				
 	}
 	
+
+	
 	/**
 	 * El método consulta a la base de datos por el único cliente que tiene ese dado Codigo_Cliente, si el mismo no aparece retorna un objeto nulo. 
 	 * Si el cliente es encontrado, se recuperan sus atributos de la base de datos y se los retornan a la clase que llamo el método. 
@@ -1015,6 +1017,50 @@ public class DBEngine {
 			p.setEfectivo(true);		
 		}
 		return (efectivo? t : null);//devolvemos la transaccion solo si la logramos guardar en la base de datos
+	}
+	
+	//public List<Transaccion> ultimosMovimientos(Cliente C){
+		
+		
+	//}
+	
+	/**
+	 * 
+	 * @return Una lista con objetos CuentaCorriente, donde cada objeto tiene el Cliente en cuestion, y el monto (double) que representa el estado de la cuenta corriente.
+	 */
+	public List<CuentaCorriente> getCuentasCorrientesHabilitados(){
+
+		Cliente aux;
+		double monto_aux;
+		List<CuentaCorriente> lista = new ArrayList<CuentaCorriente>();
+		String query = "SELECT * "
+				+ "FROM Cliente AS C INNER JOIN Cuenta_corriente AS CC ON CC.Codigo_cliente= C.Codigo_cliente WHERE C.Habilitado= 'S'";
+		
+		Statement st;
+		try {
+			st = conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    while(rs.next()){
+		    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+	    		//String telefono, String correoElectronico, String condicionIva, String habilitado
+		    	aux = new Cliente(rs.getInt("Codigo_Cliente"),
+		    			rs.getString("CUIT"),
+		    			rs.getString("Denominacion"),
+		    			rs.getString("Direccion"),
+		    			rs.getString("Localidad"),
+		    			rs.getString("Telefono"),
+		    			rs.getString("Email"),
+		    			rs.getString("Condicion_iva"),
+		    			rs.getString("Habilitado"));
+		    	monto_aux = rs.getDouble("Monto");
+		    	lista.add(new CuentaCorriente(aux,monto_aux));
+		    }
+		    st.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lista;
+		
 	}
 	
 	private double obtenerEstadoCuentaCorriente(Cliente C) throws InvalidClientException{
