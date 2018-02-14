@@ -1033,7 +1033,7 @@ public class DBEngine {
 			ResultSet rs = st.executeQuery(query);
 			if(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
 				toReturn = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
-						this.getCliente(rs.getInt("Codigo_Cliente")),
+						t.getCliente(),
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
 						rs.getDouble("Subtotal"),

@@ -30,7 +30,9 @@ public class Transaccion {
 	public boolean isValidTransaction(){
 		return (Nro_Transaccion != this.INVALID_NRO_TRANSACCION);
 	}
-	
+	public Cliente getCliente() {
+		return this.cliente;
+	}
 	public String getFecha(){
 		return Fecha;
 	}
