@@ -34,6 +34,9 @@ public class Transaccion {
 	public String getFecha(){
 		return Fecha;
 	}
+	public int getNroTransaccion() {
+		return Nro_Transaccion;
+	}
 	
 	public String toString(){
 		return "("+this.Nro_Transaccion+") ["+this.Fecha+"]-- Cliente: ["+this.cliente.toString()+"] -- Monto: "+this.Monto+" -- Estado cuenta corriente: "+this.Estado_cuenta_corriente+".";

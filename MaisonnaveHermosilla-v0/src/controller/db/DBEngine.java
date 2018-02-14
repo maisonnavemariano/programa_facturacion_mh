@@ -489,6 +489,7 @@ public class DBEngine {
 						rs.getFloat("Alicuota"),
 						rs.getDouble("Subtotal"),
 						rs.getDate("Fecha"));
+				toReturn.actualizarNroPresupuesto(nro_presupuesto);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -652,6 +653,7 @@ public class DBEngine {
 						rs.getDouble("Subtotal"),
 						rs.getDate("Fecha"));
 						toReturn.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
+				toReturn.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -960,7 +962,7 @@ public class DBEngine {
 			preparedStmt.setString(2, t.getFecha());
 			preparedStmt.setString(3, "P");
 			preparedStmt.setDouble(4, montoTotal );
-			preparedStmt.setString(5, "Efectivización de presupuesto");
+			preparedStmt.setString(5, "Presupuesto Nro: "+p.getNroPresupuesto());
 			preparedStmt.setDouble(6, nuevo_estado);
 			
 			
@@ -973,7 +975,8 @@ public class DBEngine {
 		}
 
 		
-		
+
+	    int nro_trans = -1;
 		// 
 		if(efectivo){ 
 			// REGISTRAR CAMBIO EN EL OBJETO PRESUPUESTO.
@@ -985,7 +988,6 @@ public class DBEngine {
 			try {
 				st = conn.createStatement();
 			    ResultSet rs = st.executeQuery(query_aux);
-			    int nro_trans = -1;
 			    if(rs.next())
 			    	nro_trans = rs.getInt("ultima_transaccion");
 			    p.actualizarNroTransaccion(nro_trans);
@@ -998,15 +1000,16 @@ public class DBEngine {
 			p.setFecha(Calendar.getInstance().getTime()); // Ponemos la fecha en que se efectivizo en el objeto y posteriormente
 															// la corregimos en la base de datos
 			//HACEMOS EFECTIVO EL PRESU EN LA BASE DE DATOS
-			query = "UPDATE Presupuesto SET Efectivo = 'S', Fecha = ? WHERE Nro_Presupuesto = ? "; // lo hacemos efectivo
+			query = "UPDATE Presupuesto SET Efectivo = 'S', Fecha = ?, Nro_Transaccion = ?  WHERE Nro_Presupuesto = ? "; // lo hacemos efectivo
 																									// y colocamos la fecha
-																									//de efectivizacion
+																									//de efectivizacion y asociamos el presupuesto con la transaccion que lo hizo efectivo.
 			PreparedStatement pt;
 			
 			try {
 				pt = conn.prepareStatement(query);
 				pt.setString(1, p.getFecha());
-				pt.setInt(2, p.getNroPresupuesto());
+				pt.setInt(2, nro_trans);
+				pt.setInt(3, p.getNroPresupuesto());
 				pt.execute();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -1019,10 +1022,60 @@ public class DBEngine {
 		return (efectivo? t : null);//devolvemos la transaccion solo si la logramos guardar en la base de datos
 	}
 	
-	//public List<Transaccion> ultimosMovimientos(Cliente C){
+	public Presupuesto getPresupuestoAsociado(Transaccion t){
+		Presupuesto toReturn = null;
 		
+		String query = "SELECT * FROM Presupuesto WHERE Nro_Transaccion = "+t.getNroTransaccion();
+		Statement st;
 		
-	//}
+		try {
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			if(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
+				toReturn = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
+						this.getCliente(rs.getInt("Codigo_Cliente")),
+						(rs.getString("Efectivo").equals("S") ? true:false),
+						rs.getFloat("Alicuota"),
+						rs.getDouble("Subtotal"),
+						rs.getDate("Fecha"));
+				toReturn.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return toReturn;
+	}
+	
+	public List<Transaccion> ultimosMovimientos(Cliente C){
+		List<Transaccion> transacciones = new ArrayList<Transaccion>();
+		Transaccion transaccion_aux;
+		String query = "SELECT * FROM Transaccion WHERE Codigo_Cliente = "+C.getCodigoCliente()+" ORDER BY Fecha";
+		
+		Statement st;
+		try {
+			st = conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    while(rs.next()){
+		    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+	    		//String telefono, String correoElectronico, String condicionIva, String habilitado
+		    	transaccion_aux = new Transaccion(C,
+		    			rs.getDate("Fecha"),
+		    			rs.getString("Evento").charAt(0),
+		    			rs.getDouble("Monto"),
+		    			rs.getString("Concepto"),
+		    			rs.getDouble("Estado_cuenta_corriente")
+		    			
+		    			);
+		    	transacciones.add(transaccion_aux);
+		    }
+		    st.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return transacciones;
+	}
 	
 	/**
 	 * 
