@@ -522,7 +522,7 @@ public class AreaDeTrabajoOverviewController  {
     	
     	//Botones
     	this.editar.setDisable(value);
-    	this.vistaPrevia.setDisable(value);
+    	this.vistaPrevia.setDisable(value); 
     	this.efectivizarTodos.setDisable(value);
     	this.efectivizarUno.setDisable(value);
     	this.descartarTodos.setDisable(value);
