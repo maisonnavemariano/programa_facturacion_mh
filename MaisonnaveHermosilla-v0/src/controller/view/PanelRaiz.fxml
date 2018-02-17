@@ -5,7 +5,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="900.0" stylesheets="@DarkTheme.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.view.PanelRaizController">
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.view.PanelRaizController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -17,8 +17,8 @@
                </items></Menu>
           <Menu mnemonicParsing="false" text="Cuentas Corrientes">
                <items>
-                  <MenuItem mnemonicParsing="false" text="Registrar pago" />
-                  <MenuItem mnemonicParsing="false" text="Ver estados de cuenta" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleRegistrarPago" text="Registrar pago" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleDetalleCuentaCorriente" text="Ver estados de cuenta" />
                </items></Menu>
           <Menu mnemonicParsing="false" text="Clientes">
             <items>

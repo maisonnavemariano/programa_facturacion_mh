@@ -1,9 +1,8 @@
 package controller;
 
 import controller.db.Cliente;
-//import controller.model.*;
+import controller.db.CuentaCorriente;
 import controller.view.*;
-import exception.InvalidBudgetException;
 import exception.InvalidClientException;
 import controller.db.*;
 
@@ -11,24 +10,17 @@ import java.io.IOException;
 import java.util.Optional;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -57,6 +49,11 @@ public class Main extends Application {
      * Motor de la base de datos.
      */
     private DBEngine DBMotor;
+    
+    /**
+     * lista observable de cuentas corrientes
+     */
+    private ObservableList<CuentaCorriente> cuentasCorrientesData;
    
     /**
      * Constructor de la clase principal. Inicializa las listas de clientes y 
@@ -66,9 +63,8 @@ public class Main extends Application {
     	
     	DBMotor = DBSingleton.getInstance();
     	clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente(""));
-    	//DBMotor.facturarTodos(); //Solo con propositos de prueba.
     	presupuestosNoEfectivosData = FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos());
-    	
+    	cuentasCorrientesData = FXCollections.observableArrayList(DBMotor.getCuentasCorrientesHabilitados());
     }
     
     /**
@@ -119,6 +115,30 @@ public class Main extends Application {
     public void setPresupuestosNoEfectivosData_DB() {
     	presupuestosNoEfectivosData = FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos());
     	
+    }
+    
+    /**
+     * Retorna la informacion de cuentas corrientes como una lista observable.
+     * @return
+     */
+    public ObservableList<CuentaCorriente> getCuentasCorrientesData() {
+        return cuentasCorrientesData;
+    }
+    
+    /**
+     * Setea lista observable de cuentas corrientes
+     * @return
+     */
+    public void setCuentasCorrientesData(ObservableList<CuentaCorriente> listaCuentas) {
+       cuentasCorrientesData = listaCuentas;
+    }
+    
+    /**
+     * Setea lista observable de presupuestos no efectivos desde la DB
+     * @return
+     */
+    public void setCuentasCorrientesData_DB() {
+    	cuentasCorrientesData = FXCollections.observableArrayList(DBMotor.getCuentasCorrientesHabilitados());
     }
     
      /**
@@ -267,6 +287,7 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("view/AreaDeTrabajoVista.fxml"));
             AnchorPane areaTrabajoVista = (AnchorPane) loader.load();
+            this.setPresupuestosNoEfectivosData_DB();
 
             // Setea la vista en el centro del Panel Raiz
             rootLayout.setCenter(areaTrabajoVista);
@@ -307,6 +328,7 @@ public class Main extends Application {
             // Setear los parametros del controlador       
             ModificarPresupuestoOverviewController controller = loader.getController();
             controller.setDialogStage(dialogStage);
+            controller.setmainApp(this);
             controller.setPresupuesto(presupuesto);
             controller.setPropietario(propietario);
 
@@ -383,8 +405,6 @@ public class Main extends Application {
     				Presupuesto presupuesto = null;
     				try {
     					presupuesto = DBMotor.facturarBorrador(cliente);
-    					//actualizo la lista observable desde la DB (en teoria)
-    					this.setPresupuestosNoEfectivosData(FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos()));
     				} catch (InvalidClientException e) {
     					System.out.println("falló el facturar borrador: estoy en main");
     					e.printStackTrace();
@@ -399,8 +419,8 @@ public class Main extends Application {
     	                    ButtonType.OK);
     	              alert.initOwner(this.getPrimaryStage());
     	              alert.setTitle("Nuevo presupuesto");
-    	              alert.setHeaderText("Ya existe un presupuesto no efectivo para el cliente "+cliente.getDenominacion()+".");
-    	              alert.setContentText("Puede editar dicho presupuesto en el menú Área de Trabajo.");
+    	              alert.setHeaderText(null);
+    	              alert.setContentText("Ya existe un presupuesto no efectivo para el cliente "+cliente.getDenominacion()+".\n\nPuede editar dicho presupuesto en el menú Área de Trabajo.");
     	              alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
     	              alert.showAndWait();
     			}
@@ -433,13 +453,104 @@ public class Main extends Application {
             rootLayout.setCenter(verPrespuestosVista);
 
             // Brinda acceso a la apilcaciòn principal al controlador particular de la vista
-            //TODO: Asignar controlador a la vista, y programarlo. por ahora muestra una ventana boba.
-            VerPresupuestosOverviewController controller = loader.getController();
+             VerPresupuestosOverviewController controller = loader.getController();
             controller.setMainApp(this, DBMotor);
 
         } catch (IOException e) {
             e.printStackTrace();
         }  
     }
+    
+    public void showDetallePresupuestoVista(Presupuesto presupuesto){
+    	try {
+            // Carga el archivo .fxml y crea un nuevo stage para el diálogo pop-up
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Main.class.getResource("view/DetallePresupuestoOverview.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+
+            // Crea el Stage para el diálogo
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Detalle de Presupuesto");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(primaryStage);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // Setear los parametros del controlador       
+            DetallePresupuestoOverviewController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setPresupuesto(presupuesto);
+
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
+
+            //return controller.isOkClicked();
+        	} 
+    		catch (IOException e) {
+    			e.printStackTrace();
+    			//return false;
+    		}
+    }
    
+    
+    public void showDetalleCuentaCorrienteOverview(){
+    	try {
+            // Carga el archivo .fxml y crea un nuevo stage para el diálogo pop-up
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Main.class.getResource("view/DetalleCuentaCorrienteOverview.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+
+            // Crea el Stage para el diálogo
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Detalle de Cuentas Corrientes");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.setMaximized(false);
+            dialogStage.initOwner(primaryStage);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // Setear los parametros del controlador       
+            DetalleCuentaCorrienteOverviewController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setMainApp(this);
+            controller.arranque();
+
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void showRegistrarPagoOverview(){
+    	try {
+            // Carga el archivo .fxml y crea un nuevo stage para el diálogo pop-up
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Main.class.getResource("view/RegistrarPagoOverview.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+
+            // Crea el Stage para el diálogo
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Registrar Pago");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.setMaximized(false);
+            dialogStage.initOwner(primaryStage);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // Setear los parametros del controlador       
+            RegistrarPagoOverviewController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setMainApp(this);
+            controller.arranque();
+
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
 }

@@ -3,24 +3,29 @@ package controller.db;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class Transaccion {
 	protected final int INVALID_NRO_TRANSACCION = -1 ;
 	protected int Nro_Transaccion;
 	protected Cliente cliente;
-	protected String Fecha;
+	protected StringProperty Fecha;
 	protected char Evento;
-	protected double Monto;
-	protected String concepto_observacion;
-	protected double Estado_cuenta_corriente;
+	protected DoubleProperty Monto;
+	protected StringProperty concepto_observacion;
+	protected DoubleProperty Estado_cuenta_corriente;
 	
 	public Transaccion(Cliente cliente, Date fecha, char evento, double monto, String obs, double Estado_cuenta_corriente){
 		this.cliente = cliente;
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
-		this.Fecha = format1.format(fecha);
+		this.Fecha = new SimpleStringProperty(format1.format(fecha));
 		this.Evento = evento;
-		this.Monto = monto;
-		this.concepto_observacion = obs;
-		this.Estado_cuenta_corriente = Estado_cuenta_corriente;
+		this.Monto = new SimpleDoubleProperty(monto);
+		this.concepto_observacion = new SimpleStringProperty(obs);
+		this.Estado_cuenta_corriente = new SimpleDoubleProperty(Estado_cuenta_corriente);
 	}
 	
 	public void actualizarNroTransaccion(int nroT){
@@ -33,9 +38,38 @@ public class Transaccion {
 	public Cliente getCliente() {
 		return this.cliente;
 	}
+	
 	public String getFecha(){
-		return Fecha;
+		return Fecha.get();
 	}
+	public StringProperty fechaProperty(){
+		return this.Fecha;
+	}
+	
+	public StringProperty eventoProperty(){
+		StringProperty toret = new SimpleStringProperty(); 
+		if (this.Evento == 'C') 
+			toret.set("Pago");
+		else if (this.Evento == 'P')
+			toret.set("Facturación");
+		else
+			toret.set("Sin información");
+		
+		return toret;
+	}
+	
+	public DoubleProperty montoProperty(){
+		return this.Monto;
+	}
+	
+	public StringProperty observacionProperty(){
+		return this.concepto_observacion;
+	}
+	
+	public DoubleProperty estadoCuentaProperty(){
+		return this.Estado_cuenta_corriente;
+	}
+	
 	public int getNroTransaccion() {
 		return Nro_Transaccion;
 	}

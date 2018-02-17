@@ -1,8 +1,9 @@
 package controller.view;
 
-import java.text.SimpleDateFormat;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import controller.Main;
 import controller.db.Cliente;
@@ -10,11 +11,14 @@ import controller.db.Concepto;
 import controller.db.DBEngine;
 import controller.db.DBSingleton;
 import controller.db.Presupuesto;
-import javafx.application.Platform;
+import exception.InvalidBudgetException;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -25,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Region;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -59,12 +64,14 @@ public class VerPresupuestosOverviewController {
 	 private Button buscarButton;
 	 @FXML
 	 private Button borrarCriteriosButton;
+	 @FXML
+	 private Button PDFButton;
 	 
 	 //TABLA PRESUPUESTOS
 	 @FXML
 	 private TableView<Presupuesto> presupuestosTable;
 	 @FXML
-	 private TableColumn<Presupuesto, String> Nro_Column;
+	 private TableColumn<Presupuesto, Number> Nro_Column;
 	 @FXML
 	 private TableColumn<Presupuesto, String> cuit_Column;
 	 @FXML
@@ -93,6 +100,8 @@ public class VerPresupuestosOverviewController {
 	 private Label subtotalLabel;
 	 @FXML
 	 private Label montoTotalLabel;
+	 @FXML
+	 private Label resultadosEncontradosLabel;
 	 
 	 //BOTONES GENERALES
 	 @FXML
@@ -113,7 +122,7 @@ public class VerPresupuestosOverviewController {
 	 private boolean exactaPresionado = false;
 	 
 	 private DateTimeFormatter formatter_1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	 private DateTimeFormatter formatter_2 = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	 private DateTimeFormatter formatter_2 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	 
 	public VerPresupuestosOverviewController(){
 	}
@@ -135,6 +144,14 @@ public class VerPresupuestosOverviewController {
      */
     @FXML
     private void initialize() {
+    	
+    	// Inicializa la tabla de presupuestos con los valores de las 3 columnas.
+    	Nro_Column.setCellValueFactory(
+    			cellData -> cellData.getValue().NroPresupuestoProperty());
+        cuit_Column.setCellValueFactory(
+                cellData -> cellData.getValue().getCliente().cuitProperty());
+        denominacion_Column.setCellValueFactory(
+                cellData -> cellData.getValue().getCliente().denominacionProperty());
     	
     	//Borrar detalles de Presupuesto
         showPresupuestoDetails(null);
@@ -173,8 +190,86 @@ public class VerPresupuestosOverviewController {
    			 	cuitTextField.setText(oldText); 
    	 	}); 
         
+        
+        final Callback<DatePicker, DateCell> HCellFactory = 
+    	        new Callback<DatePicker, DateCell>() {
+    	            @Override
+    	            public DateCell call(final DatePicker datePicker) {
+    	                return new DateCell() {
+    	                    @Override
+    	                    public void updateItem(LocalDate item, boolean empty) {
+    	                        super.updateItem(item, empty);
+    	                        LocalDate piso;
+    	                        if(desdeDatePicker.getValue()==null){
+    	                        	piso = LocalDate.of(2003, 1, 1);
+    	                        }
+    	                        else{
+    	                        	piso = desdeDatePicker.getValue().plusDays(1);
+    	                        }
+    	                        if (item.isBefore(piso)){
+    	                                setDisable(true);
+    	                                setStyle("-fx-background-color: #d3d3d3;");
+    	                        }
+    	                        if (item.isAfter(
+    	                                LocalDate.now()) 
+    	                        		){
+    	                                setDisable(true);
+    	                                setStyle("-fx-background-color: #d3d3d3;");
+    	                        }
+    	                        if (item.isBefore(
+    	                        		LocalDate.of(2003, 1, 1)) 
+    	                        		){
+    	                                setDisable(true);
+    	                                setStyle("-fx-background-color: #d3d3d3;");
+    	                        }
+    	                    }
+    	                };
+    	            }
+        		};
+    	    
+    	final Callback<DatePicker, DateCell> DECellFactory = 
+        	        new Callback<DatePicker, DateCell>() {
+        	            @Override
+        	            public DateCell call(final DatePicker datePicker) {
+        	                return new DateCell() {
+        	                    @Override
+        	                    public void updateItem(LocalDate item, boolean empty) {
+        	                        super.updateItem(item, empty);
+        	                        if (item.isAfter(
+        	                                LocalDate.now()) 
+        	                        		){
+        	                                setDisable(true);
+        	                                setStyle("-fx-background-color: #d3d3d3;");
+        	                        }
+        	                        if (item.isBefore(
+        	                        		LocalDate.of(2003, 1, 1)) 
+        	                        		){
+        	                                setDisable(true);
+        	                                setStyle("-fx-background-color: #d3d3d3;");
+        	                        }
+        	                       
+        	                }
+        	            };
+        	        }
+        	    };
+        
+    	hastaDatePicker.setDayCellFactory(HCellFactory);
+    	desdeDatePicker.setDayCellFactory(DECellFactory);
+    	exactaDatePicker.setDayCellFactory(DECellFactory);
+    	    
+    	hastaDatePicker.setEditable(false);
+    	desdeDatePicker.setEditable(false);
+    	exactaDatePicker.setEditable(false);
+    	exactaDatePicker.setDisable(true);
+    	
+    	resultadosEncontradosLabel.setText("");
+        
     }
     
+    
+    
+    
+
     /**
      * Setea el stage para este diálogo
      * 
@@ -223,7 +318,8 @@ public class VerPresupuestosOverviewController {
             	ivaLabel.setText("Sin información");
             }
             
-            fechaLabel.setText(presupuesto.getFecha_ARG());
+            String fechaMostrar = presupuesto.getFecha_ARG().replaceAll("-", "/");
+            fechaLabel.setText(fechaMostrar);
             
             Float ali = presupuesto.getAlicuota();
             if(ali!= null){
@@ -323,7 +419,6 @@ public class VerPresupuestosOverviewController {
 		if(denominacionTextField.getText()!=null)
 			denominacion=denominacionTextField.getText();
 		
-		System.out.println(cuit + denominacion + fecha_desde + fecha_hasta + fecha_exacta);
 		//Luego, establezco cuales son los criterios de búsqueda y busco
 		
 		if(desdeHastaPresionado){
@@ -365,8 +460,7 @@ public class VerPresupuestosOverviewController {
 				alert.showAndWait();
 			}
 			else{//Si no hay error procedo a la busqueda en la DB
-				//ObservableList<Presupuesto> listaPresupuestos = FXCollections.observableArrayList(DBMotor.verPresupuestosNoEfectivosPorCuit(busqueda));
-				//mainApp.setPresupuestosNoEfectivosData(listaPresupuestos);
+				this.ListaPresupuestos = FXCollections.observableArrayList(DBMotor.BuscarDesdeHasta(denominacion, cuit, fecha_desde, fecha_hasta));
 			}
 			
 		}
@@ -397,11 +491,13 @@ public class VerPresupuestosOverviewController {
 				alert.showAndWait();
 			}
 			else{//Si no hay error procedo a la busqueda en la DB
-				//ObservableList<Presupuesto> listaPresupuestos = FXCollections.observableArrayList(DBMotor.verPresupuestosNoEfectivosPorCuit(busqueda));
-				//mainApp.setPresupuestosNoEfectivosData(listaPresupuestos);
+				this.ListaPresupuestos = FXCollections.observableArrayList(DBMotor.BuscarFechaExacta(denominacion, cuit, fecha_exacta));
 			}
 		}
-		presupuestosTable.setItems(mainApp.getPresupuestosNoEfectivosData());
+		int c = ListaPresupuestos.size();
+		this.resultadosEncontradosLabel.setText(c + " resultados.");
+		presupuestosTable.setItems(this.ListaPresupuestos);
+
 		
     }
     
@@ -412,6 +508,9 @@ public class VerPresupuestosOverviewController {
      private void handleDesdeHastaRadioButton() {
  	   desdeHastaPresionado = true;
  	   exactaPresionado = false;
+ 	   exactaDatePicker.setDisable(true);
+ 	   desdeDatePicker.setDisable(false);
+ 	   hastaDatePicker.setDisable(false);
     }
     
     /**
@@ -421,6 +520,10 @@ public class VerPresupuestosOverviewController {
      private void handleExactaRadioButton() {
  	   desdeHastaPresionado = false;
  	   exactaPresionado = true;
+ 	   desdeDatePicker.setDisable(true);
+ 	   hastaDatePicker.setDisable(true);
+ 	   exactaDatePicker.setDisable(false);
+ 	   
     }
      
     public void handleBorrarCriterios(){
@@ -437,7 +540,86 @@ public class VerPresupuestosOverviewController {
     
     public void handleImprimirTodos(){}
     
-    public void handleAnular(){}
+    public void handleAnular(){
+    	Presupuesto seleccionado = presupuestosTable.getSelectionModel().getSelectedItem();
+    	if(seleccionado == null){
+    		Alert alert = new Alert(AlertType.WARNING);
+    		alert.initOwner(dialogStage);
+    		alert.setTitle("Seleccionar presupuesto");
+    		alert.setHeaderText(null);
+    		alert.setContentText("No ha seleccionado ningún presupuesto de la lista.");
+    		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+    		alert.showAndWait();
+    	}
+    	else{
+    		Alert alert = new Alert(AlertType.CONFIRMATION,"",ButtonType.OK, ButtonType.CANCEL);
+    		alert.initOwner(dialogStage);
+    		alert.setTitle("Anular presupuesto efectivo");
+    		alert.setHeaderText("Presupuesto Nº "+ seleccionado.getNroPresupuesto()+" - "+ seleccionado.getCliente().getDenominacion());
+    		alert.setContentText("¿Desea anular el presupuesto seleccionado?\n\nEsta acción modificará el estado de cuenta corriente del cliente.");
+    		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+    		Optional<ButtonType> resultado = alert.showAndWait();
+    		
+    		if (resultado.get().equals(ButtonType.OK)){
+    			//Primero anulo el presupuesto
+    			try {
+					DBMotor.desefectivizar(seleccionado);
+				} catch (InvalidBudgetException e) {
+					System.out.println("fallo el desefectivizar presupuesto");
+					e.printStackTrace();
+				}
+    			
+    			//Actualizo la vista
+    			this.ListaPresupuestos.remove(this.ListaPresupuestos.indexOf(seleccionado));
+    			this.presupuestosTable.setItems(ListaPresupuestos);
+    			
+    			//Luego informo al usuario que salio todo bien
+    			alert = new Alert(AlertType.INFORMATION);
+        		alert.initOwner(dialogStage);
+        		alert.setTitle("Anular presupuesto efectivo");
+        		alert.setHeaderText(null);
+        		alert.setContentText("El presupuesto Nº "+ seleccionado.getNroPresupuesto() + " fue anulado.\n\nPuede editarlo o eliminarlo definitivamente en el menú Area de Trabajo.");
+        		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        		alert.showAndWait();
+    			
+    		}
+    		else{
+    			//No hago nada y cierro el alerta ppal.
+    		}
+    	}
+    }
     
-    public void handleVerDetalle(){}
+    public void handleVerDetalle(){
+    	if(presupuestosTable.getSelectionModel().getSelectedItem() != null)
+		mainApp.showDetallePresupuestoVista(presupuestosTable.getSelectionModel().getSelectedItem());
+	else{
+		Alert alert = new Alert(AlertType.WARNING);
+		alert.initOwner(dialogStage);
+		alert.setTitle("Seleccionar presupuesto");
+		alert.setHeaderText(null);
+		alert.setContentText("No ha seleccionado ningún presupuesto de la lista.");
+		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+		alert.showAndWait();
+	}}
+    
+    @FXML
+    private void handleGuardarPDF(){
+    	FileChooser fileChooser = new FileChooser();
+
+        // Set extension filter
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "Archivos PDF (*.pdf)", "*.pdf");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        // Show save file dialog
+        File file = fileChooser.showSaveDialog(dialogStage);
+
+        if (file != null) {
+            // Make sure it has the correct extension
+            if (!file.getPath().endsWith(".pdf")) {
+                file = new File(file.getPath() + ".pdf");
+            }
+            //mainApp.savePersonDataToFile(file);
+        }
+    }
 }

@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.Region;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
@@ -159,11 +160,12 @@ public class ClienteOverviewController {
 
         } else {
             // Nothing selected.
-            Alert alert = new Alert(AlertType.INFORMATION);
+            Alert alert = new Alert(AlertType.WARNING);
             alert.initOwner(mainApp.getPrimaryStage());
             alert.setTitle("Seleccionar cliente");
-            alert.setHeaderText("No se ha seleccionado un cliente");
-            alert.setContentText("Por favor, seleccione un cliente en la tabla.");
+            alert.setHeaderText(null);
+            alert.setContentText("No se ha seleccionado un cliente de la lista.");
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
             alert.showAndWait();
         }
@@ -189,6 +191,7 @@ public class ClienteOverviewController {
             	alert.setHeaderText("¿Desea habilitar el cliente seleccionado?");
             }
             alert.setContentText(null);
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             Optional<ButtonType> result = alert.showAndWait();
             
             if(result.get() == ButtonType.OK){
@@ -207,12 +210,12 @@ public class ClienteOverviewController {
         } 
         else {
             // Nothing selected.
-            Alert alert = new Alert(AlertType.INFORMATION);
+            Alert alert = new Alert(AlertType.WARNING);
             alert.initOwner(mainApp.getPrimaryStage());
             alert.setTitle("Seleccionar cliente");
-            alert.setHeaderText("No se ha seleccionado un cliente");
-            alert.setContentText("Por favor, seleccione un cliente en la tabla.");
-
+            alert.setHeaderText(null);
+            alert.setContentText("No se ha seleccionado un cliente de la lista.");
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.showAndWait();
         }
     }

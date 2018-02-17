@@ -221,6 +221,16 @@ public class ModificarClienteOverviewController {
             alert.showAndWait();
     		
     	}
+    	//Sino chequear si el cuit tiene exacto 11 caracteres
+    	else if (cuit_valor.length()!=11){
+    		Alert alert = new Alert(AlertType.ERROR);
+            alert.initOwner(dialogStage);
+            alert.setTitle("Campos CUIT");
+            alert.setHeaderText(null);
+            alert.setContentText("El número de CUIT debe constar de 11 cifras entre 0 y 9.");
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            alert.showAndWait();
+    	}
     	
     	else{
     	    cliente.setCuit(cuit_valor);
@@ -257,14 +267,15 @@ public class ModificarClienteOverviewController {
             }
             
             
-            Alert alert = new Alert(AlertType.INFORMATION, 
+            Alert alert = new Alert(AlertType.CONFIRMATION, 
 		  			 "",
                     ButtonType.OK, 
                     ButtonType.CANCEL);
             alert.initOwner(dialogStage);
             alert.setTitle("Aceptar: Nuevo cliente");
-            alert.setHeaderText("¿Desea guardar los cambios realizados?");
-            //alert.setContentText("Pulse Aceptar para guardar los cambios realizados.");
+            alert.setHeaderText(null);
+            alert.setContentText("¿Desea guardar los cambios realizados?");
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
             Optional<ButtonType> result = alert.showAndWait();
 
@@ -285,15 +296,16 @@ public class ModificarClienteOverviewController {
     @FXML
     private void handleCancelar() {
     	
-    	  Alert alert = new Alert(AlertType.INFORMATION, 
+    	  Alert alert = new Alert(AlertType.CONFIRMATION, 
     			  			 "",
     	                     ButtonType.OK, 
     	                     ButtonType.CANCEL);
           alert.initOwner(dialogStage);
           alert.setTitle("Cancelar: Modificar cliente");
-          alert.setHeaderText("¿Desea descartar los cambios realizados?");
-          alert.setContentText("Pulse Aceptar para descartar los cambios realizados.");
-         
+          alert.setHeaderText(null);
+          alert.setContentText("¿Desea descartar los cambios realizados?\n\nPulse Aceptar para descartar los cambios realizados.");
+          alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
           Optional<ButtonType> result = alert.showAndWait();
 
           if (result.get() == ButtonType.OK) {

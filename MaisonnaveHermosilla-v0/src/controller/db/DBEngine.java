@@ -1067,6 +1067,7 @@ public class DBEngine {
 		    			rs.getDouble("Estado_cuenta_corriente")
 		    			
 		    			);
+		    	transaccion_aux.actualizarNroTransaccion(rs.getInt("Nro_Transaccion"));
 		    	transacciones.add(transaccion_aux);
 		    }
 		    st.close();
@@ -1188,7 +1189,7 @@ public class DBEngine {
 			preparedStmt = conn.prepareStatement(query);
 			preparedStmt.setInt(1, cliente.getCodigoCliente());
 			preparedStmt.setString(2, toReturn.getFecha());
-			preparedStmt.setString(3, "R");
+			preparedStmt.setString(3, "C");
 			preparedStmt.setDouble(4, monto_pagado);
 			preparedStmt.setString(5, obs);
 			preparedStmt.setDouble(6, nuevo_estado);

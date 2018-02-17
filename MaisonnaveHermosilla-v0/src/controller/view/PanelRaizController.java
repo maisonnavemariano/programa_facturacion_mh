@@ -94,6 +94,18 @@ public class PanelRaizController {
     
     /*-----------------------MENU CUENTAS CORRIENTES-----------------------*/
     
+    @FXML
+    private void handleDetalleCuentaCorriente(){
+    	
+    	mainApp.showDetalleCuentaCorrienteOverview();
+    }
+    
+    @FXML
+    private void handleRegistrarPago(){
+    	
+    	mainApp.showRegistrarPagoOverview();
+    }
+    
     
 
     /*-----------------------------MENU AYUDA-----------------------------*/

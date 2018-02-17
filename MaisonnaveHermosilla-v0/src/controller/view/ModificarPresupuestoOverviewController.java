@@ -1,7 +1,6 @@
 package controller.view;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -10,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -21,16 +19,11 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Optional;
 
 import controller.db.Presupuesto;
 import exception.InvalidBudgetException;
+import controller.Main;
 import controller.db.Cliente;
 import controller.db.Concepto;
 import controller.db.DBEngine;
@@ -78,6 +71,7 @@ public class ModificarPresupuestoOverviewController {
     
     private Object propietario;
     
+    private Main mainApp;
     private DBEngine DBMotor = DBSingleton.getInstance();
 
     /**
@@ -113,6 +107,10 @@ public class ModificarPresupuestoOverviewController {
         this.dialogStage.setOnCloseRequest((WindowEvent event1) -> {
             handleCancelar();
         });
+    }
+    
+    public void setmainApp(Main m){
+    	this.mainApp=m;
     }
 
     /**
@@ -215,20 +213,21 @@ public class ModificarPresupuestoOverviewController {
         
         //INICIO
         //DESEA GUARDAR LOS CAMBIOS?
-        Alert alert = new Alert(AlertType.INFORMATION,
+        Alert alert = new Alert(AlertType.CONFIRMATION,
         		"",
-        		ButtonType.OK, 
-                ButtonType.CANCEL);
+        		ButtonType.YES, 
+                ButtonType.NO);
         alert.initOwner(dialogStage);
-        alert.setTitle("Aceptar: Editar presupuesto");
-        alert.setHeaderText("¿Desea guardar los cambios realizados?");
-        alert.setContentText("Pulse Aceptar para guardar los cambios realizados.");
+        alert.setTitle("Editar presupuesto");
+        alert.setHeaderText(null);
+        alert.setContentText("¿Desea guardar los cambios realizados?");
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
 
         Optional<ButtonType> result = alert.showAndWait();
 
         //GUARDAR LOS CAMBIOS = OK
-        if (result.get() == ButtonType.OK) {
+        if (result.get() == ButtonType.YES) {
         	okClicked = true;
            
             //Actualizo el presupuesto en la base de datos
@@ -242,7 +241,7 @@ public class ModificarPresupuestoOverviewController {
 			if(this.propietario.getClass().getName().equals("controller.Main")){
 				
 				 //DESEA ADEMÁS EFECTIVIZAR?
-				 Alert alerta = new Alert(AlertType.INFORMATION, 
+				 Alert alerta = new Alert(AlertType.CONFIRMATION, 
 	 		  			 "",
 	                    ButtonType.YES, 
 	                    ButtonType.NO);
@@ -271,15 +270,17 @@ public class ModificarPresupuestoOverviewController {
 	                        ButtonType.OK);
 	                  alert.initOwner(dialogStage);
 	                  alert.setTitle("Efectivizar presupuesto");
-	                  alert.setHeaderText("Se ha efectivizado el presupuesto nº "+ presupuesto.NroPresupuestoStringProperty().get());
-	                  alert.setContentText(null);
+	                  alert.setHeaderText(null);
+	                  alert.setContentText("Se ha efectivizado el presupuesto nº "+ presupuesto.NroPresupuestoStringProperty().get());
 	                  alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 	                  alert.showAndWait();
 	              }
 	              
 	              //DESEA ADEMÁS EFECTIVIZAR = NO
 	              else{
-	             	 //No hago nada y cierro
+	            	//actualizo la lista observable desde la DB (en teoria)
+  					mainApp.setPresupuestosNoEfectivosData(FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos()));
+  				
 	              }
 			}//FIN FUE LLAMADO DESDE MAIN?
 			
@@ -295,18 +296,18 @@ public class ModificarPresupuestoOverviewController {
     @FXML
     private void handleCancelar() {
     	
-    	  Alert alert = new Alert(AlertType.INFORMATION, 
+    	  Alert alert = new Alert(AlertType.CONFIRMATION, 
     			  			 "",
-    	                     ButtonType.OK, 
-    	                     ButtonType.CANCEL);
+    	                     ButtonType.YES, 
+    	                     ButtonType.NO);
           alert.initOwner(dialogStage);
           alert.setTitle("Cancelar: Editar presupuesto");
-          alert.setHeaderText("¿Desea descartar los cambios realizados?");
-          alert.setContentText("Pulse Aceptar para descartar los cambios realizados.");
+          alert.setHeaderText(null);
+          alert.setContentText("¿Desea descartar los cambios realizados?");
          
           Optional<ButtonType> result = alert.showAndWait();
 
-          if (result.get() == ButtonType.OK) {
+          if (result.get() == ButtonType.YES) {
         	  dialogStage.close();
           }   
     }
@@ -501,11 +502,11 @@ public class ModificarPresupuestoOverviewController {
     	}
     	else{
     		 // No se seleccionó ningún concepto
-            Alert alert = new Alert(AlertType.INFORMATION);
+            Alert alert = new Alert(AlertType.WARNING);
             alert.initOwner(dialogStage);
             alert.setTitle("Seleccionar concepto");
-            alert.setHeaderText("No se ha seleccionado un concepto");
-            alert.setContentText("Por favor, seleccione un concepto en la tabla.");
+            alert.setHeaderText(null);
+            alert.setContentText("No se ha seleccionado un concepto de la lista.");
 
             alert.showAndWait();
     	}
@@ -516,7 +517,7 @@ public class ModificarPresupuestoOverviewController {
     	Concepto selectedConcepto = conceptosTable.getSelectionModel().getSelectedItem();
         if (selectedConcepto != null) {
         	 // Se procede a alertar al usuario
-             Alert alert = new Alert(AlertType.WARNING, 
+             Alert alert = new Alert(AlertType.CONFIRMATION, 
 		  			 "",
                    ButtonType.YES, 
                    ButtonType.NO);
@@ -554,11 +555,11 @@ public class ModificarPresupuestoOverviewController {
         } 
         else {
             // No se seleccionó ningún concepto
-            Alert alert = new Alert(AlertType.INFORMATION);
+            Alert alert = new Alert(AlertType.WARNING);
             alert.initOwner(dialogStage);
             alert.setTitle("Seleccionar concepto");
-            alert.setHeaderText("No se ha seleccionado un concepto");
-            alert.setContentText("Por favor, seleccione un concepto en la tabla.");
+            alert.setHeaderText(null);
+            alert.setContentText("No se ha seleccionado un concepto de la lista.");
 
             alert.showAndWait();
         }

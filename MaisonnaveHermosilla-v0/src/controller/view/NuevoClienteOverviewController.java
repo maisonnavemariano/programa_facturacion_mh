@@ -183,6 +183,17 @@ public class NuevoClienteOverviewController {
     		
     	}
     	
+    	//Sino chequear si el cuit tiene exacto 11 caracteres
+    	else if (cuit_valor.length()!=11){
+    		Alert alert = new Alert(AlertType.ERROR);
+            alert.initOwner(dialogStage);
+            alert.setTitle("Campo CUIT");
+            alert.setHeaderText(null);
+            alert.setContentText("El número de CUIT debe constar de 11 cifras entre 0 y 9.");
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            alert.showAndWait();
+    	}
+    	
     	else{
     	    cliente.setCuit(cuit_valor);
             cliente.setDenominacion(denominacion_valor);
@@ -218,18 +229,18 @@ public class NuevoClienteOverviewController {
             }
             
             
-            Alert alert = new Alert(AlertType.INFORMATION, 
+            Alert alert = new Alert(AlertType.CONFIRMATION, 
 		  			 "",
-                    ButtonType.OK, 
-                    ButtonType.CANCEL);
+                    ButtonType.YES, 
+                    ButtonType.NO);
             alert.initOwner(dialogStage);
             alert.setTitle("Aceptar: Nuevo cliente");
-            alert.setHeaderText("¿Desea guardar los cambios realizados?");
-            //alert.setContentText("Pulse Aceptar para guardar los cambios realizados.");
+            alert.setHeaderText(null);
+            alert.setContentText("¿Desea guardar los cambios realizados?");
 
             Optional<ButtonType> result = alert.showAndWait();
 
-            if (result.get() == ButtonType.OK) {
+            if (result.get() == ButtonType.YES) {
             	 okClicked = true;
                  //Actualizo el cliente en la base de datos
                  DBMotor.agregarCliente(cliente);
@@ -246,78 +257,19 @@ public class NuevoClienteOverviewController {
     @FXML
     private void handleCancelar() {
     	
-    	  Alert alert = new Alert(AlertType.INFORMATION, 
+    	  Alert alert = new Alert(AlertType.CONFIRMATION, 
     			  			 "",
-    	                     ButtonType.OK, 
-    	                     ButtonType.CANCEL);
+    	                     ButtonType.YES, 
+    	                     ButtonType.NO);
           alert.initOwner(dialogStage);
           alert.setTitle("Cancelar: Nuevo cliente");
-          alert.setHeaderText("¿Desea descartar los cambios realizados?");
-          alert.setContentText("Pulse Aceptar para descartar los cambios realizados.");
+          alert.setHeaderText(null);
+          alert.setContentText("¿Desea descartar los cambios realizados?");
          
           Optional<ButtonType> result = alert.showAndWait();
 
-          if (result.get() == ButtonType.OK) {
+          if (result.get() == ButtonType.YES) {
         	  dialogStage.close();
           }   
     }
-
-    /**
-     * Valida las entradas de datos en la pantalla de nuevo cliente.
-     * 
-     * @return true si la entrada es válida
-     */
-   /* private boolean isInputValid() {
-        String errorMessage = "";
-
-        //Chequeo formato del numero de CUIT ingresado
-        String numeroCuit = cuitField.getText();
-                
-        if (numeroCuit == null || numeroCuit.length() <= 0) {
-            errorMessage += "El número de CUIT es un campo obligatorio.\n"; 
-        }
-        else{
-        	 //aca chequear si no es nulo primero!!!
-            numeroCuit = numeroCuit.replace("-","");
-            numeroCuit = numeroCuit.replace(".","");
-            boolean cuitIsNumeric = numeroCuit.chars().allMatch( Character::isDigit );
-            
-            if(numeroCuit.length() > 11){
-            	errorMessage += "El número de CUIT debe estar formado por 11 dígitos como máximo.\n"; 
-            }
-            if(!cuitIsNumeric){
-            	errorMessage += "Se han ingresado caracteres inválidos en el campo CUIT.\n"; 
-            }
-        }
-        if (denominacionField.getText() == null || denominacionField.getText().length() <= 0) {
-            errorMessage += "La denominación de cliente es un campo obligatorio.\n"; 
-        }
-        else if (denominacionField.getText().length() > 60){
-        	errorMessage += "La denominación no puede contener más de 60 caracteres.\n";
-        }
-        if (condicionIvaChoiceBox.getValue() == null || condicionIvaChoiceBox.getValue().length() <= 0) {
-            errorMessage += "La condición de IVA del cliente es un campo obligatorio.\n"; 
-        }
-        if (direccionField.getText() != null && direccionField.getText().length() > 100){
-        	errorMessage += "La dirección no puede contener más de 100 caracteres.\n"; 
-        }
-        if (localidadField.getText() != null && localidadField.getText().length() > 45){
-        	errorMessage += "La localidad no puede contener más de 45 caracteres.\n"; 
-        }
-        if (telefonoField.getText() != null && telefonoField.getText().length() > 25){
-        	errorMessage += "El número de teléfono no puede contener más de 25 caracteres.\n"; 
-        }
-        if (correoElectronicoField.getText() != null && correoElectronicoField.getText().length() > 60){
-        	errorMessage += "El correo electrónico no puede contener más de 60 caracteres.\n"; 
-        }
-        
-
-        if (errorMessage.length() == 0) {
-            return true;
-        } else {
-            
-
-            return false;
-        }
-    }*/
 }

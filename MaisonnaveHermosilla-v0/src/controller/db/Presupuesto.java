@@ -215,7 +215,7 @@ public class Presupuesto {
 				
 		//Format2: lo que se muestra por pantallas (formato argentino)
 		//Solo para mostrarlo en la aplicacion cuando sea necesario
-		SimpleDateFormat format2 = new SimpleDateFormat("dd-MM-yyyy");
+		SimpleDateFormat format2 = new SimpleDateFormat("dd/MM/yyyy");
 		this.fecha_ARG = new SimpleStringProperty(format2.format(f));
 	}
 	

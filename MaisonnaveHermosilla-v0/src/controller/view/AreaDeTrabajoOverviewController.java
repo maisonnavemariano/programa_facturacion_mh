@@ -19,8 +19,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.util.Callback;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 
 import java.util.Optional;
 
@@ -41,7 +39,7 @@ public class AreaDeTrabajoOverviewController  {
     @FXML
     private TableView<Presupuesto> presupuestosTable;
     @FXML
-    private TableColumn<Presupuesto, String> numeroColumn;
+    private TableColumn<Presupuesto, Number> numeroColumn;
     @FXML
     private TableColumn<Presupuesto, String> cuitColumn;
     @FXML
@@ -87,6 +85,7 @@ public class AreaDeTrabajoOverviewController  {
     private Button descartarUno;
     @FXML
     private Button generarPresupuestosMensuales;
+    
     
     //Usados solamente en el metodo: efectivizar todos
     @FXML
@@ -202,7 +201,7 @@ public class AreaDeTrabajoOverviewController  {
     private void initialize() {
         // Inicializa la tabla de presupuestos con los valores de las 3 columnas.
     	numeroColumn.setCellValueFactory(
-    			cellData -> cellData.getValue().NroPresupuestoStringProperty());
+    			cellData -> cellData.getValue().NroPresupuestoProperty());
         cuitColumn.setCellValueFactory(
                 cellData -> cellData.getValue().getCliente().cuitProperty());
         denominacionColumn.setCellValueFactory(
@@ -222,7 +221,9 @@ public class AreaDeTrabajoOverviewController  {
         conceptosTable.setPlaceholder(new Label("No hay conceptos."));
     	
         //generarPresupuestosMensuales.disableProperty().bind(Bindings.size(presupuestosTable.getItems()).isEqualTo(0));
-     }
+        
+    
+    }
     
     /**
      * Llamado por la aplicacion principal para dar una autorreferencia
@@ -249,7 +250,7 @@ public class AreaDeTrabajoOverviewController  {
     	 Presupuesto selectedPresupuesto = presupuestosTable.getSelectionModel().getSelectedItem();
          if (selectedPresupuesto != null) {
          	  // Se procede a alertar al usuario
-              Alert alert = new Alert(AlertType.WARNING, 
+              Alert alert = new Alert(AlertType.CONFIRMATION, 
  		  			 "",
                     ButtonType.YES, 
                     ButtonType.NO);
@@ -279,8 +280,8 @@ public class AreaDeTrabajoOverviewController  {
                         ButtonType.OK);
                   alert.initOwner(mainApp.getPrimaryStage());
                   alert.setTitle("Efectivizar presupuesto");
-                  alert.setHeaderText("Se ha efectivizado el presupuesto nº "+ selectedPresupuesto.NroPresupuestoStringProperty().get());
-                  alert.setContentText(null);
+                  alert.setHeaderText(null);
+                  alert.setContentText("Se ha efectivizado el presupuesto nº "+ selectedPresupuesto.NroPresupuestoStringProperty().get());
                   alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                   alert.showAndWait();
               }
@@ -290,11 +291,11 @@ public class AreaDeTrabajoOverviewController  {
     	 } 
          else {
              // No se seleccionó ningún cliente
-             Alert alert = new Alert(AlertType.INFORMATION);
+             Alert alert = new Alert(AlertType.WARNING);
              alert.initOwner(mainApp.getPrimaryStage());
              alert.setTitle("Seleccionar presupuesto");
-             alert.setHeaderText("No se ha seleccionado un presupuesto");
-             alert.setContentText("Por favor, seleccione un presupuesto en la tabla.");
+             alert.setHeaderText(null);
+             alert.setContentText("No se ha seleccionado un presupuesto de la lista.");
              alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
              alert.showAndWait();
          }
@@ -317,7 +318,7 @@ public class AreaDeTrabajoOverviewController  {
     	 if (!lista.isEmpty()){
     		 //Hay algo en la lista, luego hay que efectivizarlo
          	 // Se procede a alertar al usuario
-             Alert alert = new Alert(AlertType.WARNING, 
+             Alert alert = new Alert(AlertType.CONFIRMATION, 
  		  			 "",
                     ButtonType.YES, 
                     ButtonType.NO);
@@ -378,8 +379,8 @@ public class AreaDeTrabajoOverviewController  {
          		                 ButtonType.OK);
          		           alert.initOwner(mainApp.getPrimaryStage());
          		           alert.setTitle("Efectivizar todo");
-         		           alert.setHeaderText("Se han efectivizado "+ lista.size() + " presupuestos.");
-         		           alert.setContentText("Puede consultar los presupuestos efectivos en el menú Buscar Presupuestos.");
+         		           alert.setHeaderText(null);
+         		           alert.setContentText("Se han efectivizado "+ lista.size() + " presupuestos.\n\nPuede consultar los presupuestos efectivos en el menú Buscar Presupuestos.");
          		           alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
          		           alert.showAndWait();
          		           barraProgreso.progressProperty().unbind();
@@ -417,8 +418,8 @@ public class AreaDeTrabajoOverviewController  {
              Alert alert = new Alert(AlertType.INFORMATION);
              alert.initOwner(mainApp.getPrimaryStage());
              alert.setTitle("Efectivizar todo");
-             alert.setHeaderText("No existen presupuestos no efectivos.");
-             alert.setContentText("");
+             alert.setHeaderText(null);
+             alert.setContentText("No existen presupuestos no efectivos.");
              alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
              alert.showAndWait();
          }
@@ -445,8 +446,8 @@ public class AreaDeTrabajoOverviewController  {
              Alert alert = new Alert(AlertType.WARNING);
              alert.initOwner(mainApp.getPrimaryStage());
              alert.setTitle("Seleccionar presupuesto");
-             alert.setHeaderText("No se ha seleccionado un presupuesto");
-             alert.setContentText("Por favor, seleccione un presupuesto en la tabla.");
+             alert.setHeaderText(null);
+             alert.setContentText("No se ha seleccionado un presupuesto de la lista.");
              alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
              alert.showAndWait();
          }
@@ -689,7 +690,7 @@ public class AreaDeTrabajoOverviewController  {
      	}
      	//sino, es decir, si SI hay no efectivos, aviso al usuario que no se puede proceder.
      	else{
-     		Alert alert = new Alert(AlertType.INFORMATION, 
+     		Alert alert = new Alert(AlertType.WARNING, 
  		  			 "",
                    ButtonType.OK);
              alert.initOwner(mainApp.getPrimaryStage());
@@ -705,7 +706,7 @@ public class AreaDeTrabajoOverviewController  {
     	 Presupuesto selectedPresupuesto = presupuestosTable.getSelectionModel().getSelectedItem();
          
     	 if (selectedPresupuesto != null) {
-    		 Alert alert = new Alert(AlertType.WARNING,
+    		 Alert alert = new Alert(AlertType.CONFIRMATION,
     				 "",
     				 ButtonType.OK,
     				 ButtonType.CANCEL);
@@ -736,8 +737,8 @@ public class AreaDeTrabajoOverviewController  {
              Alert alert = new Alert(AlertType.WARNING);
              alert.initOwner(mainApp.getPrimaryStage());
              alert.setTitle("Seleccionar presupuesto");
-             alert.setHeaderText("No se ha seleccionado un presupuesto");
-             alert.setContentText("Por favor, seleccione un presupuesto en la tabla.");
+             alert.setHeaderText(null);
+             alert.setContentText("No se ha seleccionado un presupuesto de la lista.");
              alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
              alert.showAndWait();
          }
@@ -745,7 +746,7 @@ public class AreaDeTrabajoOverviewController  {
      
      public void handleDescartarTodos(){
     	 if (presupuestosTable.getItems().size()>0) {
-    		 Alert alert = new Alert(AlertType.WARNING,
+    		 Alert alert = new Alert(AlertType.CONFIRMATION,
     				 "",
     				 ButtonType.OK,
     				 ButtonType.CANCEL);
@@ -771,7 +772,7 @@ public class AreaDeTrabajoOverviewController  {
          } 
          else{
         	 // Nothing selected.
-             Alert alert = new Alert(AlertType.WARNING);
+             Alert alert = new Alert(AlertType.INFORMATION);
              alert.initOwner(mainApp.getPrimaryStage());
              alert.setTitle("Descartar todos");
              alert.setHeaderText(null);
@@ -780,5 +781,13 @@ public class AreaDeTrabajoOverviewController  {
              alert.showAndWait();
          }
      }
+     
+     
+     
+     
+     
+     
+     
+     
     
 }
