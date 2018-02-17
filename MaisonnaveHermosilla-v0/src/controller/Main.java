@@ -473,7 +473,7 @@ public class Main extends Application {
             dialogStage.setTitle("Detalle de Presupuesto");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(primaryStage);
-            Scene scene = new Scene(page);
+            Scene scene = new Scene(page); 
             dialogStage.setScene(scene);
 
             // Setear los parametros del controlador       

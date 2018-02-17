@@ -1,5 +1,5 @@
 package controller.view;
-
+ 
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;

@@ -1,5 +1,5 @@
 package controller.db;
-
+ 
 import javafx.beans.property.*;
 
 public class Concepto {

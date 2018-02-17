@@ -1,6 +1,6 @@
 package controller.view;
 
-
+ 
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
