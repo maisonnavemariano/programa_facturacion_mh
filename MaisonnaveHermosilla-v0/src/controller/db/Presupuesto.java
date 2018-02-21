@@ -63,6 +63,10 @@ public class Presupuesto {
 	public void actualizarNroTransaccion(int nt){
 		this.transaccion_asociado = new SimpleIntegerProperty(nt);
 	}
+	public String getFormattedFecha() {
+		String [] f = this.getFecha().split("-");
+		return f[2]+"/"+f[1]+"/"+f[0];
+	}
 	
 	
 	public void actualizarNroPresupuesto(int Nro_Presupuesto){

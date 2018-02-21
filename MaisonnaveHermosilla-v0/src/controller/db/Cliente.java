@@ -249,6 +249,22 @@ public class Cliente {
     public void actualizarCodigoCliente(int cc){
         this.codigoCliente = new SimpleIntegerProperty(cc);
     }
+    public String getFormattedCuit() {
+    	return this.getCuit().substring(0, 2)+"-"+this.getCuit().substring(2, 10)+"-"+this.getCuit().substring(10, 11);
+    }
+    public String getFormattedCondicionIva() {
+    	if (this.getCondicionIva().equals("RI")){
+    		return "Resp. Inscripto";
+    	}else if (this.getCondicionIva().equals("EX")){
+    		return "Excento";
+    	}else if (this.getCondicionIva().equals("MO")){
+    		return "Monotributista";
+    	}else if (this.getCondicionIva().equals("NR")) {
+    		return "No Responsable";
+    	}else { //CF
+    		return "Consumidor Final";
+    	}
+    }
     /* 
     /**
      * Birthday: tiene un getter que retorna LocalDate,
