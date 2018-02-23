@@ -13,6 +13,7 @@
 	<classpathentry kind="lib" path="lib/spring-core-3.2.18.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/OpenViewerFX-7.1.27.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.2.jar"/>
-	<classpathentry kind="lib" path="lib/itext-2.1.7.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.bouncycastle_1.4.6.b02.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.itext_2.1.7.js6_b02.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
