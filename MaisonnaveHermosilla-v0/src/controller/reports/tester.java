@@ -12,7 +12,7 @@ public class tester {
 		System.out.println("reporte 1");
 		ReportsEngine.generarReporte(motor.verPresupuesto(2775));
 		System.out.println("reporte 2");
-		//ReportsEngine.generarReporteBorrador(motor.verPresupuesto(2575));
+		ReportsEngine.generarReporteBorrador(motor.verPresupuesto(2575));
 		System.out.println("reporte 3");
 
 	}

@@ -22,5 +22,25 @@
 	<classpathentry kind="lib" path="lib/jasperreports-functions-6.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/jasperreports-metadata-6.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/jasperreports-javaflow-6.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio_6.5.1.final.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.babel.editor_6.5.1.final.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.book_6.5.1.final.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.barbecue_1.5.0.beta1_b02.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.batik_1.9.0.b02.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.beanshell_2.0.0.b6_02.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.bouncycastle_1.4.6.b02.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.commons-beanutils_1.9.3.201709071631.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.commons-digester_2.1.0.201709071631.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.itext_2.1.7.js6_b02.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.poi_3.15.0.b03.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.bundles.zxing_3.2.1.b02.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.community_6.5.1.final.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.components_6.5.1.final.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.components.customvisualization_6.5.1.final.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.data_6.5.1.final.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.data.cassandra_6.5.1.final.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.data.drivers_6.5.1.final.jar"/>
+	<classpathentry kind="lib" path="lib/com.jaspersoft.studio.xtext.jface_6.5.1.final.jar"/>
+	<classpathentry kind="lib" path="lib/groovy-all_2.4.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
