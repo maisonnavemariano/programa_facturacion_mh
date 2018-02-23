@@ -3,6 +3,7 @@ package controller.db;
 import javafx.beans.property.*;
 
 public class Concepto {
+
 	protected String concepto;
 	protected double monto;
 	private StringProperty conceptoProperty;
