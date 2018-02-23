@@ -31,7 +31,7 @@ import exception.InvalidClientException;
  */
 public class DBEngine {
 	protected final String myDriver = "com.mysql.jdbc.Driver";
-	protected final String myUrl  = "jdbc:mysql://192.168.1.118/programa_facturacion_mh"; 
+	protected final String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
 	
 	
 	
@@ -338,7 +338,7 @@ public class DBEngine {
 			Statement st ;
 			
 			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente "
-					+ "WHERE Cliente.Efectivo = 'S' AND Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
+					+ "WHERE Presupuesto.Efectivo = 'S' AND Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
 							+ "Cliente.CUIT LIKE '%"+cuit+"%' AND "
 									+ "Fecha BETWEEN '"+desde+"' AND '"+hasta+"';";
 			
@@ -375,7 +375,7 @@ public class DBEngine {
 			Statement st ;
 			
 			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente "
-					+ "WHERE Cliente.Efectivo = 'S' AND Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
+					+ "WHERE Presupuesto.Efectivo = 'S' AND Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
 							+ "Cliente.CUIT LIKE '%"+cuit+"%' AND "
 									+ "Fecha = '"+fecha_actual+"';";
 			

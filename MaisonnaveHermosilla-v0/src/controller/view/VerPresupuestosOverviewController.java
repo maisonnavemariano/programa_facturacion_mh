@@ -63,6 +63,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import controller.reports.*;
+
 public class VerPresupuestosOverviewController {
 	
 	//Elementos propios de todas las clases controller
@@ -573,6 +575,8 @@ public class VerPresupuestosOverviewController {
      */
     public void handleVistaPrevia(){
     	
+    	Presupuesto p = presupuestosTable.getSelectionModel().getSelectedItem();
+    	/*
     	//TODO: levantar el pdf generado por el reporte
     	
     	//Primero muestro el file chooser
@@ -582,6 +586,12 @@ public class VerPresupuestosOverviewController {
     
     	//Recupero el archivo
     	File f = fc.showOpenDialog(dialogStage);
+    	
+    	*/
+    	if(p!= null){
+    	String filename = ReportsEngine.generarReporte(p);
+    	
+    	File f = new File(filename);
     	
     	//Thread para abrir el Okular o el Adobe
     	Task<Void> task = new Task<Void>() {
@@ -605,6 +615,17 @@ public class VerPresupuestosOverviewController {
 	 
     	//Inicio trabajo del thread
     	new Thread(task).start();
+    	
+    	}
+    	else{
+    		Alert alert = new Alert(AlertType.WARNING);
+    		alert.initOwner(dialogStage);
+    		alert.setTitle("Seleccionar presupuesto");
+    		alert.setHeaderText(null);
+    		alert.setContentText("No ha seleccionado ningún presupuesto de la lista.");
+    		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+    		alert.showAndWait();
+    	}
     	
     }
 
