@@ -31,7 +31,7 @@ import exception.InvalidClientException;
  */
 public class DBEngine {
 	protected final String myDriver = "com.mysql.jdbc.Driver";
-	protected final String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
+	protected final String myUrl  = "jdbc:mysql://192.168.9.72/programa_facturacion_mh"; 
 	
 	
 	
