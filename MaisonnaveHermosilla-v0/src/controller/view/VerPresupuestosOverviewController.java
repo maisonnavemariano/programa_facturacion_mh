@@ -4,16 +4,30 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.awt.print.*;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-import javax.swing.JFrame;
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.JobName;
+import javax.print.attribute.standard.PageRanges;
 
 import org.jpedal.PdfDecoderFX;
 import org.jpedal.exception.PdfException;
+import org.jpedal.fonts.FontMappings;
 
 import controller.Main;
 import controller.db.Cliente;
@@ -533,7 +547,7 @@ public class VerPresupuestosOverviewController {
      * LLamado cuando el usuario selecciona el radiobutton cuit
      */
      @FXML
-     private void handleExactaRadioButton() {
+    private void handleExactaRadioButton() {
  	   desdeHastaPresionado = false;
  	   exactaPresionado = true;
  	   desdeDatePicker.setDisable(true);
@@ -550,128 +564,135 @@ public class VerPresupuestosOverviewController {
     	exactaDatePicker.setValue(null);
     }
     
+    /**
+     * 
+     * Muestra vista previa del presupuesto seleccionado de la lista
+     * TODO: ahora levanta un pdf elegido de un file chooser, 
+     * pero en verdad hay que levantarlo del jasper
+     * 
+     */
     public void handleVistaPrevia(){
     	
-    	// get file path.
+    	//TODO: levantar el pdf generado por el reporte
+    	
+    	//Primero muestro el file chooser
     	FileChooser fc = new FileChooser();
     	fc.setTitle("Abrir archivo pdf...");
     	fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));     
-    	File f = fc.showOpenDialog(dialogStage);
-    	String filename = f.getAbsolutePath();
     
+    	//Recupero el archivo
+    	File f = fc.showOpenDialog(dialogStage);
     	
+    	//Thread para abrir el Okular o el Adobe
     	Task<Void> task = new Task<Void>() {
 		    @Override
 		    protected Void call() throws Exception {
-		    	        	
-		    	// open file.
-		    	//PdfDecoderFX pdf = new PdfDecoderFX();
+		    	
+		    	//Llamo a la aplicacion por defecto
 		    	Desktop escritorio = Desktop.getDesktop();
 		    	
-		    
+		    	//Abro el pdf en la aplicacion por defecto
 		    	try {
-		    		
-		    		escritorio.print(f);
-					//escritorio.open(f);
+		    		if(f.exists()) 
+		    			escritorio.open(f);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					System.out.println("error aca");
+					System.out.println("error al abrir el pdf para vista previa");
 					e.printStackTrace();
 				}
-		    	 catch (NullPointerException e) {
-						// TODO Auto-generated catch block
-						System.out.println("error 2");
-						e.printStackTrace();
-					}
-		    	 catch (IllegalArgumentException e) {
-						// TODO Auto-generated catch block
-						System.out.println("error 3");
-						e.printStackTrace();
-					}
-		    	 catch (UnsupportedOperationException e) {
-						// TODO Auto-generated catch block
-						System.out.println("error 4");
-						e.printStackTrace();
-					}
 		    	return null;
 		    };
-	 };
-    	
-    	
-	 new Thread(task).start();
-    	
+    	};
+	 
+    	//Inicio trabajo del thread
+    	new Thread(task).start();
     	
     }
-   
-    
+
     /**
-     * Update the GUI to show a specified page.
-     * @param page 
+     * Muestra vista para imprimir un presupuesto de la lista
+     * TODO: hay que levantarlo del Jasper, por ahora imprime algo 
+     * levantado de un filechooser
      */
-    private void showPage(int page, PdfDecoderFX pdf) {
+    public void handleImprimir(){
+    	
+    	//Primero creo el file chooser
+    	FileChooser fc = new FileChooser();
+    	fc.setTitle("Abrir archivo pdf...");
+    	fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));     
+    	
+    	//Recupero el archivo Pdf
+    	File f = fc.showOpenDialog(dialogStage);
+    	
+    	//Si se recupero el archivo, pido el nombre
+    	String filename = "";
+    	if(f.exists()){
 
-        //Check in range
-        if (page > pdf.getPageCount())
-            return;
-        if (page < 1)
-            return;
-
+        	 filename = f.getAbsolutePath();
+    	}
+    	//Si no, me voy
+    	else{
+    		System.out.println("Error al levantar el archivo: no hay archivo!");
+    		return;
+    	}
+    	
+    	FileInputStream fis = null;
+    	
+    	//Intento crear el fis
+		try {
+			fis = new FileInputStream(filename);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		
+		//Creo un decoder para el archivo pdf
+    	PdfDecoderFX decodePdf = new PdfDecoderFX();
+    	
+    	//intento abrir el pdf desde el decoder
+    	try {
+    	    decodePdf.openPdfFile(filename);
+    	    FontMappings.setFontReplacements();
+    	} catch (Exception e) {
+    	   System.out.println("error al abrir el pdf para imprimir");
+    	}
+    	
+    	//Creo un job de impresion
+    	PrinterJob printerJob = PrinterJob.getPrinterJob();
+        PrintService printService = null;
+        
+        //Recupero el servicio por defecto de impresion
+        if(printerJob.printDialog())
+        {
+            printService = printerJob.getPrintService();
+        }
+        
+        //Aca armo el objeto de impresion
+        DocFlavor docType = DocFlavor.INPUT_STREAM.AUTOSENSE;
+        Doc pdfDoc = new SimpleDoc(fis, docType, null);
+        
+        //Si el servicio de impresion por defecto es nulo, me voy
+        if(printService == null){
+        	System.out.println("El print Service por defecto es nulo!");
+        	return;
+        }
+        //Sino, prosigo
+        DocPrintJob printJob = printService.createPrintJob();
+        
+        //Imprimo
+        try {
+			printJob.print(pdfDoc, new HashPrintRequestAttributeSet());
+		} catch (PrintException e) {
+        	System.out.println("error en la impresion");
+			e.printStackTrace();
+		}
+        
+        //Cierro el fis
+        try {
+			fis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     
-        //Calculate scale
-        int pW = pdf.getPdfPageData().getCropBoxWidth(page);
-        int pH = pdf.getPdfPageData().getCropBoxHeight(page);
-
-        Dimension s = Toolkit.getDefaultToolkit().getScreenSize();
-
-        s.width -= 100;
-        s.height -= 100;
-
-        double xScale = (double)s.width / pW;
-        double yScale = (double)s.height / pH;
-        double scale = xScale < yScale ? xScale : yScale;
-
-        //Work out target size
-        pW *= scale;
-        pH *= scale;
-
-        //Get image and set
-        Image i = getPageAsImage(page,pW,pH,pdf);
-        ImageView  imageView = new ImageView();
-        imageView.setImage(i);
-
-        //Set size of components
-        imageView.setFitWidth(pW);
-        imageView.setFitHeight(pH);
-       
-        Stage aux = new Stage();
-        aux.setWidth(imageView.getFitWidth()+2);
-        aux.setHeight(imageView.getFitHeight()+2);
-
-        AnchorPane p = new AnchorPane();
-        Scene scene = new Scene(p);
-        aux.setScene(scene);
-        aux.centerOnScreen();  
-        aux.show();
     }
-    
-    
-    private Image getPageAsImage(int page, int width, int height, PdfDecoderFX pdf) {
-
-      Image img=null;
-            try {
-				img =  SwingFXUtils.toFXImage(pdf.getPageAsImage(page),null);
-			} catch (PdfException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("no puedo pasar el pdf a imagen");
-			}
-            return img;
-
-    }
-
-    
-    
-    public void handleImprimir(){}
     
     public void handleImprimirTodos(){}
     

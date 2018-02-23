@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.45-bin.jar"/>
 	<classpathentry kind="lib" path="lib/spring-beans-3.2.18.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/spring-core-3.2.18.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/OpenViewerFX-7.1.27.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
