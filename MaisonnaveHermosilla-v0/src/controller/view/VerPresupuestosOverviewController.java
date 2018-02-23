@@ -1,9 +1,19 @@
 package controller.view;
  
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+
+import javax.swing.JFrame;
+
+import org.jpedal.PdfDecoderFX;
+import org.jpedal.exception.PdfException;
 
 import controller.Main;
 import controller.db.Cliente;
@@ -14,7 +24,10 @@ import controller.db.Presupuesto;
 import exception.InvalidBudgetException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -27,7 +40,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -534,7 +550,126 @@ public class VerPresupuestosOverviewController {
     	exactaDatePicker.setValue(null);
     }
     
-    public void handleVistaPrevia(){}
+    public void handleVistaPrevia(){
+    	
+    	// get file path.
+    	FileChooser fc = new FileChooser();
+    	fc.setTitle("Abrir archivo pdf...");
+    	fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));     
+    	File f = fc.showOpenDialog(dialogStage);
+    	String filename = f.getAbsolutePath();
+    
+    	
+    	Task<Void> task = new Task<Void>() {
+		    @Override
+		    protected Void call() throws Exception {
+		    	        	
+		    	// open file.
+		    	//PdfDecoderFX pdf = new PdfDecoderFX();
+		    	Desktop escritorio = Desktop.getDesktop();
+		    	
+		    
+		    	try {
+		    		
+		    		escritorio.print(f);
+					//escritorio.open(f);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					System.out.println("error aca");
+					e.printStackTrace();
+				}
+		    	 catch (NullPointerException e) {
+						// TODO Auto-generated catch block
+						System.out.println("error 2");
+						e.printStackTrace();
+					}
+		    	 catch (IllegalArgumentException e) {
+						// TODO Auto-generated catch block
+						System.out.println("error 3");
+						e.printStackTrace();
+					}
+		    	 catch (UnsupportedOperationException e) {
+						// TODO Auto-generated catch block
+						System.out.println("error 4");
+						e.printStackTrace();
+					}
+		    	return null;
+		    };
+	 };
+    	
+    	
+	 new Thread(task).start();
+    	
+    	
+    }
+   
+    
+    /**
+     * Update the GUI to show a specified page.
+     * @param page 
+     */
+    private void showPage(int page, PdfDecoderFX pdf) {
+
+        //Check in range
+        if (page > pdf.getPageCount())
+            return;
+        if (page < 1)
+            return;
+
+    
+        //Calculate scale
+        int pW = pdf.getPdfPageData().getCropBoxWidth(page);
+        int pH = pdf.getPdfPageData().getCropBoxHeight(page);
+
+        Dimension s = Toolkit.getDefaultToolkit().getScreenSize();
+
+        s.width -= 100;
+        s.height -= 100;
+
+        double xScale = (double)s.width / pW;
+        double yScale = (double)s.height / pH;
+        double scale = xScale < yScale ? xScale : yScale;
+
+        //Work out target size
+        pW *= scale;
+        pH *= scale;
+
+        //Get image and set
+        Image i = getPageAsImage(page,pW,pH,pdf);
+        ImageView  imageView = new ImageView();
+        imageView.setImage(i);
+
+        //Set size of components
+        imageView.setFitWidth(pW);
+        imageView.setFitHeight(pH);
+       
+        Stage aux = new Stage();
+        aux.setWidth(imageView.getFitWidth()+2);
+        aux.setHeight(imageView.getFitHeight()+2);
+
+        AnchorPane p = new AnchorPane();
+        Scene scene = new Scene(p);
+        aux.setScene(scene);
+        aux.centerOnScreen();  
+        aux.show();
+    }
+    
+    
+    private Image getPageAsImage(int page, int width, int height, PdfDecoderFX pdf) {
+
+      Image img=null;
+            try {
+				img =  SwingFXUtils.toFXImage(pdf.getPageAsImage(page),null);
+			} catch (PdfException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("no puedo pasar el pdf a imagen");
+			}
+            return img;
+
+    }
+
+    
     
     public void handleImprimir(){}
     
