@@ -884,7 +884,7 @@ public class DBEngine {
 		// por la fecha de efectivización, la vista no debería mostrar la fecha de un presupuesto borrador porque no es la
 		// fecha que quedará, la que queda es la del día de efectivización.
 	
-		Presupuesto nuevo = new Presupuesto((ultimo==null?new ArrayList<Concepto>():ultimo.getConceptos())	,cliente ,false, ultimo.getAlicuota(),montoTotal, Calendar.getInstance().getTime()) ; 
+		Presupuesto nuevo = new Presupuesto((ultimo==null?new ArrayList<Concepto>():ultimo.getConceptos())	,cliente ,false, (ultimo==null?0:ultimo.getAlicuota()),montoTotal, Calendar.getInstance().getTime()) ; 
 		this.agregarPresupuesto(nuevo);
 		return nuevo;
 		
