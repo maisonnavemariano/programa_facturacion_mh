@@ -42,8 +42,8 @@ public class ReportsEngine {
 	parameters.put("fecha",p.getFormattedFecha());
 	parameters.put("cuit",p.getCliente().getFormattedCuit());
 	parameters.put("Nro_Presu",new Integer(p.getNroPresupuesto()));
-	parameters.put("Subtotal",new Double(p.getSubtotal()));
-	parameters.put("Iva_monto",new Double(0.2));
+	parameters.put("Subtotal",new Double(p.calcularSubtotal()));
+	parameters.put("Iva_monto",new Double(p.calcularIva()));
 	
 	try {
 		printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);
@@ -87,8 +87,8 @@ public class ReportsEngine {
 		parameters.put("fecha",p.getFormattedFecha());
 		parameters.put("cuit",p.getCliente().getFormattedCuit());
 		parameters.put("Nro_Presu",new Integer(p.getNroPresupuesto()));
-		parameters.put("Subtotal",new Double(p.getSubtotal()));
-		parameters.put("Iva_monto",new Double(0.2));
+		parameters.put("Subtotal",new Double(p.calcularSubtotal()));
+		parameters.put("Iva_monto",new Double(p.calcularIva()));
 		
 		try {
 			printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);
@@ -127,8 +127,8 @@ public class ReportsEngine {
 		parameters.put("fecha",p.getFormattedFecha());
 		parameters.put("cuit",p.getCliente().getFormattedCuit());
 		parameters.put("Nro_Presu",new Integer(p.getNroPresupuesto()));
-		parameters.put("Subtotal",new Double(p.getSubtotal()));
-		parameters.put("Iva_monto",p.calcularIva());
+		parameters.put("Subtotal",new Double(p.calcularSubtotal()));
+		parameters.put("Iva_monto",new Double(p.calcularIva()));
 		
 		try {
 			printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);

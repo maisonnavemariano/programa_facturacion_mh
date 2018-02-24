@@ -260,9 +260,15 @@ public class Presupuesto {
     }
     
     public double calcularIva() {
-    	return this.calcularMontoTotal() - this.subtotal.doubleValue();
+    	return this.calcularMontoTotal() - this.calcularSubtotal();
     }
-    
+    public double calcularSubtotal() {
+        double monto_calculado = 0;
+        for(Concepto c : conceptos){
+        	monto_calculado= monto_calculado + c.getMonto();
+        }
+        return monto_calculado;
+    }
     public double calcularMontoTotal(){
 
         double monto_calculado = 0;

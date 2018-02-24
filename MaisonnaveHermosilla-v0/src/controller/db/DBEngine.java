@@ -38,6 +38,15 @@ public class DBEngine {
 	protected int ProximoNumeroPresupuesto; // para poder ofrecer el proximo numero presupuesto.
 	protected Connection conn;
 	
+	public DBEngine(String url) {
+		String myUrl  = "jdbc:mysql://"+url+"/programa_facturacion_mh"; 
+		try{
+
+		    Class.forName(myDriver);
+		    conn = DriverManager.getConnection(myUrl, "virginia", "lospiojos");
+		
+		}catch(Exception e){e.printStackTrace();}
+	}
 	public DBEngine(){
 		try{
 

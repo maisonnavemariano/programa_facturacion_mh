@@ -6,7 +6,7 @@ public class tester {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		DBEngine motor = new DBEngine();
+		DBEngine motor = new DBEngine("192.168.1.109");
 		System.out.println("arranca reportes");
 		ReportsEngine.generarReporte(motor.verPresupuesto(2175),"/home/maiso/tmp.pdf");
 		System.out.println("reporte 1");
