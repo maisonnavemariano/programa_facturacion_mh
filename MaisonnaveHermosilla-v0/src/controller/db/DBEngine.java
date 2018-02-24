@@ -31,7 +31,7 @@ import exception.InvalidClientException;
  */
 public class DBEngine {
 	protected final String myDriver = "com.mysql.jdbc.Driver";
-	protected final String myUrl  = "jdbc:mysql://localhost/programa_facturacion_mh"; 
+	protected final String myUrl  = "jdbc:mysql://192.168.1.109/programa_facturacion_mh"; 
 	
 	
 	
@@ -873,13 +873,18 @@ public class DBEngine {
 	//	System.out.println(ultimo==null);
 		//Calculo para obtener el monto total nuevo (fix para el caso donde el ultimo presupuesto fue realizado con el
 		// sistema viejo y el monto total y la suma de los montos da distinto.
+
 		float montoTotal = 0;
-		for (Concepto c: ultimo.getConceptos())
-			montoTotal += c.getMonto();
+		
+		if (ultimo != null) { 
+			for (Concepto c: ultimo.getConceptos())
+				montoTotal += c.getMonto();
+		}
 		// El presupuesto se guarda con una fecha por default que es la fecha del borrador, pero al efectivizarse se cambia
 		// por la fecha de efectivización, la vista no debería mostrar la fecha de un presupuesto borrador porque no es la
 		// fecha que quedará, la que queda es la del día de efectivización.
-		Presupuesto nuevo = new Presupuesto(ultimo.getConceptos()	,cliente ,false, ultimo.getAlicuota(),montoTotal, Calendar.getInstance().getTime()) ; 
+	
+		Presupuesto nuevo = new Presupuesto((ultimo==null?new ArrayList<Concepto>():ultimo.getConceptos())	,cliente ,false, ultimo.getAlicuota(),montoTotal, Calendar.getInstance().getTime()) ; 
 		this.agregarPresupuesto(nuevo);
 		return nuevo;
 		
