@@ -299,9 +299,6 @@ public class VerPresupuestosOverviewController {
     }
     
     
-    
-    
-
     /**
      * Setea el stage para este diálogo
      * 
@@ -609,12 +606,18 @@ public class VerPresupuestosOverviewController {
 					System.out.println("error al abrir el pdf para vista previa");
 					e.printStackTrace();
 				}
+		    	
+		    	//TODO: Ver como y cuando borrar el archivo!
+		    	
 		    	return null;
 		    };
     	};
 	 
     	//Inicio trabajo del thread
     	new Thread(task).start();
+    	
+    	
+    	//TODO: ver como borro los reportes Vista Previa
     	
     	}
     	else{
@@ -636,6 +639,9 @@ public class VerPresupuestosOverviewController {
      */
     public void handleImprimir(){
     	
+    	Presupuesto p = presupuestosTable.getSelectionModel().getSelectedItem();
+    	
+    	/*
     	//Primero creo el file chooser
     	FileChooser fc = new FileChooser();
     	fc.setTitle("Abrir archivo pdf...");
@@ -643,12 +649,20 @@ public class VerPresupuestosOverviewController {
     	
     	//Recupero el archivo Pdf
     	File f = fc.showOpenDialog(dialogStage);
+    	*/
+    	
+    	if(p!= null){
+        	String filename = ReportsEngine.generarReporte(p);
+        	
+        	File f = new File(filename);
+        	
+    	
     	
     	//Si se recupero el archivo, pido el nombre
-    	String filename = "";
-    	if(f.exists()){
+    	
+        if(f.exists()){
 
-        	 filename = f.getAbsolutePath();
+        	// filename = f.getAbsolutePath();
     	}
     	//Si no, me voy
     	else{
@@ -712,10 +726,25 @@ public class VerPresupuestosOverviewController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    
+    	}
+    	else{
+    		
+    		Alert alert = new Alert(AlertType.WARNING);
+    		alert.initOwner(dialogStage);
+    		alert.setTitle("Seleccionar presupuesto");
+    		alert.setHeaderText(null);
+    		alert.setContentText("No ha seleccionado ningún presupuesto de la lista.");
+    		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+    		alert.showAndWait();
+    	}
+        
+        
     }
     
-    public void handleImprimirTodos(){}
+    public void handleImprimirTodos(){
+    	
+    	//TODO
+    }
     
     public void handleAnular(){
     	Presupuesto seleccionado = presupuestosTable.getSelectionModel().getSelectedItem();
@@ -781,22 +810,44 @@ public class VerPresupuestosOverviewController {
     
     @FXML
     private void handleGuardarPDF(){
-    	FileChooser fileChooser = new FileChooser();
+    	
+    	Presupuesto p = presupuestosTable.getSelectionModel().getSelectedItem();
+    	    	
+    	if(p!= null){
+        	String filename = ReportsEngine.generarReporte(p);
+        	
+        	File f = new File(filename);
+        	
+        	FileChooser fileChooser = new FileChooser();
 
-        // Set extension filter
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+        	// Set extension filter
+        	FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "Archivos PDF (*.pdf)", "*.pdf");
-        fileChooser.getExtensionFilters().add(extFilter);
+        	fileChooser.getExtensionFilters().add(extFilter);
 
-        // Show save file dialog
-        File file = fileChooser.showSaveDialog(dialogStage);
+        	fileChooser.setInitialFileName(filename);
+        	
+        	
+        	// 	Show save file dialog
+        	//File file = fileChooser.showSaveDialog(dialogStage);
+        	fileChooser.showSaveDialog(dialogStage);
 
-        if (file != null) {
-            // Make sure it has the correct extension
-            if (!file.getPath().endsWith(".pdf")) {
-                file = new File(file.getPath() + ".pdf");
-            }
-            //mainApp.savePersonDataToFile(file);
-        }
+        /*	if (file != null) {
+        		// Make sure it has the correct extension
+        		if (!file.getPath().endsWith(".pdf")) {
+        			file = new File(file.getPath() + ".pdf");
+        		}
+        	}*/
+    	}
+    	else{
+    		Alert alert = new Alert(AlertType.WARNING);
+    		alert.initOwner(dialogStage);
+    		alert.setTitle("Seleccionar presupuesto");
+    		alert.setHeaderText(null);
+    		alert.setContentText("No ha seleccionado ningún presupuesto de la lista.");
+    		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+    		alert.showAndWait();
+    	}
+    	
     }
 }

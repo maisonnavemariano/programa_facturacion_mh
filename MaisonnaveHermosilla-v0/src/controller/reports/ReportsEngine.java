@@ -17,7 +17,7 @@ public class ReportsEngine {
 	public static String generarReporte(Presupuesto p) {
 	boolean salida_ok=false;
 	String sourceFile = "reports_templates/Original_y_copia.jasper";
-	String salida = "reportes/"+p.getCliente().getDenominacion()+"-"+p.getNroPresupuesto()+".pdf";
+	String salida = "reportes/tmp/"+p.getCliente().getDenominacion()+"-"+p.getNroPresupuesto()+".pdf";
 	List<ConceptosBean> dataList = new ArrayList<ConceptosBean>();
 	
 	ConceptosBean cb;
@@ -62,7 +62,7 @@ public class ReportsEngine {
 	public static String generarReporteBorrador(Presupuesto p) {
 		boolean salida_ok=false;
 		String sourceFile = "reports_templates/Presupuesto_borrador.jasper";
-		String salida = "borradores/"+p.getCliente().getDenominacion()+"-"+p.getNroPresupuesto()+"-BORRADOR.pdf";
+		String salida = "borradores/tmp/"+p.getCliente().getDenominacion()+"-"+p.getNroPresupuesto()+"-BORRADOR.pdf";
 		List<ConceptosBean> dataList = new ArrayList<ConceptosBean>();
 		
 		ConceptosBean cb;
