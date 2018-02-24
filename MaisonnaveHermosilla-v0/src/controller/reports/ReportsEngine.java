@@ -128,7 +128,7 @@ public class ReportsEngine {
 		parameters.put("cuit",p.getCliente().getFormattedCuit());
 		parameters.put("Nro_Presu",new Integer(p.getNroPresupuesto()));
 		parameters.put("Subtotal",new Double(p.getSubtotal()));
-		parameters.put("Iva_monto",new Double(0.2));
+		parameters.put("Iva_monto",p.calcularIva());
 		
 		try {
 			printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);

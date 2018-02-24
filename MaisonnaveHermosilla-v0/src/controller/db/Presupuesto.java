@@ -259,6 +259,10 @@ public class Presupuesto {
         return aux;
     }
     
+    public double calcularIva() {
+    	return this.calcularMontoTotal() - this.subtotal.doubleValue();
+    }
+    
     public double calcularMontoTotal(){
 
         double monto_calculado = 0;
