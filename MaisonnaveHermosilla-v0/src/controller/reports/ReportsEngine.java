@@ -190,7 +190,7 @@ public class ReportsEngine {
 			return null;
 		}
 
-	public static void generar_todos_los_presupuestos(List<Presupuesto> lista) throws JRException{
+	public static String generar_todos_los_presupuestos(List<Presupuesto> lista) throws JRException{
 	  long start = System.currentTimeMillis();
 
 	  List<JasperPrint> jasperPrintList = new ArrayList<JasperPrint>();
@@ -220,5 +220,8 @@ public class ReportsEngine {
 	  
 	  
 	  System.err.println("PDF creation time : " + (System.currentTimeMillis() - start)+" millis");
+	  
+	  return "borradores/tmp/imprimir_todos.pdf";
+	
 	}
 }

@@ -60,7 +60,7 @@
                               </TableView>
                               <Button fx:id="vistaPreviaButton" layoutX="14.0" layoutY="298.0" mnemonicParsing="false" onAction="#handleVistaPrevia" text="Vista previa" AnchorPane.bottomAnchor="14.0" />
                               <Button fx:id="imprimirButton" layoutX="122.0" layoutY="298.0" mnemonicParsing="false" onAction="#handleImprimir" text="Imprimir" AnchorPane.bottomAnchor="14.0" />
-                              <Button fx:id="imprimirTodosButton" layoutX="320.0" layoutY="298.0" mnemonicParsing="false" onAction="#handleImprimirTodos" prefWidth="116.0" text="Imprimir todos" AnchorPane.bottomAnchor="14.0" />
+                              <Button fx:id="imprimirTodosButton" layoutX="320.0" layoutY="298.0" mnemonicParsing="false" onAction="#handleImprimirTodos" text="Ver todos" AnchorPane.bottomAnchor="14.0" />
                               <Button fx:id="PDFButton" layoutX="208.0" layoutY="298.0" mnemonicParsing="false" onAction="#handleGuardarPDF" text="Guardar PDF" AnchorPane.bottomAnchor="14.0" />
                            </children>
                         </AnchorPane>

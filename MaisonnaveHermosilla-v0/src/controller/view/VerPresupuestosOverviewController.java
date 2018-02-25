@@ -10,7 +10,9 @@ import java.awt.print.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -51,7 +53,7 @@ import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-
+import net.sf.jasperreports.engine.JRException;
 import controller.reports.*;
 
 public class VerPresupuestosOverviewController {
@@ -620,16 +622,6 @@ public class VerPresupuestosOverviewController {
     	
     	Presupuesto p = presupuestosTable.getSelectionModel().getSelectedItem();
     	
-    	/*
-    	//Primero creo el file chooser
-    	FileChooser fc = new FileChooser();
-    	fc.setTitle("Abrir archivo pdf...");
-    	fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));     
-    	
-    	//Recupero el archivo Pdf
-    	File f = fc.showOpenDialog(dialogStage);
-    	*/
-    	
     	if(p!= null){
         	String filename = ReportsEngine.generarReporte(p);
         	
@@ -721,8 +713,58 @@ public class VerPresupuestosOverviewController {
     }
     
     public void handleImprimirTodos(){
+    	ObservableList<Presupuesto> lista = presupuestosTable.getItems();
     	
-    	//TODO
+    	List<Presupuesto> mi_lista = lista.stream().collect(Collectors.toList());
+    	
+    	if(mi_lista!= null && mi_lista.size() > 0){
+    	String filename = null;
+		try {
+			filename = ReportsEngine.generar_todos_los_presupuestos(mi_lista);
+		} catch (JRException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    	
+    	File f = new File(filename);
+    	
+    	//Thread para abrir el Okular o el Adobe
+    	Task<Void> task = new Task<Void>() {
+		    @Override
+		    protected Void call() throws Exception {
+		    	
+		    	//Llamo a la aplicacion por defecto
+		    	Desktop escritorio = Desktop.getDesktop();
+		    	
+		    	//Abro el pdf en la aplicacion por defecto
+		    	try {
+		    		if(f.exists()) 
+		    			escritorio.open(f);
+				} catch (IOException e) {
+					System.out.println("error al abrir el pdf para vista previa");
+					e.printStackTrace();
+				}
+		    	
+		    	//TODO: Ver como y cuando borrar el archivo!
+		    	
+		    	return null;
+		    };
+    	};
+	 
+    	//Inicio trabajo del thread
+    	new Thread(task).start();
+    	}
+    	else{
+    		Alert alert = new Alert(AlertType.WARNING);
+    		alert.initOwner(dialogStage);
+    		alert.setTitle("No hay presupuestos");
+    		alert.setHeaderText(null);
+    		alert.setContentText("No hay presupuestos para previsualizar en la lista.");
+    		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+    		alert.showAndWait();
+    		
+    	}
+    	
     }
     
     public void handleAnular(){
@@ -794,33 +836,25 @@ public class VerPresupuestosOverviewController {
     	    
     
     	if(p!= null){
-        	String filename = ReportsEngine.generarReporte(p);
-        	String nombrecito = (filename.split("/"))[(filename.split("/")).length - 1];
-        	      	
-        	
-        	File file = new File(filename);
-              	
-        	FileChooser fileChooser = new FileChooser();
+    		
+    		FileChooser fileChooser = new FileChooser();
 
         	// Set extension filter
         	FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "Archivos PDF (*.pdf)", "*.pdf");
         	fileChooser.getExtensionFilters().add(extFilter);
         	fileChooser.setTitle("Guardar presupuesto");
+        	
+        	String nombrecito = p.getCliente().getDenominacion();
         	fileChooser.setInitialFileName(nombrecito);
         	
-        	// 	Show save file dialog
-        	//File file = fileChooser.showSaveDialog(dialogStage);
+        	//fileChooser.setInitialDirectory(value);  TODO
         	File dest = fileChooser.showSaveDialog(dialogStage);
+        	String filename = dest.getPath();
         	
-        	if (dest != null) {
-        	    try {
-        	        Files.copy(file.toPath(), dest.toPath());
-        	    } catch (IOException ex) {
-        	        // handle exception...
-        	    }
-        	}
-        
+        	ReportsEngine.generarReporte(p, filename);
+    		
+    	
     	}
     	else{
     		Alert alert = new Alert(AlertType.WARNING);
