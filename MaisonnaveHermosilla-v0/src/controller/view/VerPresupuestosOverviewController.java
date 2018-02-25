@@ -845,7 +845,7 @@ public class VerPresupuestosOverviewController {
         	fileChooser.getExtensionFilters().add(extFilter);
         	fileChooser.setTitle("Guardar presupuesto");
         	
-        	String nombrecito = p.getCliente().getDenominacion();
+        	String nombrecito = ReportsEngine.DefaultName(p);
         	fileChooser.setInitialFileName(nombrecito);
         	
         	//fileChooser.setInitialDirectory(value);  TODO

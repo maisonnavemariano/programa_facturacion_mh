@@ -4,9 +4,14 @@ package controller.view;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -16,7 +21,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Paint;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.application.Platform;
 
@@ -811,10 +821,133 @@ public class AreaDeTrabajoOverviewController  {
      
      
      
-     
-     
-     
-     
-     
+     @FXML
+     private void handleAplicarAumento(){
+    	 
+    	Dialog<ButtonType> dialog = new Dialog<>();
+     	dialog.setTitle("Aplicar aumento");
+     	dialog.setHeaderText(null);
+     	dialog.setResizable(false); 
+     	
+     	Label label1 = new Label("Coeficiente de aumento:");
+     //	Label ayuda = new Label("");
+     	TextField porcentaje = new TextField();
+     	Label labelpor = new Label("  %");
+     	CheckBox descuentoSiNo = new CheckBox();
+     	descuentoSiNo.setText("Deshacer aumento previo");
+     	
+     	
+     	//Validacion de campos textfield
+     	porcentaje.textProperty().addListener((obs, oldText, newText) -> {
+     		if (newText.matches("\\d*")) {
+     			porcentaje.setText(newText);
+     		}
+     		else
+     			porcentaje.setText(oldText);
+    	 });
+     	
+     	final Tooltip tooltip = new Tooltip();
+	     	tooltip.setText(
+	     	    "Ingrese un valor\n" +
+	     	    "entre 1 y 100.\n");
+	     	porcentaje.setTooltip(tooltip);
+     	
+	    //Creo la grilla de componentes para el dialogo    	
+    	GridPane grid = new GridPane();
+    	grid.add(label1, 1, 1);
+    	//grid.add(dummy, 1, 2);
+    	grid.add(porcentaje, 1, 3);
+    	//grid.add(dummy2, 1, 4);
+    	grid.add(labelpor, 2, 3);
+    	//grid.add(ayuda, 1, 5);
+    	grid.add(descuentoSiNo, 1, 6);
+    	dialog.getDialogPane().setContent(grid);
+    	
+    	//dialog.getDialogPane().setMinWidth(300);
+    	
+    	
+    	//genero los dos botones : aplicar (OK) y cancelar.
+    	ButtonType buttonTypeCancel = new ButtonType("Cancelar", ButtonData.CANCEL_CLOSE);
+    	dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
+    	
+    	ButtonType buttonTypeOk = new ButtonType("Aplicar", ButtonData.OK_DONE);
+    	dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+   
+    	Optional<ButtonType> result = dialog.showAndWait();
     
+    	//Si el usuario elige Generar Presupuesto
+    	if (result.get() == buttonTypeOk) {
+    		
+    		//NO VACIO
+    		if (porcentaje.getText().length()<=0 || porcentaje.getText() == null || porcentaje.getText() ==""){
+    			Alert alert = new Alert(AlertType.ERROR);
+	            alert.initOwner(mainApp.getPrimaryStage());
+	            alert.setHeaderText(null);
+	            alert.setContentText("El campo de coeficiente es obligatorio.");
+	            alert.showAndWait();
+	            handleAplicarAumento();
+    		}
+    		
+    		//NO mal valor
+    		else if (Integer.parseInt(porcentaje.getText())>100  || Integer.parseInt(porcentaje.getText())< 1 ){
+    			Alert alert = new Alert(AlertType.ERROR);
+	            alert.initOwner(mainApp.getPrimaryStage());
+	            alert.setHeaderText(null);
+	            alert.setContentText("Ingrese un valor entre 1 y 100.");
+	            alert.showAndWait();
+	            handleAplicarAumento();
+    		}
+    		
+    		//Todo ok
+    		else{
+
+				int porcentajeFinal = Integer.parseInt(porcentaje.getText());
+				 
+				//Pido confirmacion
+				Alert alert = new Alert(AlertType.CONFIRMATION,"",ButtonType.YES, ButtonType.NO);
+	            alert.initOwner(mainApp.getPrimaryStage());
+	            if (descuentoSiNo.isSelected()){
+	             		alert.setTitle("Aplicar descuento");
+	             		alert.setContentText("¿Desea aplicar un descuento del "+porcentajeFinal+" % sobre los conceptos?\n\nEsta acción afectará a todos los presupuestos no efectivos. ");
+	            }
+	            else{
+	             		alert.setTitle("Aplicar aumento");
+	             		alert.setContentText("¿Desea aplicar un aumento del "+porcentajeFinal+" % sobre los conceptos?\n\nEsta acción afectará a todos los presupuestos no efectivos. ");
+	            }
+	            alert.setHeaderText(null);
+	            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+	            Optional<ButtonType> confirma = alert.showAndWait();
+	             
+	            if(confirma.get().equals(ButtonType.YES)){
+	            	
+	            	 if (descuentoSiNo.isSelected()){
+	            		DBMotor.deshacerAumentoNoEfectivos(porcentajeFinal);
+	            	 }
+	            	 else{
+	            		 DBMotor.aplicarAumentoNoEfectivos(porcentajeFinal);
+	            	 }
+	            	Alert alerta = new Alert(AlertType.INFORMATION);
+	 	            alerta.initOwner(mainApp.getPrimaryStage());
+	 	            alerta.setHeaderText(null);
+	 	            alerta.setContentText("El procedimiento se ha realizado exitosamente.\nPuede continuar editando los presupuestos en el Área de Trabajo.");
+	 	            alerta.showAndWait();
+	 	            
+	 	            //Actualizo vista
+	 	            handleSearch();
+	 	            showPresupuestoDetails(presupuestosTable.getSelectionModel().getSelectedItem());
+	            }
+	            else{
+	             	handleAplicarAumento();
+	            }
+    		}
+    	}
+    	
+    	//No hago nada y me voy
+    	else{
+    		
+    	}
+			
+    }
+    	
 }
+     
