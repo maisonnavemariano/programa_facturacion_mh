@@ -1117,6 +1117,7 @@ public class DBEngine {
 		return nuevo;
 		
 	}
+	
 	/**
 	 * Permite recuperar aquellos presupuestos no efectivos (los borradores), para poder editarlos uno por uno, modificarlos, guardarlos en la base de datos nuevamente corregidos, o incluso para efectivizarlos.
 	 * @return Una lista con todos los presupuestos no efectivos, o una lista vacía en caso de que no haya presupuestos sin efectivizar. 
