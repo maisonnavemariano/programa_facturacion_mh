@@ -26,7 +26,6 @@ public class Presupuesto {
 	private BooleanProperty efectivo;
 	private FloatProperty alicuota;
 	private DoubleProperty subtotal;
-	//private DoubleProperty monto;
 	private StringProperty fecha;
 	private StringProperty fecha_ARG;
 	

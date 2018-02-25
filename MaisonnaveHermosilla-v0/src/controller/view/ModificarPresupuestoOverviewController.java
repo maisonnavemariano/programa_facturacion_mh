@@ -578,6 +578,8 @@ public class ModificarPresupuestoOverviewController {
         for(Concepto c : presupuesto.getConceptos()){
         	monto_calculado= monto_calculado + c.getMonto();
         }
+        
+        monto_calculado = Math.round(monto_calculado * 20.0) / 20.0;
         return monto_calculado;
     }
 
