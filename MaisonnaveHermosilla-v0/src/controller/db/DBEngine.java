@@ -865,7 +865,7 @@ public class DBEngine {
 		}
 	}
 	
-	public void deshacerAumento(int porcentaje) {
+	public void deshacerAumentoNoEfectivos(int porcentaje) {
 		if(porcentaje<=0 && porcentaje<=100 ) {
 			double porcentual = 1.0 + ((double)porcentaje/100.0);
 			porcentual = 1.0/porcentual;
@@ -884,14 +884,14 @@ public class DBEngine {
 			}
 		}
 		else
-			System.out.println("[WARNING] porcentaje INVALIDO. Método deshacerAumento(porcentaje).");
+			System.out.println("[WARNING] porcentaje INVALIDO. Método deshacerAumentoNoEfectivos(porcentaje).");
 	}
 	/**
 	 * Actualiza el monto de todos los conceptos para cada presupuesto no efectivo en la base de datos. La actualización aumenta en 'porcentaje'% el monto, si el porcentaje es invalido NO realiza cambio
 	 * en la base de datos.
 	 * @param porcentaje Valor entero entre 0 y 100 que representa un valor de porcentaje 'porcentaje'%.
 	 */
-	public void actualizarMontoNoEfectivos(int porcentaje) { // Valor entre 0 y 100 porciento
+	public void aplicarAumentoNoEfectivos(int porcentaje) { // Valor entre 0 y 100 porciento
 		if(porcentaje<=0 && porcentaje<=100 ) {
 			double porcentual = 1.0 + ((double)porcentaje/100.0);
 			
@@ -909,7 +909,7 @@ public class DBEngine {
 			}
 		}
 		else
-			System.out.println("[WARNING] porcentaje INVALIDO. Método actualizarMontoNoEfectivos(porcentaje).");
+			System.out.println("[WARNING] porcentaje INVALIDO. Método aplicarAumentoNoEfectivos(porcentaje).");
 	}
 	
 	/**
