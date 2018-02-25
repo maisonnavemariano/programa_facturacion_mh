@@ -20,6 +20,9 @@ import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
 
 public class ReportsEngine {
+	public static String defualtName(Presupuesto p) {
+		return p.getCliente().getDenominacion()+"-"+p.getNroPresupuesto()+".pdf";
+	}
 	
 	public static String generarReporte(Presupuesto p) {
 	boolean salida_ok=false;
