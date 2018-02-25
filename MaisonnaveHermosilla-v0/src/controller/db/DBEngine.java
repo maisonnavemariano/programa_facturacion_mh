@@ -981,6 +981,7 @@ public class DBEngine {
 	
 	
 	
+	
 	private void recalcularSubtotales() {
 		PreparedStatement preparedStmt;
 		String query = "SELECT p.Nro_presupuesto, ROUND(SUM(cp.Monto)*20)/20 AS Subtotal  "
