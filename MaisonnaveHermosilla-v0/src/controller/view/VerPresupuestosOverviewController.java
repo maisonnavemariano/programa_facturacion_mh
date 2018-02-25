@@ -1,12 +1,11 @@
 package controller.view;
  
 import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.awt.print.*;
 
 import java.time.LocalDate;
@@ -18,15 +17,10 @@ import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
 import javax.print.PrintException;
 import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.JobName;
-import javax.print.attribute.standard.PageRanges;
 
 import org.jpedal.PdfDecoderFX;
-import org.jpedal.exception.PdfException;
 import org.jpedal.fonts.FontMappings;
 
 import controller.Main;
@@ -39,9 +33,7 @@ import exception.InvalidBudgetException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -54,10 +46,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -167,6 +156,7 @@ public class VerPresupuestosOverviewController {
     public void setMainApp(Main mainApp, DBEngine motor) {
         this.mainApp = mainApp;
         this.DBMotor = motor;
+        
 
     }
     
@@ -573,18 +563,7 @@ public class VerPresupuestosOverviewController {
     public void handleVistaPrevia(){
     	
     	Presupuesto p = presupuestosTable.getSelectionModel().getSelectedItem();
-    	/*
-    	//TODO: levantar el pdf generado por el reporte
     	
-    	//Primero muestro el file chooser
-    	FileChooser fc = new FileChooser();
-    	fc.setTitle("Abrir archivo pdf...");
-    	fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));     
-    
-    	//Recupero el archivo
-    	File f = fc.showOpenDialog(dialogStage);
-    	
-    	*/
     	if(p!= null){
     	String filename = ReportsEngine.generarReporte(p);
     	
@@ -812,32 +791,36 @@ public class VerPresupuestosOverviewController {
     private void handleGuardarPDF(){
     	
     	Presupuesto p = presupuestosTable.getSelectionModel().getSelectedItem();
-    	    	
+    	    
+    
     	if(p!= null){
         	String filename = ReportsEngine.generarReporte(p);
+        	String nombrecito = (filename.split("/"))[(filename.split("/")).length - 1];
+        	      	
         	
-        	File f = new File(filename);
-        	
+        	File file = new File(filename);
+              	
         	FileChooser fileChooser = new FileChooser();
 
         	// Set extension filter
         	FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "Archivos PDF (*.pdf)", "*.pdf");
         	fileChooser.getExtensionFilters().add(extFilter);
-
-        	fileChooser.setInitialFileName(filename);
-        	
+        	fileChooser.setTitle("Guardar presupuesto");
+        	fileChooser.setInitialFileName(nombrecito);
         	
         	// 	Show save file dialog
         	//File file = fileChooser.showSaveDialog(dialogStage);
-        	fileChooser.showSaveDialog(dialogStage);
-
-        /*	if (file != null) {
-        		// Make sure it has the correct extension
-        		if (!file.getPath().endsWith(".pdf")) {
-        			file = new File(file.getPath() + ".pdf");
-        		}
-        	}*/
+        	File dest = fileChooser.showSaveDialog(dialogStage);
+        	
+        	if (dest != null) {
+        	    try {
+        	        Files.copy(file.toPath(), dest.toPath());
+        	    } catch (IOException ex) {
+        	        // handle exception...
+        	    }
+        	}
+        
     	}
     	else{
     		Alert alert = new Alert(AlertType.WARNING);
@@ -850,4 +833,6 @@ public class VerPresupuestosOverviewController {
     	}
     	
     }
+    
+    
 }

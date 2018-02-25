@@ -272,7 +272,7 @@ public class ModificarClienteOverviewController {
                     ButtonType.OK, 
                     ButtonType.CANCEL);
             alert.initOwner(dialogStage);
-            alert.setTitle("Aceptar: Nuevo cliente");
+            alert.setTitle("Nuevo cliente");
             alert.setHeaderText(null);
             alert.setContentText("¿Desea guardar los cambios realizados?");
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -298,17 +298,17 @@ public class ModificarClienteOverviewController {
     	
     	  Alert alert = new Alert(AlertType.CONFIRMATION, 
     			  			 "",
-    	                     ButtonType.OK, 
-    	                     ButtonType.CANCEL);
+    	                     ButtonType.YES, 
+    	                     ButtonType.NO);
           alert.initOwner(dialogStage);
           alert.setTitle("Cancelar: Modificar cliente");
           alert.setHeaderText(null);
-          alert.setContentText("¿Desea descartar los cambios realizados?\n\nPulse Aceptar para descartar los cambios realizados.");
+          alert.setContentText("¿Desea descartar los cambios realizados?");
           alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
           Optional<ButtonType> result = alert.showAndWait();
 
-          if (result.get() == ButtonType.OK) {
+          if (result.get() == ButtonType.YES) {
         	  dialogStage.close();
           }   
     }

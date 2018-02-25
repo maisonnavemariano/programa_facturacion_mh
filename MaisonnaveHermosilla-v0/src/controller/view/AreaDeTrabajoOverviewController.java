@@ -24,6 +24,9 @@ import java.util.Optional;
 
 import javafx.concurrent.Task;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.lang.Thread;
 
 import controller.Main;
@@ -31,6 +34,7 @@ import controller.db.Cliente;
 import controller.db.Concepto;
 import controller.db.DBEngine;
 import controller.db.Presupuesto;
+import controller.reports.ReportsEngine;
 import exception.InvalidBudgetException;
 
 public class AreaDeTrabajoOverviewController  {
@@ -85,6 +89,9 @@ public class AreaDeTrabajoOverviewController  {
     private Button descartarUno;
     @FXML
     private Button generarPresupuestosMensuales;
+    
+    @FXML
+    private Label conteoLabel;
     
     
     //Usados solamente en el metodo: efectivizar todos
@@ -222,7 +229,7 @@ public class AreaDeTrabajoOverviewController  {
     	
         //generarPresupuestosMensuales.disableProperty().bind(Bindings.size(presupuestosTable.getItems()).isEqualTo(0));
         
-    
+
     }
     
     /**
@@ -236,6 +243,7 @@ public class AreaDeTrabajoOverviewController  {
 
         //Agrega el contenido de la lista observable a la tabla
         presupuestosTable.setItems(mainApp.getPresupuestosNoEfectivosData());
+        conteoLabel.setText(String.valueOf(presupuestosTable.getItems().size() ) + " presupuestos.");
     }
     
     //-------------------------------BOTONES----------------------------------
@@ -334,19 +342,7 @@ public class AreaDeTrabajoOverviewController  {
             	
             	 //Efectivizo TODOS los presupuestos en la base de datos.
             	 
-              	 Task<Void> task = new Task<Void>() {
-            		    @Override
-            		    protected Void call() throws Exception {
-            		    	        	
-            		    	for (int i=0; i<= lista.size(); i++){
-                		    	updateProgress(i, lista.size());
-                   			 	Thread.sleep(115);
-            		    	}
-            		    	return null;
-            		    };
-            	 };
-            	 
-            	 Task<Void> task_efectivizar = new Task<Void>() {
+              	Task<Void> task_efectivizar = new Task<Void>() {
          		    @Override
          		    protected Void call() throws Exception {
          		    	
@@ -373,6 +369,9 @@ public class AreaDeTrabajoOverviewController  {
                         		//Actualizo contenido tabla en la vista: deberia no retornar nada
                             	clarearTablaYLista();
                             	
+              		           barraProgreso.progressProperty().unbind();
+              		           barraProgreso.progressProperty().set(0);
+                         
          		    		//Se informa al usuario que termino el proceso
          		           Alert alert = new Alert(AlertType.INFORMATION, 
          		  	  			 "",
@@ -383,8 +382,6 @@ public class AreaDeTrabajoOverviewController  {
          		           alert.setContentText("Se han efectivizado "+ lista.size() + " presupuestos.\n\nPuede consultar los presupuestos efectivos en el menú Buscar Presupuestos.");
          		           alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
          		           alert.showAndWait();
-         		           barraProgreso.progressProperty().unbind();
-         		           barraProgreso.progressProperty().set(0);
          		           
                          });
          		    	 }
@@ -397,14 +394,13 @@ public class AreaDeTrabajoOverviewController  {
             		
             	//Bindea la barra de progreso con la property de presupuestos efectivizados so far
                 barraProgreso.progressProperty().unbind();
-                barraProgreso.progressProperty().bind(task.progressProperty());
+                barraProgreso.progressProperty().bind(task_efectivizar.workDoneProperty());
               
                 //Primero pongo como disabled los elementos graficos de la 
  		    	//ventana: botones, lista, etc.
  		    	deshabilitarComponentes(true);
                 
  		    	//Arranco la efectivizacion de todos los presupuestos
- 		    	new Thread(task).start();;
                 new Thread(task_efectivizar).start();
                
              }
@@ -460,9 +456,50 @@ public class AreaDeTrabajoOverviewController  {
       */
     @FXML
       private void handleVistaPrevia() {
-    	Presupuesto selectedPresupuesto = presupuestosTable.getSelectionModel().getSelectedItem();
-        if (selectedPresupuesto != null) {
-    	 System.out.println(selectedPresupuesto.getEfectivo());}
+
+    	Presupuesto p = presupuestosTable.getSelectionModel().getSelectedItem();
+    	
+    	if(p!= null){
+    	String filename = ReportsEngine.generarReporteBorrador(p);
+    	
+    	File f = new File(filename);
+    	
+    	//Thread para abrir el Okular o el Adobe
+    	Task<Void> task = new Task<Void>() {
+		    @Override
+		    protected Void call() throws Exception {
+		    	
+		    	//Llamo a la aplicacion por defecto
+		    	Desktop escritorio = Desktop.getDesktop();
+		    	
+		    	//Abro el pdf en la aplicacion por defecto
+		    	try {
+		    		if(f.exists()) 
+		    			escritorio.open(f);
+				} catch (IOException e) {
+					System.out.println("error al abrir el pdf para vista previa");
+					e.printStackTrace();
+				}
+		    	
+		    	//TODO: Ver como y cuando borrar el archivo!
+		    	
+		    	return null;
+		    };
+    	};
+	 
+    	//Inicio trabajo del thread
+    	new Thread(task).start();
+    	}
+    	else{
+    		Alert alert = new Alert(AlertType.WARNING);
+    		alert.initOwner(mainApp.getPrimaryStage());
+    		alert.setTitle("Seleccionar presupuesto");
+    		alert.setHeaderText(null);
+    		alert.setContentText("No ha seleccionado ningún presupuesto de la lista.");
+    		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+    		alert.showAndWait();
+    	}
+    	
      }
     
     //------------------------BUSQUEDA-----------------------------------
@@ -487,12 +524,17 @@ public class AreaDeTrabajoOverviewController  {
      		mainApp.setPresupuestosNoEfectivosData(listaPresupuestos);
      	}
      	presupuestosTable.setItems(mainApp.getPresupuestosNoEfectivosData());
+    
+        conteoLabel.setText(String.valueOf(presupuestosTable.getItems().size() ) + " presupuestos.");
+
      }
      
      private void clarearTablaYLista(){
     	 ObservableList<Presupuesto> listaPresupuestos = FXCollections.observableArrayList(DBMotor.obtenerPresupuestosNoEfectivos());
     	 mainApp.setPresupuestosNoEfectivosData(listaPresupuestos);
     	 presupuestosTable.setItems(mainApp.getPresupuestosNoEfectivosData());
+         conteoLabel.setText(String.valueOf(presupuestosTable.getItems().size() ) + " presupuestos.");
+
      }
      
      /**
@@ -625,7 +667,6 @@ public class AreaDeTrabajoOverviewController  {
            		barraProgreso.progressProperty().unbind();
            		barraProgreso.progressProperty().set(0);
            		
-           		
            		//Creo el dialogo que la va a mostrar
            		Alert dialog = new Alert(AlertType.INFORMATION);
               	dialog.setTitle("Generando "+cantidad+" presupuestos mensuales...");
@@ -634,53 +675,39 @@ public class AreaDeTrabajoOverviewController  {
               	dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
               	dialog.getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
               	dialog.show();
-              	
-          		//Creo el task para actualizar la barra de progreso
-              	Task<Void> task_barra = new Task<Void>() {
-          		    @Override
-          		    protected Void call() throws Exception {
-          		    	       		    	
-          		    	
-          		    	for (int i=0; i<= cantidad; i++){
-              		    	updateProgress(i, cantidad);
-                 			 	Thread.sleep(115);
-          		    	}
-          		    
-                    	Platform.runLater(() -> {
-                    		deshabilitarComponentes(false);
-                    		dialog.close();
-                    		barraProgreso.progressProperty().unbind();
-                    		barraProgreso.progressProperty().set(0);
-     		           
-                    	});
-          		    	return null;
-          		    };
-              	}; //Fin task barra
-              	
+           		
+              
               	//Creo el task para generar los borradores
               	Task<Void> task_borradores = new Task<Void>() {
          		    @Override
          		    protected Void call() throws Exception {
          		    	
+         		    	
          		    	//Primero hago lo que debo
          		    	DBMotor.facturarTodos();
          		    	
-         		    	//Despues actualizo la vista
-         		    	handleSearch();
-         		    	
-         		    	
+           		    	Platform.runLater(() -> {
+           		    		//Despues actualizo la vista
+               		    	handleSearch();
+                    		deshabilitarComponentes(false);
+                    		dialog.close();
+                    		barraProgreso.progressProperty().unbind();
+                    		barraProgreso.progressProperty().set(0);
+       		           
+                    	});
+          		    	
+           		    	
          		    	return null;
          		    };
               	};//Fin task generar borradores
               	
-              	//Bindea la barra de progreso 
-                 barraProgreso.progressProperty().unbind();
-                 barraProgreso.progressProperty().bind(task_barra.progressProperty());
+              	 barraProgreso.progressProperty().unbind();
+                 barraProgreso.progressProperty().bind(task_borradores.workDoneProperty());
                
                  //Arranco la efectivizacion de todos los presupuestos
-  		    	 new Thread(task_barra).start();;
                  new Thread(task_borradores).start();
-          		
+                 
+                 
           	 }
           	 //Si no, si el usuario elige Generar Presupuestos mensuales = CANCEL
           	 else{
@@ -753,7 +780,7 @@ public class AreaDeTrabajoOverviewController  {
              alert.initOwner(mainApp.getPrimaryStage());
              alert.setTitle("Descartar todos");
              alert.setHeaderText(null);
-             alert.setContentText("¿Desea descartar todos los presupuestos de la lista?");
+             alert.setContentText("¿Desea descartar los "+presupuestosTable.getItems().size() +" presupuestos de la lista?");
              alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
              Optional<ButtonType> result = alert.showAndWait();
              

@@ -6,8 +6,10 @@ import controller.view.*;
 import exception.InvalidClientException;
 import controller.db.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -18,6 +20,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -60,6 +63,17 @@ public class Main extends Application {
      * presupuestos que se cargan en las tablas en cada vista.
      */
     public Main() {
+    	//Primero, voy a las carpetas de reportes y borro lo que haya en tmp
+    	File A = new File("reportes/tmp/");
+    	File B = new File("borradores/tmp/");
+    	
+    	for(File file: A.listFiles()) 
+    	    if (!file.isDirectory()) 
+    	        file.delete();
+    	
+    	for(File file: B.listFiles()) 
+    	    if (!file.isDirectory()) 
+    	        file.delete();
     	
     	DBMotor = DBSingleton.getInstance();
     	clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente(""));
@@ -156,7 +170,7 @@ public class Main extends Application {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Maisonnave Hermosilla - Estudio Contable ");
         this.primaryStage.setMaximized(true);
-        //this.primaryStage.getIcons().add(new Image("file:Resources/Images/piggybank.png"));
+        this.primaryStage.getIcons().add(new Image("file:Resources/Images/iconito.png"));
       
         initRootLayout();
         
@@ -353,12 +367,17 @@ public class Main extends Application {
     	//Primero instancio al cliente cuyo presupuesto se fabricará
     	Cliente cliente;
     	
+    	AnchorPane pantallaGris= new AnchorPane();
+
+        // Setea la vista en el centro del Panel Raiz
+        rootLayout.setCenter(pantallaGris);
+    	
     	//Creo un diálogo con una lista de clientes ordenados por denominación
     	//para seleccionar el cliente
     	Dialog<ButtonType> dialog = new Dialog<>();
     	dialog.setTitle("Nuevo presupuesto");
     	dialog.setHeaderText(null);
-    	dialog.setResizable(true); //ver por que no me entran los botones
+    	dialog.setResizable(false); 
 
     	Label label1 = new Label("Seleccione un cliente de la lista:");
     	
@@ -378,6 +397,7 @@ public class Main extends Application {
     	grid.add(label1, 1, 1);
     	grid.add(clientesChoiceBox, 1, 2);
     	dialog.getDialogPane().setContent(grid);
+    	
     			
     	//genero los dos botones : generar presupuesto (OK) y cancelar.
     	ButtonType buttonTypeOk = new ButtonType("Generar presupuesto", ButtonData.OK_DONE);
@@ -386,6 +406,9 @@ public class Main extends Application {
     	ButtonType buttonTypeCancel = new ButtonType("Cancelar", ButtonData.CANCEL_CLOSE);
     	dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
 
+
+    	dialog.getDialogPane().setMinWidth(390);
+    	
     	Optional<ButtonType> result = dialog.showAndWait();
     	
     	//Si el usuario elige Generar Presupuesto
@@ -492,6 +515,10 @@ public class Main extends Application {
     		}
     }
    
+    /**
+     * 
+     * 
+     */
     
     public void showDetalleCuentaCorrienteOverview(){
     	try {
@@ -499,7 +526,12 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("view/DetalleCuentaCorrienteOverview.fxml"));
             AnchorPane page = (AnchorPane) loader.load();
+            /*
+            AnchorPane pantallaGris= new AnchorPane();
 
+            // Setea la vista en el centro del Panel Raiz
+            rootLayout.setCenter(pantallaGris);
+             */
             // Crea el Stage para el diálogo
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Detalle de Cuentas Corrientes");
@@ -524,6 +556,12 @@ public class Main extends Application {
     }
     
     public void showRegistrarPagoOverview(){
+    	/*
+    	AnchorPane pantallaGris= new AnchorPane();
+
+        // Setea la vista en el centro del Panel Raiz
+        rootLayout.setCenter(pantallaGris);*/
+    	
     	try {
             // Carga el archivo .fxml y crea un nuevo stage para el diálogo pop-up
             FXMLLoader loader = new FXMLLoader();

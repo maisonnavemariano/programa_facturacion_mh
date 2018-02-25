@@ -21,8 +21,8 @@
         <items>
           <AnchorPane maxHeight="30.0" minHeight="30.0" prefHeight="30.0" prefWidth="160.0">
                <children>
-                  <Label layoutX="14.0" layoutY="6.0" text="Buscar por:" />
-                  <RadioButton fx:id="cuitRadioButton" layoutX="99.0" layoutY="6.0" mnemonicParsing="false" onAction="#handleCuitRadioButton" selected="true" text="CUIT">
+                  <Label layoutX="14.0" layoutY="6.0" text="Buscar cliente por:" />
+                  <RadioButton fx:id="cuitRadioButton" layoutX="159.0" layoutY="6.0" mnemonicParsing="false" onAction="#handleCuitRadioButton" selected="true" text="CUIT">
                      <font>
                         <Font size="12.0" />
                      </font>
@@ -30,24 +30,24 @@
                         <ToggleGroup fx:id="RadioBusqueda" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton fx:id="denominacionRadioButton" layoutX="158.0" layoutY="6.0" mnemonicParsing="false" onAction="#handleDenomRadioButton" text="Denominación" toggleGroup="$RadioBusqueda">
+                  <RadioButton fx:id="denominacionRadioButton" layoutX="218.0" layoutY="6.0" mnemonicParsing="false" onAction="#handleDenomRadioButton" text="Denominación" toggleGroup="$RadioBusqueda">
                      <font>
                         <Font size="12.0" />
                      </font>
                   </RadioButton>
-                  <TextField fx:id="busquedaTextField" layoutX="279.0" layoutY="1.0" onKeyReleased="#handleSearch" />
+                  <TextField fx:id="busquedaTextField" layoutX="339.0" layoutY="1.0" onKeyReleased="#handleSearch" />
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <SplitPane dividerPositions="0.4547738693467337" prefHeight="300.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <SplitPane dividerPositions="0.4020100502512563" prefHeight="300.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
-                      <AnchorPane maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="270.0" prefWidth="450.0">
+                      <AnchorPane prefHeight="574.0" prefWidth="735.0">
                            <children>
-                              <TableView fx:id="clienteTable" layoutX="-26.0" layoutY="14.0" prefHeight="298.0" prefWidth="174.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <TableView fx:id="clienteTable" layoutX="-26.0" layoutY="14.0" prefHeight="458.0" prefWidth="762.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <columns>
-                                  <TableColumn fx:id="cuitColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="110.0" resizable="false" text="CUIT" />
-                                  <TableColumn fx:id="denominacionColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="270.0" resizable="false" text="Denominación" />
+                                  <TableColumn fx:id="cuitColumn" editable="false" maxWidth="250.0" minWidth="-Infinity" prefWidth="137.0" resizable="false" text="CUIT" />
+                                  <TableColumn fx:id="denominacionColumn" editable="false" maxWidth="450.0" minWidth="-Infinity" prefWidth="310.0" resizable="false" text="Denominación" />
                                 </columns>
                                  <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -55,16 +55,16 @@
                               </TableView>
                            </children>
                         </AnchorPane>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                      <AnchorPane prefHeight="444.0" prefWidth="600.0">
                            <children>
-                              <Label layoutX="14.0" layoutY="6.0" text="Detalles">
+                              <Label layoutX="14.0" layoutY="6.0" text="Detalles" underline="true">
                                  <font>
                                     <Font size="18.0" />
                                  </font></Label>
-                              <GridPane layoutX="140.0" layoutY="97.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="30.0">
+                              <GridPane layoutX="140.0" layoutY="97.0" prefHeight="358.0" prefWidth="570.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="30.0">
                                 <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="264.0" minWidth="10.0" prefWidth="155.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="272.0" minWidth="10.0" prefWidth="272.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -77,25 +77,73 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Label text="CUIT" />
-                                    <Label text="Denominación" GridPane.rowIndex="1" />
-                                    <Label text="Dirección" GridPane.rowIndex="2" />
-                                    <Label text="Localidad" GridPane.rowIndex="3" />
-                                    <Label text="Teléfono" GridPane.rowIndex="4" />
-                                    <Label text="Correo Electrónico" GridPane.rowIndex="5" />
-                                    <Label fx:id="cuitLabel" text="                    " GridPane.columnIndex="1" />
-                                    <Label fx:id="denominacionLabel" text="                  " GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <Label fx:id="direccionLabel" text="                     " GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                    <Label fx:id="localidadLabel" text="                   " GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                    <Label fx:id="telefonoLabel" text="                    " GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                    <Label fx:id="correoElectronicoLabel" text="                   " GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                    <Label text="Condición IVA" GridPane.rowIndex="6" />
-                                    <Label text="Habilitado" GridPane.rowIndex="7" />
-                                    <Label fx:id="condicionIvaLabel" text="                    " GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                    <Label fx:id="habilitadoLabel" text="                    " GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                    <Label text="CUIT">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font></Label>
+                                    <Label text="Denominación" GridPane.rowIndex="1">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font></Label>
+                                    <Label text="Dirección" GridPane.rowIndex="2">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font></Label>
+                                    <Label text="Localidad" GridPane.rowIndex="3">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font></Label>
+                                    <Label text="Teléfono" GridPane.rowIndex="4">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font></Label>
+                                    <Label text="Correo Electrónico" GridPane.rowIndex="5">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font></Label>
+                                    <Label fx:id="cuitLabel" prefHeight="18.0" prefWidth="420.0" text="                    " textFill="#8a8a8a" GridPane.columnIndex="1">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font></Label>
+                                    <Label fx:id="denominacionLabel" prefHeight="18.0" prefWidth="247.0" text="                  " textFill="#8a8a8a" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font></Label>
+                                    <Label fx:id="direccionLabel" prefHeight="18.0" prefWidth="489.0" text="                     " textFill="#8a8a8a" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font></Label>
+                                    <Label fx:id="localidadLabel" prefHeight="18.0" prefWidth="453.0" text="                   " textFill="#8a8a8a" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font></Label>
+                                    <Label fx:id="telefonoLabel" prefHeight="18.0" prefWidth="403.0" text="                    " textFill="#8a8a8a" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font></Label>
+                                    <Label fx:id="correoElectronicoLabel" prefHeight="18.0" prefWidth="397.0" text="                   " textFill="#8a8a8a" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font></Label>
+                                    <Label text="Condición IVA" GridPane.rowIndex="6">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font></Label>
+                                    <Label text="Habilitado" GridPane.rowIndex="7">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font></Label>
+                                    <Label fx:id="condicionIvaLabel" prefHeight="18.0" prefWidth="357.0" text="                    " textFill="#8a8a8a" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font></Label>
+                                    <Label fx:id="habilitadoLabel" prefHeight="18.0" prefWidth="409.0" text="                    " textFill="#8a8a8a" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font></Label>
                                  </children>
                               </GridPane>
-                              <ButtonBar buttonMinWidth="60.0" layoutX="-16.0" layoutY="218.0" prefHeight="40.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-16.0" AnchorPane.rightAnchor="3.0">
+                              <ButtonBar buttonMinWidth="60.0" layoutX="-3.0" layoutY="218.0" prefHeight="40.0" prefWidth="472.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-3.0" AnchorPane.rightAnchor="3.0">
                                 <buttons>
                                   <Button maxWidth="132.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleNewCliente" pickOnBounds="false" prefHeight="26.0" prefWidth="117.0" text="Nuevo Cliente" />
                                     <Button layoutX="125.0" layoutY="17.0" maxWidth="129.0" minWidth="58.0" mnemonicParsing="false" onAction="#handleEditCliente" prefHeight="26.0" text="Editar Cliente" />
