@@ -273,7 +273,16 @@ public class DBEngine {
 		return toReturn;
 	}
 	
-	private boolean inhabilitarCliente(Cliente c){
+	/**
+	 * Método que dado un objeto cliente cambia su estado en la base de datos (utilizando el código de cliente del mismo). Cambia su atributo Habilitado a 'N'.
+	 * @param c Recibe un objeto Cliente del cuál extrae el código de cliente para acceder a la base de datos.
+	 * @return Retorna true si salió todo bien. 
+	 * @throws InvalidClientException Si él código de cliente es inválido (el cliente no existiría en la base de datos).
+	 */
+	private boolean inhabilitarCliente(Cliente c) throws InvalidClientException{
+		if (!c.esValidoCodigoCliente()) {
+			throw new InvalidClientException("Código de cliente inválido (método inhabilitar cliente)");
+		}
 	    PreparedStatement preparedStmt;
 		if(c.esValidoCodigoCliente()){
 			String update = "UPDATE Cliente SET Habilitado = 'N' WHERE Codigo_Cliente = ?";
@@ -290,7 +299,16 @@ public class DBEngine {
 		}
 		return false;
 	}
-	private boolean habilitarCliente(Cliente c){
+	/**
+	 * Método que dado un objeto cliente cambia su estado en la base de datos (utilizando el código de cliente del mismo). Cambia su atributo Habilitado a 'S'.
+	 * @param c Recibe un objeto Cliente del cuál extrae el código de cliente para acceder a la base de datos.
+	 * @return Retorna true si salió todo bien. 
+	 * @throws InvalidClientException InvalidClientException Si él código de cliente es inválido (el cliente no existiría en la base de datos).
+	 */
+	private boolean habilitarCliente(Cliente c) throws InvalidClientException{
+		if (!c.esValidoCodigoCliente()) {
+			throw new InvalidClientException("Código de cliente inválido (método habilitar cliente)");
+		}
 	    PreparedStatement preparedStmt;
 		if(c.esValidoCodigoCliente()){
 			String update = "UPDATE Cliente SET Habilitado = 'S' WHERE Codigo_Cliente = ?";
@@ -308,6 +326,22 @@ public class DBEngine {
 		return false;
 	}
 
+	/**
+	 * Método que actualiza en la base de datos el estado del cliente. Actualiza todos sus datos:
+	 *         - CUIT
+	 *         - Denominacion
+	 *         - Direccion
+	 *         - Localidad
+	 *         - Telefono
+	 *         - Email
+	 *         - Habilitado
+	 *         - Condicion_iva
+	 *         
+	 * OBSERVACIÓN: Si el cliente no existe en la base de datos, el método no hace NADA.
+	 * 
+	 * @param c Recibe el objeto Cliente a actualizar, utiliza el Codigo_cliente del objeto para acceder a la base de datos y cambiar TODOS los datos sobre el cliente.
+	 * 
+	 */
 	public void actualizarCliente(Cliente c){
 	    PreparedStatement preparedStmt;
 		if(c.esValidoCodigoCliente()){
@@ -331,11 +365,26 @@ public class DBEngine {
 			}
 		    
 		}
+		else
+			System.out.println("[WARNING] Se llamó al método actualizarCliente con un cliente inválido.");
 	}
 	
 	// ==================================================================================================================================
 	//     ** ** ** **                                    PRESUPUESTOS                                              ** ** ** **
 	// ==================================================================================================================================
+	/**
+	 * Método que busca en la base de datos con una serie de parámetros, y retorna una lista de presupuestos que coinciden con la busqueda. Los parámetros que busca son:
+	 *         - denominacion
+	 *         - cuit
+	 *         - fechas desde
+	 *         - fecha hasta
+	 * Obs: Busca por la coincidencia de TODOS los parámetros. 
+	 * @param denom La denominación a buscar en la base de datos
+	 * @param cuit
+	 * @param desde
+	 * @param hasta
+	 * @return
+	 */
 	public List<Presupuesto> BuscarDesdeHasta(String denom, String cuit, String desde, String hasta){
 		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();
 		if(denom==null || cuit == null || desde ==null || hasta == null) {
@@ -814,6 +863,28 @@ public class DBEngine {
 			//agregamos 
 			this.insertarConceptos(p);
 		}
+	}
+	
+	public void deshacerAumento(int porcentaje) {
+		if(porcentaje<=0 && porcentaje<=100 ) {
+			double porcentual = 1.0 + ((double)porcentaje/100.0);
+			porcentual = 1.0/porcentual;
+			
+			String query = "UPDATE Concepto_presupuesto AS c INNER JOIN Presupuesto AS p ON p.Nro_presupuesto=c.Nro_presupuesto SET c.Monto=ROUND(c.Monto*?*20)/20 WHERE p.Efectivo='N';";
+			PreparedStatement preparedStmt;
+			try {
+				preparedStmt = conn.prepareStatement(query);
+				preparedStmt.setDouble(1, porcentual);
+	
+				// execute the java preparedstatement
+				preparedStmt.executeUpdate();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else
+			System.out.println("[WARNING] porcentaje INVALIDO. Método deshacerAumento(porcentaje).");
 	}
 	/**
 	 * Actualiza el monto de todos los conceptos para cada presupuesto no efectivo en la base de datos. La actualización aumenta en 'porcentaje'% el monto, si el porcentaje es invalido NO realiza cambio
