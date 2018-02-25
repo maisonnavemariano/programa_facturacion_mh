@@ -815,6 +815,31 @@ public class DBEngine {
 			this.insertarConceptos(p);
 		}
 	}
+	/**
+	 * Actualiza el monto de todos los conceptos para cada presupuesto no efectivo en la base de datos. La actualización aumenta en 'porcentaje'% el monto, si el porcentaje es invalido NO realiza cambio
+	 * en la base de datos.
+	 * @param porcentaje Valor entero entre 0 y 100 que representa un valor de porcentaje 'porcentaje'%.
+	 */
+	public void actualizarMontoNoEfectivos(int porcentaje) { // Valor entre 0 y 100 porciento
+		if(porcentaje<=0 && porcentaje<=100 ) {
+			double porcentual = 1.0 + ((double)porcentaje/100.0);
+			
+			String query = "UPDATE Concepto_presupuesto AS c INNER JOIN Presupuesto AS p ON p.Nro_presupuesto=c.Nro_presupuesto SET c.Monto=ROUND(c.Monto*?*20)/20 WHERE p.Efectivo='N';";
+			PreparedStatement preparedStmt;
+			try {
+				preparedStmt = conn.prepareStatement(query);
+				preparedStmt.setDouble(1, porcentual);
+	
+				// execute the java preparedstatement
+				preparedStmt.executeUpdate();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else
+			System.out.println("[WARNING] porcentaje INVALIDO. Método actualizarMontoNoEfectivos(porcentaje).");
+	}
 	
 	/**
 	 * Método que genera PARA TODOS los clientes HABILITADOS, una nueva factura NO efectivizada, con los mismos conceptos que el presupuesto anterior. 
