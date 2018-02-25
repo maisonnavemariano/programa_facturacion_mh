@@ -973,9 +973,49 @@ public class DBEngine {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			recalcularSubtotales() ;
 		}
 		else
 			System.out.println("[WARNING] porcentaje INVALIDO. Método deshacerAumentoNoEfectivos(porcentaje).");
+	}
+	
+	
+	private void recalcularSubtotales() {
+		PreparedStatement preparedStmt;
+		String query = "SELECT p.Nro_presupuesto, ROUND(SUM(cp.Monto)*20)/20 AS Subtotal  "
+				+ "FROM Presupuesto as p INNER JOIN Concepto_presupuesto AS cp ON p.Nro_presupuesto=cp.Nro_presupuesto "
+				+ "WHERE p.Efectivo='N' "
+				+ "GROUP BY p.Nro_presupuesto;";
+		Statement st ;
+		String update = "UPDATE Presupuesto SET Subtotal=? WHERE Nro_presupuesto=?";
+		try {
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			double subtotal;
+			int Nro_presupuesto;
+			while(rs.next()){
+				subtotal = rs.getDouble("Subtotal");
+				Nro_presupuesto = rs.getInt("Nro_presupuesto");
+				
+				//ACTUALIZACION DE CADA SUBTOTAL DE CADA PRESUPUESTO
+
+				try {
+					preparedStmt = conn.prepareStatement(update);
+					preparedStmt.setDouble(1, subtotal);
+					preparedStmt.setInt(2, Nro_presupuesto);
+		
+					// execute the java preparedstatement
+					preparedStmt.executeUpdate();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * Actualiza el monto de todos los conceptos para cada presupuesto no efectivo en la base de datos. La actualización aumenta en 'porcentaje'% el monto, si el porcentaje es invalido NO realiza cambio
@@ -998,6 +1038,8 @@ public class DBEngine {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			recalcularSubtotales();
+			
 		}
 		else
 			System.out.println("[WARNING] porcentaje INVALIDO. Método aplicarAumentoNoEfectivos(porcentaje).");
@@ -1082,9 +1124,6 @@ public class DBEngine {
 	 * Obs: Puede entregar presupuestos de clientes no habilitados, si es que existen clientes no habilitados con presupuestos borrador creados.
 	 */
 	public List<Presupuesto> obtenerPresupuestosNoEfectivos(){
-		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
-		// 																			TRABAJO POR HACER
-		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
 		String query = "SELECT * "
 				+ "FROM Presupuesto "
 				+ "WHERE Efectivo = 'N'";
@@ -1222,6 +1261,12 @@ public class DBEngine {
 		return (efectivo? t : null);//devolvemos la transaccion solo si la logramos guardar en la base de datos
 	}
 	
+	/**
+	 * Recuperar el presupuesto asociado a la transaccion t. Si no existe tal presupuesto entonces retorna null.
+	 * @param t La transacción a la cuaĺ se le quiere buscar el presupuesto asociado, puede que no exista tal presupuesto.
+	 * @return Recupera el objeto Presupuesto asociado (si es que existe) y lo retorna.
+	 */
+	
 	public Presupuesto getPresupuestoAsociado(Transaccion t){
 		Presupuesto toReturn = null;
 		
@@ -1246,40 +1291,52 @@ public class DBEngine {
 		}
 		return toReturn;
 	}
+	/**
+	 * Recupera los ultimos movimientos para un dado cliente C.
+	 * @param C El cliente al cuál se le quiere recuperar TODOS sus ultimos movimientos.
+	 * @return Una lista de Transacciones conteniendo TODOS los movimientos del cliente, o una lista vacía en caso de que no haya movimientos.
+	 * 
+	 * 
+	 * OBS: Si el cliente es nulo o invalido NO HACE NADA. //TODO 
+	 */
 	
 	public List<Transaccion> ultimosMovimientos(Cliente C){
 		List<Transaccion> transacciones = new ArrayList<Transaccion>();
-		Transaccion transaccion_aux;
-		String query = "SELECT * FROM Transaccion WHERE Codigo_Cliente = "+C.getCodigoCliente()+" ORDER BY Fecha";
 		
-		Statement st;
-		try {
-			st = conn.createStatement();
-		    ResultSet rs = st.executeQuery(query);
-		    while(rs.next()){
-		    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
-	    		//String telefono, String correoElectronico, String condicionIva, String habilitado
-		    	transaccion_aux = new Transaccion(C,
-		    			rs.getDate("Fecha"),
-		    			rs.getString("Evento").charAt(0),
-		    			rs.getDouble("Monto"),
-		    			rs.getString("Concepto"),
-		    			rs.getDouble("Estado_cuenta_corriente")
-		    			
-		    			);
-		    	transaccion_aux.actualizarNroTransaccion(rs.getInt("Nro_Transaccion"));
-		    	transacciones.add(transaccion_aux);
-		    }
-		    st.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if(!C.esValidoCodigoCliente() || C==null)
+			System.out.println("[WARNING] cliente invalido o nulo en ultimosMovimientos");
+		else {
+			Transaccion transaccion_aux;
+			String query = "SELECT * FROM Transaccion WHERE Codigo_Cliente = "+C.getCodigoCliente()+" ORDER BY Fecha";
+			
+			Statement st;
+			try {
+				st = conn.createStatement();
+			    ResultSet rs = st.executeQuery(query);
+			    while(rs.next()){
+			    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+		    		//String telefono, String correoElectronico, String condicionIva, String habilitado
+			    	transaccion_aux = new Transaccion(C,
+			    			rs.getDate("Fecha"),
+			    			rs.getString("Evento").charAt(0),
+			    			rs.getDouble("Monto"),
+			    			rs.getString("Concepto"),
+			    			rs.getDouble("Estado_cuenta_corriente")
+			    			
+			    			);
+			    	transaccion_aux.actualizarNroTransaccion(rs.getInt("Nro_Transaccion"));
+			    	transacciones.add(transaccion_aux);
+			    }
+			    st.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		
 		return transacciones;
 	}
 	
 	/**
-	 * 
+	 * Una lista con las cuentas corrientes de todos los clientes habilitados.
 	 * @return Una lista con objetos CuentaCorriente, donde cada objeto tiene el Cliente en cuestion, y el monto (double) que representa el estado de la cuenta corriente.
 	 */
 	public List<CuentaCorriente> getCuentasCorrientesHabilitados(){
@@ -1316,9 +1373,15 @@ public class DBEngine {
 		return lista;
 		
 	}
-	
+	/**
+	 * Método privado para obtener el double que representa el estado de la cuenta corriente del cliente C pasado por parámetro.
+	 * @param C El cliente al cuál se le quiere recuperar el estado de la cuenta corriente
+	 * @return Un double que representa el estado actual de la cuenta corriente
+	 * @throws InvalidClientException Si el código de cliente es invalido (no existe el cliente en la base de datos), o si el cliente es null.
+	 * 
+	 */
 	private double obtenerEstadoCuentaCorriente(Cliente C) throws InvalidClientException{
-		if (!C.esValidoCodigoCliente())
+		if (!C.esValidoCodigoCliente() || C == null)
 			throw new InvalidClientException("Cliente no insertado en la base de datos.");
 		
 		
@@ -1339,19 +1402,30 @@ public class DBEngine {
 		}
 		return estado;
 	}
+	/**
+	 * Método que permite modificar el double que representa el estado de la cuenta corriente del cliente C.
+	 * @param c El Cliente al cuál modificarle la cuenta corriente.
+	 * @param monto El valor nuevo para almacenar en la base de datos.
+	 * 
+	 * OBS: Si el cliente es nulo o invalido NO HACE NADA. //TODO 
+	 */
 	private void actualizarEstadoCuentaCorriente(Cliente c,double monto){
-		String query = "UPDATE Cuenta_corriente SET Codigo_Cliente=?,  Monto = ?  WHERE Codigo_Cliente=? ";
-		PreparedStatement pt;
-		
-		try {
-			pt = conn.prepareStatement(query);
-			pt.setInt(1, c.getCodigoCliente());
-			pt.setDouble(2, monto);
-			pt.setInt(3, c.getCodigoCliente());
-			pt.execute();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(!c.esValidoCodigoCliente() || c==null)
+			System.out.println("[WARNING] Cliente invalido o nulo en actualizarEstadoCuentaCorriente" );
+		else {
+			String query = "UPDATE Cuenta_corriente SET Codigo_Cliente=?,  Monto = ?  WHERE Codigo_Cliente=? ";
+			PreparedStatement pt;
+			
+			try {
+				pt = conn.prepareStatement(query);
+				pt.setInt(1, c.getCodigoCliente());
+				pt.setDouble(2, monto);
+				pt.setInt(3, c.getCodigoCliente());
+				pt.execute();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	/**
