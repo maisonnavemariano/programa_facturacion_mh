@@ -1104,12 +1104,13 @@ public class DBEngine {
 		//Calculo para obtener el monto total nuevo (fix para el caso donde el ultimo presupuesto fue realizado con el
 		// sistema viejo y el monto total y la suma de los montos da distinto.
 
-		float montoTotal = 0;
+		double montoTotal = 0;
 		
 		if (ultimo != null) { 
 			for (Concepto c: ultimo.getConceptos())
 				montoTotal += c.getMonto();
 		}
+		montoTotal = Math.round(montoTotal*20.0)/20.0;
 		// El presupuesto se guarda con una fecha por default que es la fecha del borrador, pero al efectivizarse se cambia
 		// por la fecha de efectivización, la vista no debería mostrar la fecha de un presupuesto borrador porque no es la
 		// fecha que quedará, la que queda es la del día de efectivización.
