@@ -28,6 +28,22 @@ public class Transaccion {
 		this.Estado_cuenta_corriente = new SimpleDoubleProperty(Estado_cuenta_corriente);
 	}
 	
+	public String getFormattedEvent() {
+		String ev = "";
+		switch(this.Evento) {
+		case('C'):
+			ev = "credito";
+			break;
+		case('P'):
+			ev = "presupuesto";
+			break;
+		case('X'):
+			ev = "cancelación";
+			break;
+		}
+		return ev;
+	}
+	
 	public void actualizarNroTransaccion(int nroT){
 		Nro_Transaccion = nroT;
 	}

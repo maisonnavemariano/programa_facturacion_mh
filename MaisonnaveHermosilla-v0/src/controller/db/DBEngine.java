@@ -1,12 +1,14 @@
 package controller.db;
  
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import exception.InvalidBudgetException;
 import exception.InvalidClientException;
+import javafx.beans.property.SimpleStringProperty;
 
 /**
  * Clase que permite un manejo transparente de la base de datos 'programa_facturacion_mh'. Brindando operaciones para manipular Clientes, Presupuestos, Transacciones y Pagos.
@@ -379,11 +381,13 @@ public class DBEngine {
 	 *         - fechas desde
 	 *         - fecha hasta
 	 * Obs: Busca por la coincidencia de TODOS los parámetros. 
-	 * @param denom La denominación a buscar en la base de datos
-	 * @param cuit
-	 * @param desde
-	 * @param hasta
-	 * @return
+	 * 
+	 * Obs2: Si ALGUNO De los campos es NULO la busqueda no se puede hacer y el método no hace nada excepto imprimir un WARNING.
+	 * @param denom La denominación a buscar en la base de datos, si String vacío hace match con TODAS las denominaciones.
+	 * @param cuit cuit a buscar en la base de datos, busca en cualquier lugar del campo cuit, es indistinto poner el principio o el final del cuit. Si String vacío hace match con toda la base de datos.
+	 * @param desde Fecha tope inferior en la busqueda, fecha requerida.
+	 * @param hasta Fecha tope máximo para la busqueda, campo requerido.
+	 * @return Retorna una lista de presupuestos que coinciden con la parte de la denominación y cuit recibido, solo presupuestos entre la fecha 'desde' 'hasta'.
 	 */
 	public List<Presupuesto> BuscarDesdeHasta(String denom, String cuit, String desde, String hasta){
 		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();
@@ -421,6 +425,16 @@ public class DBEngine {
 		return toReturn;
 	}
 	
+	/**
+	 * Método que busca presupuestos para un cliente dado (cuit y denominación por parametro) para una fecha especifica 'fecha_actual'.
+	 * Obs: si cualquiera de los parametros es null el método no hace nada, solo imprime un warning.
+	 * 
+	 * @param denom Denominación para buscar en la base de datos, si el string es vacío hace match con toda la base de datos.
+	 * @param cuit Cuit a buscar en la base de datos, puede hacer match con cualquier parte del cuit. Si el string es vacío hace match con toda la base de datos.
+	 * @param fecha_actual Fecha exacta en la cuál se busca el presupuesto.
+	 * @return La lista que coincide con todos los parámetros de busqueda.
+	 * 
+	 */
 	
 	public List<Presupuesto> BuscarFechaExacta(String denom, String cuit, String fecha_actual){
 		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();
@@ -458,7 +472,10 @@ public class DBEngine {
 		return toReturn;
 	}
 	
-	
+	/**
+	 * método simple que ejecuta una sentencia que elimina todos aquellos presupuestos no efectivos, solo puede fallar si no hay conexion con la base de datos.
+	 * Obs: Si no existes presupuestos en estas condiciones ejecuta una sentencia SQL que no realiza ningún cambio en la base de datos.
+	 */
 	public void eliminarPresupuestosNoEfectivos() {
 		try {
 			String query = "DELETE FROM Presupuesto WHERE Efectivo = 'N'";
@@ -469,6 +486,13 @@ public class DBEngine {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Método que elimina un presupuesto borrador (no efectivo) que pudo haber sido realizado por error por el usuario. Falla si no hay conexión con la base de datos, o si el presupuesto pasado por 
+	 * parámetro no existo, o si el presupuesto ya ha sido efectivizado a cuentas corrientes.
+	 * 
+	 * @param p Recibe el objeto presupuesto a ser borrado, utiliza su nro de presupuesto para buscarlo y eliminarlo de la base de datos.
+	 * @throws InvalidBudgetException Lanza excepción si el presupuesto no existe en la base de datos (Nro inválido) o si el presupuesto ya ha sido efectivizado.
+	 */
 	public void eliminarNoEfectivo(Presupuesto p) throws InvalidBudgetException {
 		if (!p.hasValidNumber())
 			throw new InvalidBudgetException("El presupuesto no existe en la base de datos");
@@ -486,26 +510,47 @@ public class DBEngine {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Método que se encarga de cancelar los efectos de una efectivización:
+	 *         - Resta el valor de la cuenta corriente.
+	 *         - Crea una nueva transaccion del tipo CANCELACION (x), y la registra en la base de datos (con fecha actual y sumando el monto del presupuesto).
+	 *         - Marcamos el presupuesto como no efectivo, tanto en el objeto como en la base de datos.
+	 *         
+	 * Obs: el monto del presupuesto se suma, porque al efectivizar se resta. La suma se corresponde con la operación contraria.
+	 * @param p El objeto presupuesto a desefectivizar, requiere que sea efectivo y que tenga nro de presupuesto.
+	 * @throws InvalidBudgetException Si no tiene nro de presupuesto o si el presupuesto no es efectivo.
+	 */
 	public void desefectivizar(Presupuesto p) throws InvalidBudgetException {
 		if ((!p.hasValidNumber()) || !(p.getEfectivo()) )
-			throw new InvalidBudgetException("Presupuesto no existente en base de datos, o no ha sido efectivizado aún.");
+			throw new InvalidBudgetException("Presupuesto no existente en base de datos, o no ha sido efectivizado aún (el el método desefectivizar).");
 		
-		int nro_transaccion = p.getNroTransaccion();
 		int nro_presupuesto = p.getNroPresupuesto();
 		
 		double monto_a_restar = p.calcularMontoTotal();
 		
+		// Calculamos fecha
+		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+		String fechaActual = format1.format(Calendar.getInstance().getTime());
 		double estado_cta_corriente;
+		double nuevo_estado_cta_corriente;
 		try {
 			// * * * ACTUALIZAMOS CUENTA CORRIENTE * * * 
 			estado_cta_corriente = this.obtenerEstadoCuentaCorriente(p.getCliente());
-			this.actualizarEstadoCuentaCorriente(p.getCliente(), estado_cta_corriente+monto_a_restar);
+			nuevo_estado_cta_corriente = estado_cta_corriente+monto_a_restar;
+			this.actualizarEstadoCuentaCorriente(p.getCliente(), nuevo_estado_cta_corriente);
 			
-			// * * * ELIMINAMOS TRANSACCION DE TABLA DE TRANSACCIONES * * * 		
-			String query = "DELETE FROM Transaccion WHERE Nro_Transaccion = ?";
+			// * * * INSERTAMOS TRANSACCION DE CANCELACION EN TABLA DE TRANSACCIONES * * * 		
+			String query = "INSERT INTO Transaccion "
+					+       "(Codigo_cliente, Fecha, Evento, Monto, Concepto, Estado_cuenta_corriente) VALUES (?,?,'X',?,?,?) ;";
+		//	query = "DELETE FROM Transaccion WHERE Nro_Transaccion = ?";
 			PreparedStatement preparedStmt;
 			preparedStmt = conn.prepareStatement(query);
-			preparedStmt.setInt(1, nro_transaccion);
+			preparedStmt.setInt(1, p.getCliente().getCodigoCliente());
+			preparedStmt.setString(2, fechaActual);
+			preparedStmt.setDouble(3, monto_a_restar);
+			preparedStmt.setString(4, "Cancelación de presupuesto nro: "+p.getNroPresupuesto());
+			preparedStmt.setDouble(5, nuevo_estado_cta_corriente);
+
 			preparedStmt.execute();
 				
 				
@@ -515,6 +560,8 @@ public class DBEngine {
 			pt = conn.prepareStatement(query);
 			pt.setInt(1, nro_presupuesto);
 			pt.execute();
+			// * * * MARCAMOS EL OBJETO PRESUPUESTO COMO NO EFECTIVO * * * 
+			p.setEfectivo(false);
 		}catch(SQLException e) {
 			e.printStackTrace();
 		} catch (InvalidClientException e) {
@@ -556,6 +603,11 @@ public class DBEngine {
 		return toReturn;
 	}
 	
+	/**
+	 * Método que busca en la tabla de Concepto_presupuesto para recuperar todos los conceptos asociados a un dado presupuesto.
+	 * @param Nro_presu El nro de presupuesto del cuál se buscan los conceptos.
+	 * @return Retorna una lista de conceptos correspondientes al nro buscado, si ningún presupuesto coincide retorna una lista vacía.
+	 */
 	private List<Concepto> getConceptos(int Nro_presu){
 		List<Concepto> lista = new ArrayList<Concepto>();
 		Concepto aux;
@@ -582,7 +634,7 @@ public class DBEngine {
 	 * Retorna una lista de todos los prespuestos existentes en la base de datos que fueron realizados al cliente 'cliente'. 
 	 * @param cliente Cliente al cual se le quieren pedir todos los presupuestos. La busqueda se realiza mediante su código de cliente.
 	 * @return Una lista con todos los presupuestos que le corresponden al cliente 'cliente', o una lista vacía en caso de que no existe el cliente, o no tenga presupuestos asociados.
-	 * @throws InvalidClientException 
+	 * @throws InvalidClientException En el caso de que no tenga un código de cliente válido (probablemente no sea efectivo en la base de datos si no tiene código).
 	 */
 	public List<Presupuesto> verPresupuestos(Cliente cliente) throws InvalidClientException{
 		if (!cliente.esValidoCodigoCliente())
@@ -614,81 +666,95 @@ public class DBEngine {
 		}
 		return lista;
 	}
-	//temp
 
 	/**
+	 * Método que recibe la denominación de un cliente y recupera todos sus presupuestos no efectivos.
+	 * @param denom La denominación a buscar, busca por match en cualquier lugar del campo denominación. Si el String es vacío hace match con toda la base de datos de presupuestos no efectivos.
+	 * @return Lista con los presupuestos no efectivos que coinciden con esa búsqueda, lista vacía si nada coincide. 
+	 * Obs: retorna lista vacía si el string denom es null e imprime un WARNING.
 	 */
 	public List<Presupuesto> verPresupuestosNoEfectivosPorDenominacion(String denom){
 
 		List<Presupuesto> lista = new ArrayList<Presupuesto>();
-		Presupuesto aux;
-		Statement st ;
-		
-		String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente WHERE Cliente.Denominacion LIKE '%"+ denom+ "%' AND Presupuesto.Efectivo = 'N'";
-		
-		try {
-			st = conn.createStatement();
-			ResultSet rs = st.executeQuery(query);
-			while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
-				aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
-						this.getCliente(rs.getInt("Codigo_Cliente")),
-						(rs.getString("Efectivo").equals("S") ? true:false),
-						rs.getFloat("Alicuota"),
-						rs.getDouble("Subtotal"),
-						rs.getDate("Fecha"));
-				aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
-				lista.add(aux);
+		if(denom!=null) {
+			Presupuesto aux;
+			Statement st ;
+			
+			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente WHERE Cliente.Denominacion LIKE '%"+ denom+ "%' AND Presupuesto.Efectivo = 'N'";
+			
+			try {
+				st = conn.createStatement();
+				ResultSet rs = st.executeQuery(query);
+				while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
+					aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
+							this.getCliente(rs.getInt("Codigo_Cliente")),
+							(rs.getString("Efectivo").equals("S") ? true:false),
+							rs.getFloat("Alicuota"),
+							rs.getDouble("Subtotal"),
+							rs.getDate("Fecha"));
+					aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
+					lista.add(aux);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		else
+			System.out.println("[WARNING] String denom null en método verPresupuestosNoEfectivosPorDenominacion.");
 		return lista;
-	}	//temp
+	}
+
 
 	/**
+	 * Método que busca presupuestos no efectivos por cuit y los retorna. 
+	 * @param cuit Cuit a buscar en la base de datos, hace match en cualquier lugar del campo Cuit (puede ser al ppio. o al final). Si el String es vacío retorna toda la base de datos de no efectivos. 
+	 * @return Retorna la lista que coincida con los criterios de búsqueda, puede ser lista vacía si nada coincide. 
+	 * Obs: retorna también lista vacía si el parametro cuit es nulo y imprime un WARNING.
 	 */
 	public List<Presupuesto> verPresupuestosNoEfectivosPorCuit(String cuit){
 
 	
 		List<Presupuesto> lista = new ArrayList<Presupuesto>();
-		Presupuesto aux;
-		Statement st ;
-		
-		String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente WHERE Cliente.CUIT LIKE '%"+ cuit+ "%' AND Presupuesto.Efectivo = 'N'";
-		
-		try {
-			st = conn.createStatement();
-			ResultSet rs = st.executeQuery(query);
-			while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
-				aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
-						this.getCliente(rs.getInt("Codigo_Cliente")),
-						(rs.getString("Efectivo").equals("S") ? true:false),
-						rs.getFloat("Alicuota"),
-						rs.getDouble("Subtotal"),
-						rs.getDate("Fecha"));
-				aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
-				lista.add(aux);
+		if ( cuit!=null) {
+			Presupuesto aux;
+			Statement st ;
+			
+			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente WHERE Cliente.CUIT LIKE '%"+ cuit+ "%' AND Presupuesto.Efectivo = 'N'";
+			
+			try {
+				st = conn.createStatement();
+				ResultSet rs = st.executeQuery(query);
+				while(rs.next()){ // List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double Subtotal, Date fecha
+					aux = new Presupuesto(this.getConceptos(rs.getInt("Nro_Presupuesto")),
+							this.getCliente(rs.getInt("Codigo_Cliente")),
+							(rs.getString("Efectivo").equals("S") ? true:false),
+							rs.getFloat("Alicuota"),
+							rs.getDouble("Subtotal"),
+							rs.getDate("Fecha"));
+					aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
+					lista.add(aux);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		else
+			System.out.println("[WARNING] campo cuit null (método verPresupuestosNoEfectivosPorCuit.");
 		return lista;
-	}
-	//temp
-	
+	}	
 	
 	
 	/**
 	 * Retorna el último presupuesto que se le realizó al cliente 'cliente'.
 	 * @param cliente Cliente al cual se le requiere el último presupuesto. Se utiliza su código de cliente para la busqueda.
 	 * @return El ultimo presupuesto del cliente pasado por parámetro, o nulo en caso de que no existe el cliente, o no tenga presupuestos asociados.
-	 * @throws InvalidClientException 
+	 * @throws InvalidClientException Si el cliente no tiene un nro de cliente valido (probablemente porque no exista en la base de datos) o si el cliente es null.
 	 */
 	public Presupuesto verUltimoPresupuesto(Cliente cliente) throws InvalidClientException{
-		if (!cliente.esValidoCodigoCliente())
-			throw new InvalidClientException("Cliente no insertado en la base de datos.");
+		if (!cliente.esValidoCodigoCliente() || cliente==null)
+			throw new InvalidClientException("Cliente no insertado en la base de datos o objeto cliente nulo.");
 		
 		String query = "SELECT * "
 				+ "FROM Presupuesto "
@@ -728,59 +794,73 @@ public class DBEngine {
 	 * Por último se guarda al Nro_Presupuesto+1 como el proximo numero de presupuesto que va a salir, para poder ofrecer el servicio de devolver este numero para la interfaz gráfica de construccion de presupuestos.
 	 * @param p Presupuesto a agregar en la base de datos
 	 * @return True si pudo insertar correctamente en la base de datos. False caso contrario.
+	 * Obs: el método retornara false en caso de que el presupuesto pasado por parámetro sea null.
 	 */
 	public boolean agregarPresupuesto(Presupuesto p){
 		boolean toReturn = false;
-		String query = "INSERT INTO Presupuesto (Codigo_Cliente, Fecha, Efectivo, Alicuota, Subtotal) VALUES ('"+p.getCliente().getCodigoCliente()+"', "
-				+ "'"+p.getFecha()+"', "
-				+ "'"+(p.getEfectivo()?"S":"N") +"', "
-				+ "'"+p.getAlicuota()+"', "
-				+ "'"+p.getSubtotal()+"' ) ; ";
-		PreparedStatement pt;
-		
-		try {
-			pt = conn.prepareStatement(query);
-			pt.execute();
-			toReturn = true;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		if (toReturn){
-		    // OBTENIENDO EL Nro_Presupuesto del ultimo presupuesto insertado, para actualizarlo del objeto presupuesto.
-		    
-		    String query_aux = "SELECT LAST_INSERT_ID() AS ultimo_presupuesto";
-			Statement st;
+		if(p!=null) {
+			String query = "INSERT INTO Presupuesto (Codigo_Cliente, Fecha, Efectivo, Alicuota, Subtotal) VALUES ('"+p.getCliente().getCodigoCliente()+"', "
+					+ "'"+p.getFecha()+"', "
+					+ "'"+(p.getEfectivo()?"S":"N") +"', "
+					+ "'"+p.getAlicuota()+"', "
+					+ "'"+p.getSubtotal()+"' ) ; ";
+			PreparedStatement pt;
+			
 			try {
-				st = conn.createStatement();
-			    ResultSet rs = st.executeQuery(query_aux);
-			    int nro_presu = -1;
-			    if(rs.next()){
-			    	nro_presu = rs.getInt("ultimo_presupuesto");
-			    	this.ProximoNumeroPresupuesto = nro_presu+1;
-			    }
-			    p.actualizarNroPresupuesto(nro_presu);
-			    st.close();
+				pt = conn.prepareStatement(query);
+				pt.execute();
+				toReturn = true;
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			// Para insertar los conceptos necesitamos el paso previo inmediato, INSERTAR EL NRO DE PRESUPUESTO EN EL OBJETO 'p'
-			try {
-				insertarConceptos(p);
-			} catch (InvalidBudgetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (toReturn){
+			    // OBTENIENDO EL Nro_Presupuesto del ultimo presupuesto insertado, para actualizarlo del objeto presupuesto.
+			    
+			    String query_aux = "SELECT LAST_INSERT_ID() AS ultimo_presupuesto";
+				Statement st;
+				try {
+					st = conn.createStatement();
+				    ResultSet rs = st.executeQuery(query_aux);
+				    int nro_presu = -1;
+				    if(rs.next()){
+				    	nro_presu = rs.getInt("ultimo_presupuesto");
+				    	this.ProximoNumeroPresupuesto = nro_presu+1;
+				    }
+				    p.actualizarNroPresupuesto(nro_presu);
+				    st.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				// Para insertar los conceptos necesitamos el paso previo inmediato, INSERTAR EL NRO DE PRESUPUESTO EN EL OBJETO 'p'
+				try {
+					insertarConceptos(p);
+				} catch (InvalidBudgetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	
 			}
-
 		}
+		else
+			System.out.println("[WARNING] Objeto presupuesto null en método agregarPresupuesto.");
 		return toReturn;
 	}
 	
+	/**
+	 * Método que inserta todos los conceptos de un dado presupuesto p en la base de datos.
+	 * Obs: CUIDADO, ESTE MÉTODO NO ELIMINA NINGÚN CONCEPTO, SI EL PRESUPUESTO YA TENIA CONCEPTOS, ESTÉ MÉTODO LE AGREGA MÁS CONCEPTOS. Y el objeto puede quedar desactualizado si en la base de datos hay presupuestos que 
+	 * en el objeto no están.
+	 * >> Este método se utiliza para actualizar un presupuesto primero se borran todos los conceptos con un método auxiliar y luego se agregan mediante este metodo todos los conceptos nuevos. <<
+	 * @param p Presupuesto al cuál se le extraeran los conceptos para insertarlos en la base de datos. 
+	 * @throws InvalidBudgetException En caso de que el presupuesto no tenga numero valido o sea un objeto null.
+	 */
+	
 	private void insertarConceptos(Presupuesto p) throws InvalidBudgetException{
-		if(!p.hasValidNumber())
+		if(!p.hasValidNumber() || p==null)
 			throw new InvalidBudgetException("Presupuesto no creado en base de datos.");
 		String query = "INSERT INTO Concepto_presupuesto (Nro_Presupuesto, Concepto, Monto) VALUES (?,?,?)";
 		
@@ -802,14 +882,15 @@ public class DBEngine {
 		
 	}
 	/**
-	 * Realiza una operacion de UPDATE sobre la base de datos, cambiando los atributos del presupuesto. Para buscar el presupuesto utiliza el nro de presupuesto el cual es único.
+	 * Realiza una operacion de UPDATE sobre la base de datos, cambiando los atributos del presupuesto. Para buscar el presupuesto utiliza el nro de presupuesto el cual es único. El presupuesto se puede 
+	 * modificar SI SOLO SI el presupuesto no es efectivo.
 	 *  
 	 * @param p Presupuesto buscado en la base de datos para ser actualizado. Actualiza todos su atributos: Codigo_Cliente, Fecha, Efectivo, Alicuota y Subtotal. 
 	 * @return True si se pudo modificar correctamente. False en caso contrario.
 	 * 
 	 * 
 	 * OBS IMPORTANTE: el parametro efectivo no debe ser cambiado a mano, en lugar de eso se debe usar el método 'efectivizarPresupuesto'.
-	 * @throws InvalidBudgetException 
+	 * @throws InvalidBudgetException  Si el presupuesto tiene un numero invalid, o si el presupuesto ya es efectivo.
 	 */
 	//TODO: limitar la edicion a presupuestos no efectivos
 	public boolean editarPresupuesto(Presupuesto p) throws InvalidBudgetException{
@@ -839,11 +920,16 @@ public class DBEngine {
 			e.printStackTrace();
 		}
 		if(toReturn)
-			actualizarConceptos(p);
+			actualizarConceptos(p);  // el método ELIMINA TODOS LOS CONCEPTOS del presupuesto, y agrega TODOS los conceptos nuevos que estań en esté objeto presupuesto
 		return toReturn;
 	}
+	/**
+	 * El método actualiza los conceptos del presupuesto P. Para ello primero los elimina a todos los viejos y luego agrega todos los conceptos que tenga el objeto p (insertarConceptos(p)).
+	 * @param p El presupuesto al cual actualizarle los conceptos.
+	 * @throws InvalidBudgetException Lanza excepcion si el presupesto tiene un numero invalido (probablemente porque no este en la base de datos). O si el objeto p es nulo.
+	 */
 	private void actualizarConceptos(Presupuesto p) throws InvalidBudgetException{
-		if (! p.hasValidNumber())
+		if (! p.hasValidNumber() || p==null)
 			throw new InvalidBudgetException("Presupuesto no creado en base de datos");
 		//borrarlos y cargarlos de nuevo..
 		boolean eliminados = false;
@@ -864,9 +950,14 @@ public class DBEngine {
 			this.insertarConceptos(p);
 		}
 	}
+	/**
+	 * Método inverso al método aplicarAumento, se encarga de aplicar un descuento inverso al del aumentar con el fin de hacer un revertir aumento.
+	 * Si uno ejecuta aplicarAumento(x) y un deshacerAumento(x) vuelve al mismo valor de conceptos (hace un undo).
+	 * @param porcentaje El porcentaje el cuál se quiere deshacer, valor numerico entero entre 0 y 100. Si el valor no esta dentro de estos rangos el método no hace nada e imprime un warning.
+	 */
 	
 	public void deshacerAumentoNoEfectivos(int porcentaje) {
-		if(porcentaje<=0 && porcentaje<=100 ) {
+		if(porcentaje>=0 && porcentaje<=100 ) {
 			double porcentual = 1.0 + ((double)porcentaje/100.0);
 			porcentual = 1.0/porcentual;
 			
@@ -888,11 +979,11 @@ public class DBEngine {
 	}
 	/**
 	 * Actualiza el monto de todos los conceptos para cada presupuesto no efectivo en la base de datos. La actualización aumenta en 'porcentaje'% el monto, si el porcentaje es invalido NO realiza cambio
-	 * en la base de datos.
+	 * en la base de datos e imprime un cartel de WARNING.
 	 * @param porcentaje Valor entero entre 0 y 100 que representa un valor de porcentaje 'porcentaje'%.
 	 */
 	public void aplicarAumentoNoEfectivos(int porcentaje) { // Valor entre 0 y 100 porciento
-		if(porcentaje<=0 && porcentaje<=100 ) {
+		if(porcentaje>=0 && porcentaje<=100 ) {
 			double porcentual = 1.0 + ((double)porcentaje/100.0);
 			
 			String query = "UPDATE Concepto_presupuesto AS c INNER JOIN Presupuesto AS p ON p.Nro_presupuesto=c.Nro_presupuesto SET c.Monto=ROUND(c.Monto*?*20)/20 WHERE p.Efectivo='N';";
@@ -913,7 +1004,7 @@ public class DBEngine {
 	}
 	
 	/**
-	 * Método que genera PARA TODOS los clientes HABILITADOS, una nueva factura NO efectivizada, con los mismos conceptos que el presupuesto anterior. 
+	 * Método que genera PARA TODOS los clientes HABILITADOS, una nueva factura NO efectivizada, con los mismos conceptos que el  presupuesto anterior. 
 	 */
 	public void facturarTodos(){
 		// +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * +++++++++++++++++++++++++++++++++ * 
