@@ -20,6 +20,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -169,7 +170,7 @@ public class Main extends Application {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Maisonnave Hermosilla - Estudio Contable ");
         this.primaryStage.setMaximized(true);
-        //this.primaryStage.getIcons().add(new Image("file:Resources/Images/piggybank.png"));
+        this.primaryStage.getIcons().add(new Image("file:Resources/Images/iconito.png"));
       
         initRootLayout();
         

@@ -180,21 +180,21 @@ public class ClienteOverviewController {
         Cliente selectedCliente = clienteTable.getSelectionModel().getSelectedItem();
         if (selectedCliente != null) {
             boolean valor = selectedCliente.getHabilitado().equals("S");
-            Alert alert = new Alert(AlertType.CONFIRMATION,"",ButtonType.OK, ButtonType.CANCEL);
+            Alert alert = new Alert(AlertType.CONFIRMATION,"",ButtonType.YES, ButtonType.NO);
             alert.initOwner(mainApp.getPrimaryStage());
             if(valor){
             	alert.setTitle("Deshabilitar cliente");
-            	alert.setHeaderText("¿Desea deshabilitar el cliente seleccionado?");
+            	alert.setContentText("¿Desea deshabilitar el cliente seleccionado?");
             }
             else{
             	alert.setTitle("Habilitar cliente");
-            	alert.setHeaderText("¿Desea habilitar el cliente seleccionado?");
+            	alert.setContentText("¿Desea habilitar el cliente seleccionado?");
             }
-            alert.setContentText(null);
+            alert.setHeaderText(null);
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             Optional<ButtonType> result = alert.showAndWait();
             
-            if(result.get() == ButtonType.OK){
+            if(result.get() == ButtonType.YES){
             	if(valor)
             		selectedCliente.setHabilitado("N");
             	else
