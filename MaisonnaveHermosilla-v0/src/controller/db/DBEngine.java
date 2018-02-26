@@ -242,8 +242,23 @@ public class DBEngine {
 		    cliente.actualizarCodigoCliente(codigo_cliente);
 		    st.close();
 		    
+		    // AGREGAMOS LA CUENTA CORRIENTE ASOCIADA A ESE CLIENTE
+		    query = "INSERT INTO Cuenta_corriente (Codigo_cliente, Monto) VALUES (?,0.0) ;";
+		    try {
+				preparedStmt = conn.prepareStatement(query);
+				preparedStmt.setInt(1, cliente.getCodigoCliente());
+				preparedStmt.executeUpdate();
+				return true;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    
 		    
 		    return true;
+		    
+
+		    
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
