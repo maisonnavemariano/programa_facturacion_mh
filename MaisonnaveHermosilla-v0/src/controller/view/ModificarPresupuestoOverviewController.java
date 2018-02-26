@@ -95,6 +95,8 @@ public class ModificarPresupuestoOverviewController {
                 	String.valueOf(recalcularMonto(Double.parseDouble(newValue))));
 
                 });
+    	
+    	montoColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
     }
 
     /**
@@ -331,7 +333,7 @@ public class ModificarPresupuestoOverviewController {
     			
     	//Validacion de campos
     	 text1.textProperty().addListener((obs, oldText, newText) -> {
-             if (oldText.length() < 150 && newText.length() >= 150) {
+             if (oldText.length() < 300 && newText.length() >= 300) {
                       text2.requestFocus();
              }
           });
@@ -423,7 +425,7 @@ public class ModificarPresupuestoOverviewController {
     			
     	//Validacion de campos
     	 text1.textProperty().addListener((obs, oldText, newText) -> {
-             if (oldText.length() < 150 && newText.length() >= 150) {
+             if (oldText.length() < 300 && newText.length() >= 300) {
                       text2.requestFocus();
              }
           });

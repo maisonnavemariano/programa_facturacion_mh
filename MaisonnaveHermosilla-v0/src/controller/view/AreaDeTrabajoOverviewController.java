@@ -241,6 +241,7 @@ public class AreaDeTrabajoOverviewController  {
     	
         //generarPresupuestosMensuales.disableProperty().bind(Bindings.size(presupuestosTable.getItems()).isEqualTo(0));
         
+        montoConceptoColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
 
     }
     

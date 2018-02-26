@@ -20,6 +20,8 @@ import javax.print.DocPrintJob;
 import javax.print.PrintException;
 import javax.print.PrintService;
 import javax.print.SimpleDoc;
+import javax.print.attribute.DocAttributeSet;
+import javax.print.attribute.HashDocAttributeSet;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 
 import org.jpedal.PdfDecoderFX;
@@ -287,6 +289,10 @@ public class VerPresupuestosOverviewController {
     	exactaDatePicker.setDisable(true);
     	
     	resultadosEncontradosLabel.setText("");
+    	
+    	imprimirButton.setDisable(true);
+    	
+    	importe_Column.setStyle( "-fx-alignment: CENTER-RIGHT;");
         
     }
     
@@ -673,7 +679,8 @@ public class VerPresupuestosOverviewController {
         
         //Aca armo el objeto de impresion
         DocFlavor docType = DocFlavor.INPUT_STREAM.AUTOSENSE;
-        Doc pdfDoc = new SimpleDoc(fis, docType, null);
+        DocAttributeSet das = new HashDocAttributeSet();
+        Doc pdfDoc = new SimpleDoc(fis, docType, das);
         
         //Si el servicio de impresion por defecto es nulo, me voy
         if(printService == null){

@@ -17,7 +17,7 @@ public class Transaccion {
 	protected DoubleProperty Monto;
 	protected StringProperty concepto_observacion;
 	protected DoubleProperty Estado_cuenta_corriente;
-	
+	protected Date fechita;	
 	public Transaccion(Cliente cliente, Date fecha, char evento, double monto, String obs, double Estado_cuenta_corriente){
 		this.cliente = cliente;
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
@@ -26,7 +26,9 @@ public class Transaccion {
 		this.Monto = new SimpleDoubleProperty(monto);
 		this.concepto_observacion = new SimpleStringProperty(obs);
 		this.Estado_cuenta_corriente = new SimpleDoubleProperty(Estado_cuenta_corriente);
+		this.fechita=fecha;
 	}
+
 	
 	public String getFormattedEvent() {
 		String ev = "";
@@ -65,6 +67,15 @@ public class Transaccion {
 		return this.Fecha;
 	}
 	
+	public StringProperty fechaARGProperty(){
+		//Format2: lo que se muestra por pantallas (formato argentino)
+		//Solo para mostrarlo en la aplicacion cuando sea necesario
+		SimpleDateFormat format2 = new SimpleDateFormat("dd/MM/yyyy");
+		StringProperty fecha_ARG = new SimpleStringProperty(format2.format(this.fechita));
+		
+		return fecha_ARG;
+	}
+	
 	public StringProperty eventoProperty(){
 		StringProperty toret = new SimpleStringProperty(); 
 		toret.set(getFormattedEvent());
@@ -76,12 +87,23 @@ public class Transaccion {
 		return this.Monto;
 	}
 	
+	public StringProperty montoStringProperty(){
+		StringProperty msp = new SimpleStringProperty(String.format("$ %,.2f", this.Monto.get()));
+		return msp;
+	}
+	
+	
 	public StringProperty observacionProperty(){
 		return this.concepto_observacion;
 	}
 	
 	public DoubleProperty estadoCuentaProperty(){
 		return this.Estado_cuenta_corriente;
+	}
+	
+	public StringProperty estadoStringProperty(){
+		StringProperty esp = new SimpleStringProperty(String.format("$ %,.2f", this.Estado_cuenta_corriente.get()));
+		return esp;
 	}
 	
 	public int getNroTransaccion() {

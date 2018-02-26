@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
- 
+
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.view.UltimosMovimientosOverviewController">
    <children>
@@ -20,16 +21,34 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <Label layoutX="26.0" layoutY="25.0" text="Últimos movimientos - " />
+      <Label layoutX="26.0" layoutY="25.0" text="Últimos movimientos - ">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
       <Button layoutX="486.0" layoutY="560.0" mnemonicParsing="false" onAction="#handleAceptar" prefWidth="90.0" text="Aceptar" />
-      <Label fx:id="denominacionLabel" layoutX="177.0" layoutY="25.0" text="Nombre del cliente" />
-      <Label layoutX="26.0" layoutY="70.0" text="CUIT: " />
-      <Label layoutX="26.0" layoutY="105.0" text="Monto cuenta corriente: $" />
-      <Label layoutX="342.0" layoutY="105.0" text="Fecha último pago: " />
-      <Label layoutX="26.0" layoutY="143.0" text="Últimos movimientos:" />
-      <Label fx:id="cuitLabel" layoutX="65.0" layoutY="70.0" text="cuit del cliente" />
-      <Label fx:id="fechaUltimoLabel" layoutX="472.0" layoutY="105.0" text="fecha" />
-      <Label fx:id="montoLabel" layoutX="200.0" layoutY="105.0" text="monto" />
+      <Label fx:id="denominacionLabel" layoutX="235.0" layoutY="25.0" text="Nombre del cliente">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
+      <Label layoutX="26.0" layoutY="70.0" text="CUIT: ">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label layoutX="26.0" layoutY="105.0" text="Monto cuenta corriente: $">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label layoutX="342.0" layoutY="105.0" text="Fecha último pago: ">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label layoutX="26.0" layoutY="143.0" text="Últimos movimientos:">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label fx:id="cuitLabel" layoutX="69.0" layoutY="71.0" text="cuit del cliente" />
+      <Label fx:id="fechaUltimoLabel" layoutX="486.0" layoutY="105.0" text="fecha" />
+      <Label fx:id="montoLabel" layoutX="214.0" layoutY="106.0" text="monto" />
       <Button layoutX="262.0" layoutY="560.0" mnemonicParsing="false" onAction="#handleVerPresupuestoAsociado" prefHeight="26.0" prefWidth="204.0" text="Ver presupuesto asociado" />
    </children>
 </AnchorPane>

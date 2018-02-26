@@ -45,7 +45,7 @@ public class RegistrarPagoOverviewController {
     @FXML
     private TableColumn<CuentaCorriente, String> denominacionColumn;
     @FXML
-    private TableColumn<CuentaCorriente,Number> montoColumn;
+    private TableColumn<CuentaCorriente,String> montoColumn;
    
     @FXML
     private Label fechaLabel;
@@ -87,6 +87,7 @@ public class RegistrarPagoOverviewController {
         	}
         }
     });
+ 		montoColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
  		
     }
 
@@ -114,7 +115,7 @@ public class RegistrarPagoOverviewController {
 	 				cellData -> cellData.getValue().getCliente().denominacionProperty());
 			
 	 	montoColumn.setCellValueFactory(
- 				cellData -> cellData.getValue().montoProperty());
+ 				cellData -> cellData.getValue().montoStringProperty());
 	 	
 	 	cuentasTable.getSelectionModel().selectedItemProperty().addListener(
 	                (observable, oldValue, newValue) -> {

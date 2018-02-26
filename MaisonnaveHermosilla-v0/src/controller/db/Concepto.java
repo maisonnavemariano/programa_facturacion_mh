@@ -34,7 +34,7 @@ public class Concepto {
 	}
 	
 	public StringProperty getMontoConceptoStringProperty(){
-		StringProperty aux = new SimpleStringProperty("$ " + String.valueOf(this.monto));
+		StringProperty aux = new SimpleStringProperty(String.format("$ %,.2f", this.monto));
 		return aux;
 	}
 	

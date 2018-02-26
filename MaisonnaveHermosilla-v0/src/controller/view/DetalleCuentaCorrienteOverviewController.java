@@ -39,7 +39,7 @@ public class DetalleCuentaCorrienteOverviewController {
     @FXML
     private TableColumn<CuentaCorriente, String> denominacionColumn;
     @FXML
-    private TableColumn<CuentaCorriente,Number> montoColumn;
+    private TableColumn<CuentaCorriente,String> montoColumn;
    
  
     private Stage dialogStage;
@@ -55,7 +55,7 @@ public class DetalleCuentaCorrienteOverviewController {
     	  	  	
  		cuentasTable.getColumns().forEach(this::addTooltipToColumnCells_CuentaCorriente);
  		
- 		
+ 		montoColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
     }
 
     /**
@@ -83,7 +83,7 @@ public class DetalleCuentaCorrienteOverviewController {
 	 				cellData -> cellData.getValue().getCliente().denominacionProperty());
 			
 	 	montoColumn.setCellValueFactory(
- 				cellData -> cellData.getValue().montoProperty());
+ 				cellData -> cellData.getValue().montoStringProperty());
     }
     
 

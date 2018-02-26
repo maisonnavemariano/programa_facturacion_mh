@@ -45,11 +45,11 @@ public class UltimosMovimientosOverviewController {
     @FXML
     private TableColumn<Transaccion, String> eventoColumn;
     @FXML
-    private TableColumn<Transaccion, Number> importeColumn;
+    private TableColumn<Transaccion, String> importeColumn;
     @FXML
     private TableColumn<Transaccion, String> observacionColumn;
     @FXML
-    private TableColumn<Transaccion, Number> estadoColumn;
+    private TableColumn<Transaccion, String> estadoColumn;
     
     @FXML
     private Label denominacionLabel;
@@ -76,6 +76,9 @@ public class UltimosMovimientosOverviewController {
     	  	  	
  		transaccionesTable.getColumns().forEach(this::addTooltipToColumnCells_Transaccion);
  		 		
+ 		importeColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
+ 		
+ 		estadoColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
     }
 
     /**
@@ -102,18 +105,18 @@ public class UltimosMovimientosOverviewController {
     	 	transaccionesTable.setItems(listaTransacciones);
     	 	
     	 	fechaColumn.setCellValueFactory(
-    	 				cellData -> cellData.getValue().fechaProperty());
+    	 				cellData -> cellData.getValue().fechaARGProperty());
     	 		
     	 	eventoColumn.setCellValueFactory(
     	 				cellData -> cellData.getValue().eventoProperty());
     			
     	 	importeColumn.setCellValueFactory(
-     				cellData -> cellData.getValue().montoProperty());
+     				cellData -> cellData.getValue().montoStringProperty());
     	 	observacionColumn.setCellValueFactory(
      				cellData -> cellData.getValue().observacionProperty());
     		
     	 	estadoColumn.setCellValueFactory(
-    				cellData -> cellData.getValue().estadoCuentaProperty());
+    				cellData -> cellData.getValue().estadoStringProperty());
     	}
     	else{
     		this.cuitLabel.setText("");

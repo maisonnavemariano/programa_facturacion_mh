@@ -182,7 +182,7 @@ public class Presupuesto {
 	}
 	
 	public StringProperty subtotalStringProperty(){
-		StringProperty aux = new SimpleStringProperty("$ " +String.valueOf(subtotal.get()));
+		StringProperty aux = new SimpleStringProperty(String.format("$ %,.2f", subtotal.get()));
 		return aux;
 	}
 

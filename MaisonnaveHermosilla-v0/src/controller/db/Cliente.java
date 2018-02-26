@@ -256,7 +256,7 @@ public class Cliente {
     	if (this.getCondicionIva().equals("RI")){
     		return "Resp. Inscripto";
     	}else if (this.getCondicionIva().equals("EX")){
-    		return "Excento";
+    		return "Exento";
     	}else if (this.getCondicionIva().equals("MO")){
     		return "Monotributista";
     	}else if (this.getCondicionIva().equals("NR")) {

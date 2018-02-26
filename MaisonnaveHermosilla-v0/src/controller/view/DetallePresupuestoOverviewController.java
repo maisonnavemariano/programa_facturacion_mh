@@ -60,6 +60,8 @@ public class DetallePresupuestoOverviewController {
     	conceptosTable.setPlaceholder(new Label("No hay conceptos para mostrar."));
     	  	  	
  		conceptosTable.getColumns().forEach(this::addTooltipToColumnCells_Concepto);
+    
+ 		importeColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
     }
 
     /**
