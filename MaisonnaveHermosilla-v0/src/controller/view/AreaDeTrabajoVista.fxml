@@ -63,7 +63,7 @@
                                  <children>
                                     <Button fx:id="descartarTodos" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleDescartarTodos" prefHeight="26.0" prefWidth="118.0" text="Descartar Todo" />
                                     <Button fx:id="efectivizarTodos" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleEfectivizarTodos" prefHeight="26.0" prefWidth="128.0" text="Efectivizar Todo" />
-                                    <Button fx:id="efectivizarTodos1" layoutX="138.0" layoutY="10.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAplicarAumento" prefHeight="26.0" prefWidth="128.0" text="Aplicar Aumento" />
+                                    <Button fx:id="aumento" layoutX="138.0" layoutY="10.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAplicarAumento" prefHeight="26.0" prefWidth="128.0" text="Aplicar Aumento" />
                                  </children>
                               </HBox>
                               <ProgressBar fx:id="barraProgreso" layoutX="416.0" layoutY="417.0" prefHeight="20.0" prefWidth="6.0" progress="0.0" AnchorPane.bottomAnchor="11.0" AnchorPane.leftAnchor="416.0" AnchorPane.rightAnchor="14.0" />

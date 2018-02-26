@@ -32,13 +32,16 @@ public class Transaccion {
 		String ev = "";
 		switch(this.Evento) {
 		case('C'):
-			ev = "credito";
+			ev = "Pago";
 			break;
 		case('P'):
-			ev = "presupuesto";
+			ev = "Presupuesto";
 			break;
 		case('X'):
-			ev = "cancelación";
+			ev = "Cancelación";
+			break;
+		default:
+			ev= "Sin información";
 			break;
 		}
 		return ev;
@@ -64,12 +67,7 @@ public class Transaccion {
 	
 	public StringProperty eventoProperty(){
 		StringProperty toret = new SimpleStringProperty(); 
-		if (this.Evento == 'C') 
-			toret.set("Pago");
-		else if (this.Evento == 'P')
-			toret.set("Facturación");
-		else
-			toret.set("Sin información");
+		toret.set(getFormattedEvent());
 		
 		return toret;
 	}

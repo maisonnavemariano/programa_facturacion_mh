@@ -99,6 +99,8 @@ public class AreaDeTrabajoOverviewController  {
     private Button descartarUno;
     @FXML
     private Button generarPresupuestosMensuales;
+    @FXML
+    private Button aumento;
     
     @FXML
     private Label conteoLabel;
@@ -568,6 +570,7 @@ public class AreaDeTrabajoOverviewController  {
      //-----------------------------OTROS----------------------------------
    
      private void deshabilitarComponentes(boolean value){
+    	 
     	//Tablas
     	this.conceptosTable.setDisable(value);
     	this.presupuestosTable.setDisable(value);
@@ -580,7 +583,8 @@ public class AreaDeTrabajoOverviewController  {
     	this.descartarTodos.setDisable(value);
     	this.descartarUno.setDisable(value);
     	this.generarPresupuestosMensuales.setDisable(value); //TODO: este se configura aparte
-    	    	
+    	this.aumento.setDisable(value);
+    	
     	//Radiobutton
     	this.cuitRadioButton.setDisable(value);
     	this.denominacionRadioButton.setDisable(value);
@@ -919,22 +923,57 @@ public class AreaDeTrabajoOverviewController  {
 	            Optional<ButtonType> confirma = alert.showAndWait();
 	             
 	            if(confirma.get().equals(ButtonType.YES)){
+	            	Task<Void> task = new Task<Void>() {
+	         		    @Override
+	         		    protected Void call() throws Exception {
+	         		    	deshabilitarComponentes(true);
+	         		    	return null;}};
+	         		    	
+	         		   Task<Void> task2 = new Task<Void>() {
+	    	         		    @Override
+	    	         		    protected Void call() throws Exception {
+	    	         		    	
+	    	         		    	
+
+	    	   	            	 if (descuentoSiNo.isSelected()){
+	    	   	            		DBMotor.deshacerAumentoNoEfectivos(porcentajeFinal);
+	    	   	            	 }
+	    	   	            	 else{
+	    	   	            		 DBMotor.aplicarAumentoNoEfectivos(porcentajeFinal);
+	    	   	            	 }
+	    	   	            	 
+	    	   	            	
+	    	   	            	 
+	    	   	            	Platform.runLater(() -> {
+	             		    		
+	    	   	            	 deshabilitarComponentes(false);
+	    	   	            	 
+	                         
+	    	   	            	Alert alerta = new Alert(AlertType.INFORMATION);
+	    		 	            alerta.initOwner(mainApp.getPrimaryStage());
+	    		 	            alerta.setHeaderText(null);
+	    		 	            alerta.setContentText("El procedimiento se ha realizado exitosamente.\nPuede continuar editando los presupuestos en el Área de Trabajo.");
+	    		 	            alerta.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
+	    		 	            alerta.showAndWait();
+	    		 	            
+	    		 	            int index = presupuestosTable.getSelectionModel().getSelectedIndex();
+	    		 	            
+	    		 	            //Actualizo vista: todo como antes
+	    		 	            handleSearch();
+	    		 	            presupuestosTable.getSelectionModel().select(index);
+	    		 	            showPresupuestoDetails( presupuestosTable.getSelectionModel().getSelectedItem());
+	    		 	          
+	         		           
+	                         });
+	    	         		    	
+	    	         		    	
+	    	         		    	return null;}};
+	         		    	
+	         		 new Thread(task).start(); 
+	         		new Thread(task2).start();
 	            	
-	            	 if (descuentoSiNo.isSelected()){
-	            		DBMotor.deshacerAumentoNoEfectivos(porcentajeFinal);
-	            	 }
-	            	 else{
-	            		 DBMotor.aplicarAumentoNoEfectivos(porcentajeFinal);
-	            	 }
-	            	Alert alerta = new Alert(AlertType.INFORMATION);
-	 	            alerta.initOwner(mainApp.getPrimaryStage());
-	 	            alerta.setHeaderText(null);
-	 	            alerta.setContentText("El procedimiento se ha realizado exitosamente.\nPuede continuar editando los presupuestos en el Área de Trabajo.");
-	 	            alerta.showAndWait();
-	 	            
-	 	            //Actualizo vista
-	 	            handleSearch();
-	 	            showPresupuestoDetails(presupuestosTable.getSelectionModel().getSelectedItem());
+	            	
 	            }
 	            else{
 	             	handleAplicarAumento();

@@ -69,6 +69,8 @@ public class DetalleCuentaCorrienteOverviewController {
 
     public void setMainApp(Main m){
     	this.mainApp=m;
+    	
+    	mainApp.setCuentasCorrientesData_DB();
     }
     
     public void arranque(){

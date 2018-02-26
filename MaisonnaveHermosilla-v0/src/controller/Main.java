@@ -8,6 +8,7 @@ import controller.db.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -87,6 +88,10 @@ public class Main extends Application {
      */
     public Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    public List<Cliente> getClientesHabilitados(){
+    	return DBMotor.getClientesHabilitados();
     }
     
     /**
@@ -384,10 +389,15 @@ public class Main extends Application {
     	//Creo la lista de clientes
     	ChoiceBox<String> clientesChoiceBox = new ChoiceBox<String>();
     	ObservableList<String> listaDenominaciones = FXCollections.observableArrayList();
-    	for(Cliente c : this.getClienteData()){
+    	ObservableList<String> listaMostrable =  FXCollections.observableArrayList();
+    	List<Cliente> unaListita = this.getClientesHabilitados();
+    	for(Cliente c : unaListita ){
     		listaDenominaciones.add(c.getDenominacion());
+    		listaMostrable.add(c.getDenominacion());
     	}
-    	clientesChoiceBox.setItems(listaDenominaciones);
+    	
+    	java.util.Collections.sort(listaMostrable);
+    	clientesChoiceBox.setItems(listaMostrable);
     	
     	//Seteo valor por defecto del choice box
     	clientesChoiceBox.getSelectionModel().selectFirst();
@@ -406,7 +416,7 @@ public class Main extends Application {
     	ButtonType buttonTypeCancel = new ButtonType("Cancelar", ButtonData.CANCEL_CLOSE);
     	dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
 
-
+    	
     	dialog.getDialogPane().setMinWidth(390);
     	
     	Optional<ButtonType> result = dialog.showAndWait();
@@ -416,10 +426,13 @@ public class Main extends Application {
     		
     		//Seteo al cliente
     		int indice = clientesChoiceBox.getItems().indexOf(clientesChoiceBox.getValue());
-        	cliente = this.getClienteData().get(indice);
+    		String nombre = listaMostrable.get(indice);
+    		int indiceverdadero = listaDenominaciones.indexOf(nombre);
+    		
+    		cliente = unaListita.get(indiceverdadero);
                 		
-    		//Chequeo que el cliente no sea nulo
-    		if (cliente != null){
+    		//Chequeo que el cliente no sea nulo y este habilitado
+    		if (cliente != null || cliente.getHabilitado().equals("N")){
     			
     			//antes que nada veo que no haya ya un presupuesto no efectivo para ese cliente
     			if(DBMotor.verPresupuestosNoEfectivosPorDenominacion(cliente.getDenominacion()).size()==0){

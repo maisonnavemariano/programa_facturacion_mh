@@ -93,7 +93,9 @@ public class UltimosMovimientosOverviewController {
     	if(cuenta!= null){
     		this.cuitLabel.setText(cuenta.getCliente().getCuit());
     		this.denominacionLabel.setText(cuenta.getCliente().getDenominacion());
+    		
     		this.fechaUltimoLabel.setText(""); //TODO
+    		
     		this.montoLabel.setText(String.valueOf(cuenta.getEstadoCuentaCorriente()));
     		
     		ObservableList<Transaccion> listaTransacciones = FXCollections.observableArrayList(DBMotor.ultimosMovimientos(this.cuenta.getCliente()));
@@ -154,7 +156,7 @@ public class UltimosMovimientosOverviewController {
     	
     	if(transaccionesTable.getSelectionModel().getSelectedItem()!=null){
     		Transaccion T = transaccionesTable.getSelectionModel().getSelectedItem();
-    		if(T.eventoProperty().get().equals("Facturación")){
+    		if(T.eventoProperty().get().equals("Presupuesto")){
     			Presupuesto p = DBMotor.getPresupuestoAsociado(transaccionesTable.getSelectionModel().getSelectedItem());
     	    	try {
     	            // Carga el archivo .fxml y crea un nuevo stage para el diálogo pop-up
@@ -192,7 +194,8 @@ public class UltimosMovimientosOverviewController {
                  alert.initOwner(dialogStage);
                  alert.setTitle("Registro de pago");
                  alert.setHeaderText(null);
-                 alert.setContentText("La transacción seleccionada corresponde a un pago, y por ende no tiene asociada un presupuesto efectivo.");
+                 //TODO: cancelaciones
+                 alert.setContentText("La transacción seleccionada corresponde a un pago o a una cancelación, y por ende no tiene asociada un presupuesto efectivo.");
                  alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                  alert.showAndWait();
     		}
