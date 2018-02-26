@@ -129,6 +129,41 @@ public class DBEngine {
 		}
 		return toReturn;
 	}
+	
+	
+	// TMP
+	public List<Cliente> getClientesHabilitados(){
+		Cliente aux;
+		List<Cliente> lista = new ArrayList<Cliente>();
+		String query = "SELECT * "
+				+ "FROM Cliente "
+				+ "WHERE Habilitado='S' ";
+		
+		Statement st;
+		try {
+			st = conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    while(rs.next()){
+		    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+	    		//String telefono, String correoElectronico, String condicionIva, String habilitado
+		    	aux = new Cliente(rs.getInt("Codigo_Cliente"),
+		    			rs.getString("CUIT"),
+		    			rs.getString("Denominacion"),
+		    			rs.getString("Direccion"),
+		    			rs.getString("Localidad"),
+		    			rs.getString("Telefono"),
+		    			rs.getString("Email"),
+		    			rs.getString("Condicion_iva"),
+		    			rs.getString("Habilitado"));
+		    	lista.add(aux);
+		    }
+		    st.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lista;
+	}
+	// TMP
 	/**
 	 * Busca en la base de Clientes por un cliente que contenga en algun lugar del campo "denominacion", el String pasado por parámetro ('denominacion'). No es sensible a minusculas y mayusculas.
 	 * 
