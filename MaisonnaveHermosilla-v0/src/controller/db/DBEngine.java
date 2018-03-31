@@ -548,6 +548,9 @@ public class DBEngine {
 				SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
 				return format1.format(rs.getDate("Fecha"));
 			}
+			else {
+				System.out.println("[WARNING] Se pidió fechaUltimoPago para cliente que no tiene ninguna fecha.");
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
