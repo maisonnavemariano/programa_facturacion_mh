@@ -9,11 +9,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
@@ -33,6 +39,8 @@ import javafx.application.Platform;
 import java.util.Optional;
 
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -243,6 +251,33 @@ public class AreaDeTrabajoOverviewController  {
         
         montoConceptoColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
 
+        ContextMenu cm_conceptos = new ContextMenu();
+        MenuItem mi_copiar = new MenuItem("Copiar descripción");
+        cm_conceptos.getItems().add(mi_copiar);
+
+        conceptosTable.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent t) {
+                if(t.getButton() == MouseButton.SECONDARY) {
+                    cm_conceptos.show(conceptosTable, t.getScreenX(), t.getScreenY());
+                }
+                if(t.getButton() == MouseButton.PRIMARY) {
+                    cm_conceptos.hide();
+                }
+            }
+        });
+        
+        
+        mi_copiar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+            	 final Clipboard clipboard = Clipboard.getSystemClipboard();
+                 final ClipboardContent content = new ClipboardContent();
+                 content.putString(conceptosTable.getSelectionModel().getSelectedItem().getConcepto());
+                 clipboard.setContent(content);
+            }
+        });
+        
     }
     
     /**

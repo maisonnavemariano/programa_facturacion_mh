@@ -1,23 +1,36 @@
 package controller.view;
  
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 
 import java.util.Optional;
 
@@ -85,7 +98,8 @@ public class ModificarPresupuestoOverviewController {
         borrarButton.disableProperty().bind(Bindings.isEmpty(conceptosTable.getSelectionModel().getSelectedItems()));
             	
     	conceptosTable.setPlaceholder(new Label("No hay conceptos para mostrar."));
-    	
+    	conceptosTable.getColumns().forEach(this::addTooltipToColumnCells_Concepto);
+        
     	alicuotaChoiceBox.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                 	
@@ -97,6 +111,33 @@ public class ModificarPresupuestoOverviewController {
                 });
     	
     	montoColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
+    	
+    	 ContextMenu cm_conceptos = new ContextMenu();
+         MenuItem mi_copiar = new MenuItem("Copiar descripción");
+         cm_conceptos.getItems().add(mi_copiar);
+
+         conceptosTable.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+
+             @Override
+             public void handle(MouseEvent t) {
+                 if(t.getButton() == MouseButton.SECONDARY) {
+                     cm_conceptos.show(conceptosTable, t.getScreenX(), t.getScreenY());
+                 }
+                 if(t.getButton() == MouseButton.PRIMARY) {
+                     cm_conceptos.hide();
+                 }
+             }
+         });
+         
+         
+         mi_copiar.setOnAction(new EventHandler<ActionEvent>() {
+             @Override public void handle(ActionEvent e) {
+             	 final Clipboard clipboard = Clipboard.getSystemClipboard();
+                  final ClipboardContent content = new ClipboardContent();
+                  content.putString(conceptosTable.getSelectionModel().getSelectedItem().getConcepto());
+                  clipboard.setContent(content);
+             }
+         });
     }
 
     /**
@@ -247,6 +288,18 @@ public class ModificarPresupuestoOverviewController {
 	 		  			 "",
 	                    ButtonType.YES, 
 	                    ButtonType.NO);
+				 
+				 
+				//Deactivate Defaultbehavior for yes-Button:
+				Button yesButton = (Button) alerta.getDialogPane().lookupButton( ButtonType.YES );
+				yesButton.setDefaultButton( false );
+
+				//Activate Defaultbehavior for no-Button:
+				Button noButton = (Button) alerta.getDialogPane().lookupButton( ButtonType.NO );
+				noButton.setDefaultButton( true );
+
+				 
+				 
 	              alerta.initOwner(dialogStage);
 	              alerta.setTitle("Efectivizar presupuesto");
 	              alerta.setHeaderText("Presupuesto seleccionado: "+ presupuesto.getNroPresupuesto()+ " - "
@@ -326,7 +379,10 @@ public class ModificarPresupuestoOverviewController {
 
     	Label label1 = new Label("Descripción: ");
     	Label label2 = new Label("Importe: $");
-    	TextField text1 = new TextField();
+    	TextArea text1 = new TextArea();
+    	text1.setPrefHeight(100);  
+    	text1.setPrefWidth(250);
+    	text1.setWrapText(true);
     	TextField text2 = new TextField();
     	text1.setPromptText("Nuevo concepto");
     	text2.setPromptText("0.0");
@@ -354,13 +410,15 @@ public class ModificarPresupuestoOverviewController {
     	grid.add(label2, 1, 2);
     	grid.add(text2, 2, 2);
     	dialog.getDialogPane().setContent(grid);
+    	
+    	Platform.runLater(() -> text1.requestFocus());
     			
     	ButtonType buttonTypeOk = new ButtonType("OK", ButtonData.OK_DONE);
     	dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
     	
     	ButtonType buttonTypeCancel = new ButtonType("Cancelar", ButtonData.CANCEL_CLOSE);
     	dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
-
+    	
     	Optional<ButtonType> result = dialog.showAndWait();
     	
     	if (result.get() == buttonTypeOk) {
@@ -418,7 +476,13 @@ public class ModificarPresupuestoOverviewController {
 
     	Label label1 = new Label("Descripción: ");
     	Label label2 = new Label("Importe: $");
-    	TextField text1 = new TextField(concepto.getConcepto());
+    	TextArea text1 = new TextArea(concepto.getConcepto());
+    	//You can use these methods
+    	text1.setPrefHeight(100);  //sets height of the TextArea to 400 pixels 
+    	text1.setPrefWidth(250);    //sets width of the TextArea to 300 pixels
+    	text1.setWrapText(true);
+    	text1.positionCaret(text1.getLength());
+    	
     	TextField text2 = new TextField(String.valueOf(concepto.getMonto()));
     	text1.setPromptText("Editar concepto");
     	text2.setPromptText("0.0");
@@ -446,14 +510,17 @@ public class ModificarPresupuestoOverviewController {
     	grid.add(label2, 1, 2);
     	grid.add(text2, 2, 2);
     	dialog.getDialogPane().setContent(grid);
+    	
+    	Platform.runLater(() -> text1.requestFocus());
     			
     	ButtonType buttonTypeOk = new ButtonType("OK", ButtonData.OK_DONE);
     	dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
     	
-    	ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+    	ButtonType buttonTypeCancel = new ButtonType("Cancelar", ButtonData.CANCEL_CLOSE);
     	dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
 
     	Optional<ButtonType> result = dialog.showAndWait();
+    	
     	
     	if (result.get() == buttonTypeOk) {
     		String cs;
@@ -589,5 +656,23 @@ public class ModificarPresupuestoOverviewController {
     	this.propietario = p;
     }
 
+    private <T> void addTooltipToColumnCells_Concepto(TableColumn<Concepto,T> column) {
+
+	    Callback<TableColumn<Concepto, T>, TableCell<Concepto,T>> existingCellFactory 
+	        = column.getCellFactory();
+
+	    column.setCellFactory(c -> {
+	        TableCell<Concepto, T> cell = existingCellFactory.call(c);
+
+	        Tooltip tooltip = new Tooltip();
+	        // can use arbitrary binding here to make text depend on cell
+	        // in any way you need:
+	        tooltip.textProperty().bind(cell.itemProperty().asString());
+
+	        cell.setTooltip(tooltip);
+	        return cell;
+	    });
+	}
+    
     
 }

@@ -1,12 +1,20 @@
 package controller.view;
  
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -62,6 +70,33 @@ public class DetallePresupuestoOverviewController {
  		conceptosTable.getColumns().forEach(this::addTooltipToColumnCells_Concepto);
     
  		importeColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
+ 		
+ 		 ContextMenu cm_conceptos = new ContextMenu();
+         MenuItem mi_copiar = new MenuItem("Copiar descripción");
+         cm_conceptos.getItems().add(mi_copiar);
+
+         conceptosTable.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+
+             @Override
+             public void handle(MouseEvent t) {
+                 if(t.getButton() == MouseButton.SECONDARY) {
+                     cm_conceptos.show(conceptosTable, t.getScreenX(), t.getScreenY());
+                 }
+                 if(t.getButton() == MouseButton.PRIMARY) {
+                     cm_conceptos.hide();
+                 }
+             }
+         });
+         
+         
+         mi_copiar.setOnAction(new EventHandler<ActionEvent>() {
+             @Override public void handle(ActionEvent e) {
+             	 final Clipboard clipboard = Clipboard.getSystemClipboard();
+                  final ClipboardContent content = new ClipboardContent();
+                  content.putString(conceptosTable.getSelectionModel().getSelectedItem().getConcepto());
+                  clipboard.setContent(content);
+             }
+         });
     }
 
     /**

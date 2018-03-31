@@ -106,7 +106,9 @@ public class Cliente {
      * */
 
     public String getCuit() {
-        return cuit.get();
+    	
+    	String a = String.format("%s-%s-%s", cuit.get().substring(0, 2),cuit.get().substring(2, 10),cuit.get().substring(10));
+        return a;
     }
 
     public void setCuit(String cu) {
@@ -114,7 +116,11 @@ public class Cliente {
     }
 
     public StringProperty cuitProperty() {
-        return cuit;
+    	
+    	String a = String.format("%s-%s-%s", cuit.get().substring(0, 2),cuit.get().substring(2, 10),cuit.get().substring(10));
+        StringProperty toret = new SimpleStringProperty(a);
+    	
+        return toret;
     }
     
     /**
@@ -265,26 +271,5 @@ public class Cliente {
     		return "Consumidor Final";
     	}
     }
-    /* 
-    /**
-     * Birthday: tiene un getter que retorna LocalDate,
-     * un setter que pide un LocalDate,
-     * y un getter que retorna un ObjectProperty<LocalDate> 
-     */
-    
-    /*
-    
-    public LocalDate getBirthday() {
-        return birthday.get();
-    }
-
-    public void setBirthday(LocalDate birthday) {
-        this.birthday.set(birthday);
-    }
-
-    public ObjectProperty<LocalDate> birthdayProperty() {
-        return birthday;
-    }
-    
-    */
+   
 }

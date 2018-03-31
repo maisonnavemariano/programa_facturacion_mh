@@ -34,25 +34,40 @@ import controller.db.DBEngine;
 import controller.db.DBSingleton;
 import controller.db.Presupuesto;
 import exception.InvalidBudgetException;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import net.sf.jasperreports.engine.JRException;
@@ -132,8 +147,6 @@ public class VerPresupuestosOverviewController {
 	 @FXML
 	 private Button vistaPreviaButton;
 	 @FXML
-	 private Button imprimirButton;
-	 @FXML
 	 private Button imprimirTodosButton;
 	 
 	 //BOTONES PARTICULARES
@@ -150,6 +163,7 @@ public class VerPresupuestosOverviewController {
 	 private DateTimeFormatter formatter_2 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	 
 	public VerPresupuestosOverviewController(){
+		
 	}
 	
 	/**
@@ -171,6 +185,8 @@ public class VerPresupuestosOverviewController {
     @FXML
     private void initialize() {
     	
+    	this.setDialogStage();
+    	    	
     	// Inicializa la tabla de presupuestos con los valores de las 3 columnas.
     	Nro_Column.setCellValueFactory(
     			cellData -> cellData.getValue().NroPresupuestoProperty());
@@ -192,6 +208,49 @@ public class VerPresupuestosOverviewController {
         conceptosTable.getColumns().forEach(this::addTooltipToColumnCells_Concepto);
         conceptosTable.setPlaceholder(new Label("No hay conceptos."));
         
+        ContextMenu cm_conceptos = new ContextMenu();
+        MenuItem mi_copiar = new MenuItem("Copiar descripción");
+        cm_conceptos.getItems().add(mi_copiar);
+
+        conceptosTable.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent t) {
+                if(t.getButton() == MouseButton.SECONDARY) {
+                    cm_conceptos.show(conceptosTable, t.getScreenX(), t.getScreenY());
+                }
+                if(t.getButton() == MouseButton.PRIMARY) {
+                    cm_conceptos.hide();
+                }
+            }
+        });
+        
+        
+        mi_copiar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+            	 final Clipboard clipboard = Clipboard.getSystemClipboard();
+                 final ClipboardContent content = new ClipboardContent();
+                 content.putString(conceptosTable.getSelectionModel().getSelectedItem().getConcepto());
+                 clipboard.setContent(content);
+            }
+        });
+        
+       /* this.dialogStage.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY), new Runnable(){
+
+			@Override
+			public void run() {
+				
+				if(conceptosTable.getSelectionModel().getSelectedItem()!=null){
+					
+					final Clipboard clipboard = Clipboard.getSystemClipboard();
+	                final ClipboardContent content = new ClipboardContent();
+	                content.putString(conceptosTable.getSelectionModel().getSelectedItem().getConcepto());
+	                clipboard.setContent(content);
+				}
+				
+			}});*/
+        
+         
         desdeDatePicker.setPromptText(this.EPOCH.format(formatter_2));
         hastaDatePicker.setPromptText(this.NOW.format(formatter_2));
         exactaDatePicker.setPromptText(this.NOW.format(formatter_2));
@@ -289,11 +348,12 @@ public class VerPresupuestosOverviewController {
     	exactaDatePicker.setDisable(true);
     	
     	resultadosEncontradosLabel.setText("");
-    	
-    	imprimirButton.setDisable(true);
-    	
+    	    	
     	importe_Column.setStyle( "-fx-alignment: CENTER-RIGHT;");
-        
+    	
+    	//Platform.runLater(() -> 
+    	desdeDatePicker.requestFocus();
+        	      
     }
     
     
@@ -302,8 +362,14 @@ public class VerPresupuestosOverviewController {
      * 
      * @param dialogStage
      */
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
+    public void setDialogStage() {
+
+        Scene scene = new Scene(new AnchorPane());
+        Stage ds = new Stage();
+        ds.setScene(scene);
+        this.dialogStage = ds;
+        
+        
        
     }
     
@@ -389,6 +455,7 @@ public class VerPresupuestosOverviewController {
             fechaLabel.setText("");
             
         }
+        
         
     }
 
@@ -619,12 +686,13 @@ public class VerPresupuestosOverviewController {
     	
     }
 
+    
     /**
      * Muestra vista para imprimir un presupuesto de la lista
      * TODO: hay que levantarlo del Jasper, por ahora imprime algo 
      * levantado de un filechooser
      */
-    public void handleImprimir(){
+   /* public void handleImprimir(){
     	
     	Presupuesto p = presupuestosTable.getSelectionModel().getSelectedItem();
     	
@@ -717,7 +785,7 @@ public class VerPresupuestosOverviewController {
     	}
         
         
-    }
+    } */
     
     public void handleImprimirTodos(){
     	ObservableList<Presupuesto> lista = presupuestosTable.getItems();
@@ -855,7 +923,7 @@ public class VerPresupuestosOverviewController {
         	String nombrecito = ReportsEngine.DefaultName(p);
         	fileChooser.setInitialFileName(nombrecito);
         	
-        	//fileChooser.setInitialDirectory(value);  TODO
+        	//fileChooser.setInitialDirectory(%userprofile%\Documents\MH\);  //TODO
         	File dest = fileChooser.showSaveDialog(dialogStage);
         	String filename = dest.getPath();
         	
@@ -874,6 +942,5 @@ public class VerPresupuestosOverviewController {
     	}
     	
     }
-    
     
 }

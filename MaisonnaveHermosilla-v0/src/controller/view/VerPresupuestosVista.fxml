@@ -20,6 +20,7 @@
         <items>
           <AnchorPane maxHeight="150.0" minHeight="150.0" prefHeight="150.0">
                <children>
+                  <Button fx:id="buscarButton" defaultButton="true" layoutX="729.0" layoutY="70.0" mnemonicParsing="false" onAction="#handleBusqueda" text="Buscar" AnchorPane.bottomAnchor="54.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="70.0" />
                   <Label layoutX="18.0" layoutY="14.0" text="Criterios de Búsqueda" underline="true">
                      <font>
                         <Font size="16.0" />
@@ -40,7 +41,6 @@
                   <DatePicker fx:id="hastaDatePicker" layoutX="594.0" layoutY="70.0" prefHeight="26.0" prefWidth="126.0" showWeekNumbers="true" />
                   <RadioButton fx:id="exactaRadioButton" layoutX="335.0" layoutY="110.0" mnemonicParsing="false" onAction="#handleExactaRadioButton" text="Fecha exacta" toggleGroup="$FechaGroup" />
                   <DatePicker fx:id="exactaDatePicker" layoutX="448.0" layoutY="108.0" prefHeight="26.0" prefWidth="126.0" showWeekNumbers="true" />
-                  <Button fx:id="buscarButton" layoutX="729.0" layoutY="70.0" mnemonicParsing="false" onAction="#handleBusqueda" text="Buscar" AnchorPane.bottomAnchor="54.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="70.0" />
                   <Button fx:id="borrarCriteriosButton" layoutX="682.0" layoutY="115.0" mnemonicParsing="false" onAction="#handleBorrarCriterios" text="Borrar criterios" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="110.0" />
                   <Label fx:id="resultadosEncontradosLabel" layoutX="654.0" layoutY="115.0" text="!" textFill="#8a8a8a" AnchorPane.rightAnchor="138.0">
                      <font>
@@ -64,11 +64,10 @@
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
                               </TableView>
-                              <HBox layoutX="34.0" layoutY="298.0" spacing="10.0" AnchorPane.bottomAnchor="14.0">
+                              <HBox layoutX="52.0" layoutY="298.0" spacing="30.0" AnchorPane.bottomAnchor="14.0">
                                  <children>
-                                    <Button fx:id="vistaPreviaButton" mnemonicParsing="false" onAction="#handleVistaPrevia" text="Vista previa" />
-                                    <Button fx:id="imprimirButton" mnemonicParsing="false" onAction="#handleImprimir" text="Imprimir" />
                                     <Button fx:id="PDFButton" mnemonicParsing="false" onAction="#handleGuardarPDF" text="Guardar PDF" />
+                                    <Button fx:id="vistaPreviaButton" mnemonicParsing="false" onAction="#handleVistaPrevia" text="Ver selección" />
                                     <Button fx:id="imprimirTodosButton" mnemonicParsing="false" onAction="#handleImprimirTodos" text="Ver todos" />
                                  </children>
                               </HBox>
@@ -153,7 +152,7 @@
                               <HBox alignment="CENTER" layoutX="90.0" layoutY="299.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="90.0" AnchorPane.rightAnchor="89.0">
                                  <children>
                                     <Button fx:id="detallesButton" mnemonicParsing="false" onAction="#handleVerDetalle" snapToPixel="false" text="Ver detalle" />
-                                    <Button fx:id="anularButton" mnemonicParsing="false" onAction="#handleAnular" snapToPixel="false" text="Anular">
+                                    <Button fx:id="anularButton" mnemonicParsing="false" onAction="#handleAnular" snapToPixel="false" text="Anular" textFill="#cd0a0a">
                                        <opaqueInsets>
                                           <Insets />
                                        </opaqueInsets>
