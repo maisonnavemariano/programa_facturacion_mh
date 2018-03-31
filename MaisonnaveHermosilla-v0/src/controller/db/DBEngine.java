@@ -536,6 +536,25 @@ public class DBEngine {
 			e.printStackTrace();
 		}
 	}
+	
+	public String fechaUltimoPago(Cliente c) {
+		String query = "SELECT Fecha FROM Transaccion WHERE Codigo_cliente="+c.getCodigoCliente()+" AND Evento='C' ORDER BY Fecha DESC LIMIT 1;";
+		Statement st;
+		
+		try {
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			if(rs.next()){ 
+				SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+				return format1.format(rs.getDate("Fecha"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
 	/**
 	 * Método que elimina un presupuesto borrador (no efectivo) que pudo haber sido realizado por error por el usuario. Falla si no hay conexión con la base de datos, o si el presupuesto pasado por 
 	 * parámetro no existo, o si el presupuesto ya ha sido efectivizado a cuentas corrientes.
