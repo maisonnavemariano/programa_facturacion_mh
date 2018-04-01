@@ -2,6 +2,7 @@ package controller.db;
  
 import java.util.List;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javafx.beans.property.*;
@@ -30,6 +31,12 @@ public class Presupuesto {
 	private StringProperty fecha_ARG;
 	private int mes; 
 	
+	public static List<String> getMeses(){
+		List<String> toReturn = new ArrayList<String>();
+		for ( int i = 1;i<13 ; i++)
+			toReturn.add(getMesFormateadoAux(i));
+		return toReturn;
+	}
 	public int getMes() {
 		return mes;
 	}
@@ -39,6 +46,9 @@ public class Presupuesto {
 	
 	
 	public String getMesFormateado() {
+		return getMesFormateadoAux(mes);
+	}
+	private static String getMesFormateadoAux(int mes) {
 		String m = null;
 		switch (mes){
 		case(1):
