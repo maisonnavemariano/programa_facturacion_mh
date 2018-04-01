@@ -28,6 +28,57 @@ public class Presupuesto {
 	private DoubleProperty subtotal;
 	private StringProperty fecha;
 	private StringProperty fecha_ARG;
+	private int mes; 
+	
+	public int getMes() {
+		return mes;
+	}
+	public void setMes(int m) {
+		mes = m;
+	}
+	
+	public String getMesFormateado() {
+		String m = null;
+		switch (mes){
+		case(1):
+			m = "Enero";
+			break;
+		case(2):
+			m = "Febrero";
+			break;
+		case(3):
+			m = "Marzo";
+			break;
+		case(4):
+			m = "Abril";
+			break;
+		case(5):
+			m = "Mayo";
+			break;
+		case(6):
+			m = "Junio";
+			break;
+		case(7):
+			m = "Julio";
+			break;
+		case(8):
+			m = "Agosto";
+			break;
+		case(9):
+			m = "Septiembre";
+			break;
+		case(10):
+			m = "Octubre";
+			break;
+		case(11):
+			m = "Noviembre";
+			break;
+		case(12):
+			m = "Diciembre";
+			break;
+		}
+		return m;
+	}
 	
 	
 	// :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: :::::::::: ::::::::::
@@ -37,7 +88,7 @@ public class Presupuesto {
 	
 	
 	
-	public Presupuesto(List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double sub_total, Date fecha){
+	public Presupuesto(List<Concepto> conceptos, Cliente cliente, boolean efectivo, float alicuota, double sub_total, Date fecha, int mes){
 
 		Nro_Presupuesto = new SimpleIntegerProperty(PRESUPUESTO_INVALIDO);
 		this.conceptos = conceptos;
@@ -46,6 +97,7 @@ public class Presupuesto {
 		this.alicuota = new SimpleFloatProperty(alicuota);
 		this.subtotal = new SimpleDoubleProperty(sub_total);
 		//this.monto = new SimpleDoubleProperty(calcularMontoTotal());
+		this.mes=mes;
 		
 		//Format1: lo que se usa en sql
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
