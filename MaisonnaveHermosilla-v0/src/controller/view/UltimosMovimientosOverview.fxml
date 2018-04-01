@@ -49,6 +49,7 @@
       <Label fx:id="cuitLabel" layoutX="69.0" layoutY="71.0" text="cuit del cliente" />
       <Label fx:id="fechaUltimoLabel" layoutX="486.0" layoutY="105.0" text="fecha" />
       <Label fx:id="montoLabel" layoutX="214.0" layoutY="106.0" text="monto" />
-      <Button layoutX="262.0" layoutY="560.0" mnemonicParsing="false" onAction="#handleVerPresupuestoAsociado" prefHeight="26.0" prefWidth="204.0" text="Ver presupuesto asociado" />
+      <Button layoutX="94.0" layoutY="560.0" mnemonicParsing="false" onAction="#handleVerPresupuestoAsociado" prefHeight="26.0" prefWidth="275.0" text="Ver presupuesto asociado a selección" />
+      <Button layoutX="383.0" layoutY="560.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="90.0" text="Imprimir" />
    </children>
 </AnchorPane>

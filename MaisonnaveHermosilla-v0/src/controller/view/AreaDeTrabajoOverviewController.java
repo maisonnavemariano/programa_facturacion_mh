@@ -113,8 +113,6 @@ public class AreaDeTrabajoOverviewController  {
     private Button generarPresupuestosMensuales;
     @FXML
     private Button aumento;
-    @FXML
-    private Button btnMes;
     
     @FXML
     private Label conteoLabel;
@@ -1032,7 +1030,8 @@ public class AreaDeTrabajoOverviewController  {
     	}
 			
     }
-     
+    
+     /*
      @FXML
      private void handleElegirMes(){
     	 
@@ -1063,7 +1062,25 @@ public class AreaDeTrabajoOverviewController  {
     		Optional<ButtonType> result = dialog.showAndWait();
      	
     		if (result.get() == buttonTypeOk) {
-    			//TODO: Alerta
+    			Alert alert = new Alert(AlertType.CONFIRMATION, 
+   		  			 "",
+                     ButtonType.OK,
+                     ButtonType.CANCEL);
+               alert.initOwner(mainApp.getPrimaryStage());
+               alert.setTitle("Elegir mes");
+               alert.setHeaderText(null);
+               alert.setContentText("¿Desea modificar el mes de todos\nlos presupuestos de la lista?");
+               alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+               alert.showAndWait();
+               
+               Optional<ButtonType> result_alert = dialog.showAndWait();
+               
+               if(result_alert.get().equals(ButtonType.OK)){
+            	   
+            	   
+            	   
+               }
+               
     		}
     		else{
     			//No hago nada
@@ -1082,7 +1099,7 @@ public class AreaDeTrabajoOverviewController  {
     	}
     	 
     	 
-     }
+     }*/
     	
 }
      

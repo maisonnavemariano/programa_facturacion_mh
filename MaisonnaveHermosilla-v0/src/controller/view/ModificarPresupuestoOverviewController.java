@@ -61,6 +61,8 @@ public class ModificarPresupuestoOverviewController {
     @FXML
     private ChoiceBox<String> alicuotaChoiceBox = new ChoiceBox<String>();
     @FXML
+    private ChoiceBox<String> mesChoiceBox = new ChoiceBox<String>();
+    @FXML
     private Label subtotalField;
     @FXML
     private Label montoTotalField;
@@ -205,6 +207,12 @@ public class ModificarPresupuestoOverviewController {
             }
         }
         
+        mesChoiceBox.setItems(FXCollections.observableArrayList(Presupuesto.getMeses()));
+		
+		//TODO: elegir el mes actual de los presupuestos
+		int mesesito = presupuesto.getMes() -1 ;
+		mesChoiceBox.getSelectionModel().select(mesesito);
+        
         subtotalField.setText(String.valueOf(presupuesto.getSubtotal()));
         montoTotalField.setText(String.valueOf(recalcularMonto(presupuesto.getAlicuota())));
         
@@ -247,6 +255,13 @@ public class ModificarPresupuestoOverviewController {
                	presupuesto.setAlicuota((float)21.0);
             }
         }
+        
+        //MES
+        String mes = mesChoiceBox.getValue();
+        if(mes!=null){
+        	presupuesto.setMes(mesChoiceBox.getSelectionModel().getSelectedIndex() + 1);
+        }
+        
             
         //CONCEPTOS: se editan solos en el presupuesto
         

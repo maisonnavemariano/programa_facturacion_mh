@@ -87,6 +87,6 @@
             <Font size="17.0" />
          </font>
       </Label>
-      <ChoiceBox layoutX="446.0" layoutY="76.0" prefHeight="26.0" prefWidth="105.0" />
+      <ChoiceBox fx:id="mesChoiceBox" layoutX="446.0" layoutY="76.0" prefHeight="26.0" prefWidth="105.0" />
    </children>
 </AnchorPane>

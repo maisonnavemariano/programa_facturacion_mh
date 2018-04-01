@@ -168,7 +168,7 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="mesLabel" layoutX="282.0" layoutY="39.0" prefHeight="18.0" prefWidth="39.0" text="mes" textFill="#8a8a8a">
+                              <Label fx:id="mesLabel" layoutX="282.0" layoutY="39.0" text="mes" textFill="#8a8a8a">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
