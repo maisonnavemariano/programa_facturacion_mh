@@ -1198,7 +1198,7 @@ public class DBEngine {
 		// fecha que quedará, la que queda es la del día de efectivización.
 	
 
-		int nuevo_mes = ultimo == null ||ultimo.getMes()==12 ?0:ultimo.getMes()+1;
+		int nuevo_mes = ultimo == null ||ultimo.getMes()==12 ?1:ultimo.getMes()+1;
 		Presupuesto nuevo = new Presupuesto((ultimo==null?new ArrayList<Concepto>():ultimo.getConceptos())	,cliente ,false, (ultimo==null?0:ultimo.getAlicuota()),montoTotal, Calendar.getInstance().getTime(),nuevo_mes) ; 
 		this.agregarPresupuesto(nuevo);
 		return nuevo;
