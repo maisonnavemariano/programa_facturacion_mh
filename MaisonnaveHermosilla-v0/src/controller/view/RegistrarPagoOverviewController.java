@@ -89,6 +89,12 @@ public class RegistrarPagoOverviewController {
     });
  		montoColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
  		
+ 		cuentasTable.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                	importeTextField.setText("");
+                	observacionesTextArea.setText("");
+                });
+ 		
     }
 
     /**
@@ -224,7 +230,7 @@ public class RegistrarPagoOverviewController {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-    				//Luego aviso
+    				/*//Luego aviso
     				alert = new Alert(AlertType.INFORMATION, 
         		  			 "",
                            ButtonType.OK);
@@ -233,7 +239,7 @@ public class RegistrarPagoOverviewController {
     				alert.setHeaderText(null);
     				alert.setContentText("Se ha registrado exitosamente el pago en la cuenta corriente. \n\nTransacción Nº "+ T.getNroTransaccion() );
     				alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-    				alert.showAndWait();
+    				alert.showAndWait();*/
     			}
     		}
         	
