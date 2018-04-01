@@ -17,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.scene.input.KeyEvent;
+import javafx.application.Platform;
 import javafx.event.*;
 
 import java.time.LocalDate;
@@ -82,7 +83,7 @@ public class RegistrarPagoOverviewController {
  		
  		importeTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
         public void handle(KeyEvent event) {
-        	if(event.getCode() == KeyCode.TAB){
+        	if(event.getCode() == KeyCode.TAB ){
         		calcularNuevoMonto();
         	}
         }
@@ -93,6 +94,7 @@ public class RegistrarPagoOverviewController {
                 (observable, oldValue, newValue) -> {
                 	importeTextField.setText("");
                 	observacionesTextArea.setText("");
+                	Platform.runLater(()->calcularNuevoMonto());
                 });
  		
     }
@@ -125,9 +127,11 @@ public class RegistrarPagoOverviewController {
 	 	
 	 	cuentasTable.getSelectionModel().selectedItemProperty().addListener(
 	                (observable, oldValue, newValue) -> {
-	                	
-	                	montoViejoLabel.setText(String.valueOf(newValue.getEstadoCuentaCorriente()));
-	                	
+	                	try{
+	                		montoViejoLabel.setText(String.valueOf(newValue.getEstadoCuentaCorriente()));}
+	                	catch(NullPointerException e){
+	                		System.out.println("Cambie la tabla y por un instante no supe que hacer con el label de monto viejo!");
+	                	}
 	                });
 	 	
 	 	//Validacion de campos
@@ -151,12 +155,16 @@ public class RegistrarPagoOverviewController {
 
     @FXML
     private void calcularNuevoMonto(){
+    	
     	CuentaCorriente c = cuentasTable.getSelectionModel().getSelectedItem();
     	double viejo = 0.0;
     	if(c!=null){
     		viejo = c.getEstadoCuentaCorriente();
     		
-    		double pagado = Double.parseDouble(importeTextField.getText());
+    		double pagado = 0;
+    		
+    		if(importeTextField.getText().length()>0)
+    			pagado = Double.parseDouble(importeTextField.getText());
     		
     		viejo = viejo + pagado;
     		
@@ -230,6 +238,16 @@ public class RegistrarPagoOverviewController {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+    				
+    				//Finalmente borro campos
+    				importeTextField.setText("");
+    				observacionesTextArea.setText("");
+    				
+    				//Actualizo contenido tabla
+    				mainApp.setCuentasCorrientesData_DB();
+    				cuentasTable.setItems(mainApp.getCuentasCorrientesData());
+    				calcularNuevoMonto();
+    				
     				/*//Luego aviso
     				alert = new Alert(AlertType.INFORMATION, 
         		  			 "",
@@ -240,6 +258,12 @@ public class RegistrarPagoOverviewController {
     				alert.setContentText("Se ha registrado exitosamente el pago en la cuenta corriente. \n\nTransacción Nº "+ T.getNroTransaccion() );
     				alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
     				alert.showAndWait();*/
+    			}
+    			else{
+    				//Finalmente borro campos
+    				importeTextField.setText("");
+    				observacionesTextArea.setText("");
+    				calcularNuevoMonto();
     			}
     		}
         	
