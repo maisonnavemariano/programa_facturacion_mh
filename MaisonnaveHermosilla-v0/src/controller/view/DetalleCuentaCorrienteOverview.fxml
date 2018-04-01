@@ -25,5 +25,6 @@
          </font></Label>
       <Button layoutX="292.0" layoutY="547.0" mnemonicParsing="false" onAction="#handleUltimosMovimientos" text="Ver últimos movimientos" />
       <Button layoutX="487.0" layoutY="547.0" mnemonicParsing="false" onAction="#handleAceptar" text="Aceptar" />
+      <Button layoutX="160.0" layoutY="547.0" mnemonicParsing="false" text="Imprimir listado" />
    </children>
 </AnchorPane>

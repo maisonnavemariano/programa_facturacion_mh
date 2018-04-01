@@ -142,6 +142,8 @@ public class VerPresupuestosOverviewController {
 	 private Label montoTotalLabel;
 	 @FXML
 	 private Label resultadosEncontradosLabel;
+	 @FXML
+	 private Label mesLabel;
 	 
 	 //BOTONES GENERALES
 	 @FXML
@@ -440,6 +442,7 @@ public class VerPresupuestosOverviewController {
     		importe_Column.setCellValueFactory(
     			cellData -> cellData.getValue().getMontoConceptoStringProperty());
             
+    		mesLabel.setText(presupuesto.getMesFormateado());
 
         } else {
         	
@@ -453,6 +456,7 @@ public class VerPresupuestosOverviewController {
             montoTotalLabel.setText("");
             conceptosTable.setItems(null);
             fechaLabel.setText("");
+            mesLabel.setText("");
             
         }
         

@@ -882,8 +882,8 @@ public class DBEngine {
 					+ "'"+p.getFecha()+"', "
 					+ "'"+(p.getEfectivo()?"S":"N") +"', "
 					+ "'"+p.getAlicuota()+"', "
-					+ "'"+p.getSubtotal()+"' ) "
-							+ "'"+p.getMes()+"'; ";
+					+ "'"+p.getSubtotal()+"', "
+							+ "'"+p.getMes()+"'); ";
 			PreparedStatement pt;
 			
 			try {

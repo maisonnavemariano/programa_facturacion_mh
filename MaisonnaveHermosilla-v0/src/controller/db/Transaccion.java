@@ -1,14 +1,22 @@
 package controller.db;
  
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
 
+import java.time.LocalDate;
+
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 
 public class Transaccion {
+	
 	protected final int INVALID_NRO_TRANSACCION = -1 ;
 	protected int Nro_Transaccion;
 	protected Cliente cliente;
@@ -18,6 +26,7 @@ public class Transaccion {
 	protected StringProperty concepto_observacion;
 	protected DoubleProperty Estado_cuenta_corriente;
 	protected Date fechita;	
+	
 	public Transaccion(Cliente cliente, Date fecha, char evento, double monto, String obs, double Estado_cuenta_corriente){
 		this.cliente = cliente;
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
@@ -74,6 +83,12 @@ public class Transaccion {
 		StringProperty fecha_ARG = new SimpleStringProperty(format2.format(this.fechita));
 		
 		return fecha_ARG;
+	}
+	
+	//TODO	
+	public ObjectProperty fechaObjectProperty(){
+		return new SimpleObjectProperty(fechita);
+		
 	}
 	
 	public StringProperty eventoProperty(){
