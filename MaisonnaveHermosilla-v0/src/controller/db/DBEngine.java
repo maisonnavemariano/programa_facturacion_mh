@@ -1128,6 +1128,7 @@ public class DBEngine {
 			System.out.println("[WARNING] porcentaje INVALIDO. Método aplicarAumentoNoEfectivos(porcentaje).");
 	}
 	
+	
 	/**
 	 * Método que genera PARA TODOS los clientes HABILITADOS, una nueva factura NO efectivizada, con los mismos conceptos que el  presupuesto anterior. 
 	 */
