@@ -54,6 +54,7 @@ public class ReportsEngine {
 	parameters.put("Nro_Presu",new Integer(p.getNroPresupuesto()));
 	parameters.put("Subtotal",new Double(p.calcularSubtotal()));
 	parameters.put("Iva_monto",new Double(p.calcularIva()));
+	parameters.put("Mes", p.getMesFormateado());
 	
 	try {
 		printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);
@@ -99,6 +100,7 @@ public class ReportsEngine {
 		parameters.put("Nro_Presu",new Integer(p.getNroPresupuesto()));
 		parameters.put("Subtotal",new Double(p.calcularSubtotal()));
 		parameters.put("Iva_monto",new Double(p.calcularIva()));
+		parameters.put("Mes", p.getMesFormateado());
 		
 		try {
 			printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);
@@ -139,6 +141,7 @@ public class ReportsEngine {
 		parameters.put("Nro_Presu",new Integer(p.getNroPresupuesto()));
 		parameters.put("Subtotal",new Double(p.calcularSubtotal()));
 		parameters.put("Iva_monto",new Double(p.calcularIva()));
+		parameters.put("Mes",p.getMesFormateado());
 		
 		try {
 			printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);
@@ -179,6 +182,7 @@ public class ReportsEngine {
 		parameters.put("Nro_Presu",new Integer(p.getNroPresupuesto()));
 		parameters.put("Subtotal",new Double(p.calcularSubtotal()));
 		parameters.put("Iva_monto",new Double(p.calcularIva()));
+		parameters.put("Mes", p.getMesFormateado());
 		
 		try {
 			printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);
