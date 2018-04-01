@@ -463,7 +463,8 @@ public class DBEngine {
 							(rs.getString("Efectivo").equals("S") ? true:false),
 							rs.getFloat("Alicuota"),
 							rs.getDouble("Subtotal"),
-							rs.getDate("Fecha"));
+							rs.getDate("Fecha"),
+							rs.getInt("Mes"));
 					aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 					toReturn.add(aux);
 				}
@@ -510,7 +511,8 @@ public class DBEngine {
 							(rs.getString("Efectivo").equals("S") ? true:false),
 							rs.getFloat("Alicuota"),
 							rs.getDouble("Subtotal"),
-							rs.getDate("Fecha"));
+							rs.getDate("Fecha"),
+							rs.getInt("Mes"));
 					aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 					toReturn.add(aux);
 				}
@@ -547,6 +549,9 @@ public class DBEngine {
 			if(rs.next()){ 
 				SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
 				return format1.format(rs.getDate("Fecha"));
+			}
+			else {
+				System.out.println("[WARNING] Se pidió fechaUltimoPago para cliente que no tiene ninguna fecha.");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -662,7 +667,8 @@ public class DBEngine {
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
 						rs.getDouble("Subtotal"),
-						rs.getDate("Fecha"));
+						rs.getDate("Fecha"),
+						rs.getInt("Mes"));
 				toReturn.actualizarNroPresupuesto(nro_presupuesto);
 			}
 		} catch (SQLException e) {
@@ -725,7 +731,8 @@ public class DBEngine {
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
 						rs.getDouble("Subtotal"),
-						rs.getDate("Fecha"));
+						rs.getDate("Fecha"),
+						rs.getInt("Mes"));
 				aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 				lista.add(aux);
 			}
@@ -760,7 +767,8 @@ public class DBEngine {
 							(rs.getString("Efectivo").equals("S") ? true:false),
 							rs.getFloat("Alicuota"),
 							rs.getDouble("Subtotal"),
-							rs.getDate("Fecha"));
+							rs.getDate("Fecha"),
+							rs.getInt("Mes"));
 					aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 					lista.add(aux);
 				}
@@ -800,7 +808,8 @@ public class DBEngine {
 							(rs.getString("Efectivo").equals("S") ? true:false),
 							rs.getFloat("Alicuota"),
 							rs.getDouble("Subtotal"),
-							rs.getDate("Fecha"));
+							rs.getDate("Fecha"),
+							rs.getInt("Mes"));
 					aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 					lista.add(aux);
 				}
@@ -844,7 +853,8 @@ public class DBEngine {
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
 						rs.getDouble("Subtotal"),
-						rs.getDate("Fecha"));
+						rs.getDate("Fecha"),
+						rs.getInt("Mes"));
 						toReturn.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 				toReturn.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 			}
@@ -868,11 +878,12 @@ public class DBEngine {
 	public boolean agregarPresupuesto(Presupuesto p){
 		boolean toReturn = false;
 		if(p!=null) {
-			String query = "INSERT INTO Presupuesto (Codigo_Cliente, Fecha, Efectivo, Alicuota, Subtotal) VALUES ('"+p.getCliente().getCodigoCliente()+"', "
+			String query = "INSERT INTO Presupuesto (Codigo_Cliente, Fecha, Efectivo, Alicuota, Subtotal,Mes) VALUES ('"+p.getCliente().getCodigoCliente()+"', "
 					+ "'"+p.getFecha()+"', "
 					+ "'"+(p.getEfectivo()?"S":"N") +"', "
 					+ "'"+p.getAlicuota()+"', "
-					+ "'"+p.getSubtotal()+"' ) ; ";
+					+ "'"+p.getSubtotal()+"' ) "
+							+ "'"+p.getMes()+"'; ";
 			PreparedStatement pt;
 			
 			try {
@@ -970,7 +981,7 @@ public class DBEngine {
 		// TODO chequear que el presupuesto no sea efectivo!!!
 		// ===========================================================================================================================================
 		boolean toReturn = false;
-		String query = "UPDATE Presupuesto SET Codigo_Cliente = ?, Fecha = ?, Efectivo = ?, Alicuota = ?, Subtotal = ? WHERE Nro_Presupuesto = ?";
+		String query = "UPDATE Presupuesto SET Codigo_Cliente = ?, Fecha = ?, Efectivo = ?, Alicuota = ?, Subtotal = ?, Mes=? WHERE Nro_Presupuesto = ?";
 	    PreparedStatement preparedStmt;
 		try {
 			preparedStmt = conn.prepareStatement(query);
@@ -979,7 +990,8 @@ public class DBEngine {
 			preparedStmt.setString(3, (p.getEfectivo()? "S":"N"));
 			preparedStmt.setFloat(4, p.getAlicuota() );
 			preparedStmt.setDouble(5, p.getSubtotal());
-			preparedStmt.setInt(6, p.getNroPresupuesto());
+			preparedStmt.setInt(6, p.getMes());
+			preparedStmt.setInt(7, p.getNroPresupuesto());
 			
 			// execute the java preparedstatement
 			preparedStmt.executeUpdate();
@@ -1116,6 +1128,7 @@ public class DBEngine {
 			System.out.println("[WARNING] porcentaje INVALIDO. Método aplicarAumentoNoEfectivos(porcentaje).");
 	}
 	
+	
 	/**
 	 * Método que genera PARA TODOS los clientes HABILITADOS, una nueva factura NO efectivizada, con los mismos conceptos que el  presupuesto anterior. 
 	 */
@@ -1184,7 +1197,9 @@ public class DBEngine {
 		// por la fecha de efectivización, la vista no debería mostrar la fecha de un presupuesto borrador porque no es la
 		// fecha que quedará, la que queda es la del día de efectivización.
 	
-		Presupuesto nuevo = new Presupuesto((ultimo==null?new ArrayList<Concepto>():ultimo.getConceptos())	,cliente ,false, (ultimo==null?0:ultimo.getAlicuota()),montoTotal, Calendar.getInstance().getTime()) ; 
+
+		int nuevo_mes = ultimo.getMes()==12?0:ultimo.getMes()+1;
+		Presupuesto nuevo = new Presupuesto((ultimo==null?new ArrayList<Concepto>():ultimo.getConceptos())	,cliente ,false, (ultimo==null?0:ultimo.getAlicuota()),montoTotal, Calendar.getInstance().getTime(),nuevo_mes) ; 
 		this.agregarPresupuesto(nuevo);
 		return nuevo;
 		
@@ -1213,7 +1228,8 @@ public class DBEngine {
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
 						rs.getDouble("Subtotal"),
-						rs.getDate("Fecha"));
+						rs.getDate("Fecha"),
+						rs.getInt("Mes"));
 				aux.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 				toReturn.add(aux);
 			}
@@ -1355,7 +1371,8 @@ public class DBEngine {
 						(rs.getString("Efectivo").equals("S") ? true:false),
 						rs.getFloat("Alicuota"),
 						rs.getDouble("Subtotal"),
-						rs.getDate("Fecha"));
+						rs.getDate("Fecha"),
+						rs.getInt("Mes"));
 				toReturn.actualizarNroPresupuesto(rs.getInt("Nro_Presupuesto"));
 			}
 		} catch (SQLException e) {
