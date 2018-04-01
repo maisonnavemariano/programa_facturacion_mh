@@ -48,6 +48,8 @@ public class DetallePresupuestoOverviewController {
     @FXML
     private Label montoTotalLabel;
     @FXML
+    private Label mesLabel;
+    @FXML
     private TableView<Concepto> conceptosTable;
     @FXML
     private TableColumn<Concepto, String> descripcionColumn;
@@ -155,6 +157,8 @@ public class DetallePresupuestoOverviewController {
     	  	
    	 		String fechaMostrar = presupuesto.getFecha_ARG().replaceAll("-", "/");
    	 		fechaLabel.setText(fechaMostrar);
+   	 		
+   	 		mesLabel.setText(presupuesto.getMesFormateado());
     	}
     	else {
     		cuitLabel.setText("");
@@ -167,6 +171,7 @@ public class DetallePresupuestoOverviewController {
     		//Actualizo contenido tabla en la vista
    	 		conceptosTable.setItems(null);
    	 		fechaLabel.setText("");
+   	 		mesLabel.setText("");
     	}
     }
     

@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Alert.AlertType;
@@ -25,6 +26,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
@@ -90,6 +92,8 @@ public class AreaDeTrabajoOverviewController  {
     @FXML
     private Label subtotalLabel;
     @FXML
+    private Label mesLabel;
+    @FXML
     private RadioButton cuitRadioButton;
     @FXML
     private RadioButton denominacionRadioButton;
@@ -109,6 +113,8 @@ public class AreaDeTrabajoOverviewController  {
     private Button generarPresupuestosMensuales;
     @FXML
     private Button aumento;
+    @FXML
+    private Button btnMes;
     
     @FXML
     private Label conteoLabel;
@@ -203,6 +209,7 @@ public class AreaDeTrabajoOverviewController  {
     		montoConceptoColumn.setCellValueFactory(
     			cellData -> cellData.getValue().getMontoConceptoStringProperty());
             
+    		mesLabel.setText(presupuesto.getMesFormateado());
 
         } else {
         	
@@ -215,6 +222,7 @@ public class AreaDeTrabajoOverviewController  {
             subtotalLabel.setText("");
             montoLabel.setText("");
             conceptosTable.setItems(null);
+            mesLabel.setText("");
             
         }
         
@@ -683,7 +691,8 @@ public class AreaDeTrabajoOverviewController  {
       * en la DB.
       * 
       */
-     public void handleGenerarPresupuestosMensuales(){
+     @FXML
+     private void handleGenerarPresupuestosMensuales(){
      	
      	//Primero, pregunto si ya hay no efectivos en la DB
      	boolean noHay = (DBMotor.obtenerPresupuestosNoEfectivos().size() == 0);
@@ -779,7 +788,8 @@ public class AreaDeTrabajoOverviewController  {
      	}
      }
      
-     public void handleDescartarUno(){
+     @FXML
+     private void handleDescartarUno(){
     	 Presupuesto selectedPresupuesto = presupuestosTable.getSelectionModel().getSelectedItem();
          
     	 if (selectedPresupuesto != null) {
@@ -821,7 +831,8 @@ public class AreaDeTrabajoOverviewController  {
          }
      }
      
-     public void handleDescartarTodos(){
+     @FXML
+     private void handleDescartarTodos(){
     	 if (presupuestosTable.getItems().size()>0) {
     		 Alert alert = new Alert(AlertType.CONFIRMATION,
     				 "",
@@ -858,8 +869,6 @@ public class AreaDeTrabajoOverviewController  {
              alert.showAndWait();
          }
      }
-     
-     
      
      @FXML
      private void handleAplicarAumento(){
@@ -1023,6 +1032,57 @@ public class AreaDeTrabajoOverviewController  {
     	}
 			
     }
+     
+     @FXML
+     private void handleElegirMes(){
+    	 
+    	if(!mainApp.getPresupuestosNoEfectivosData().isEmpty()){
+    	 
+    		Dialog<ButtonType> dialog = new Dialog<>();
+    		dialog.setTitle("Elegir mes:");
+    		dialog.setHeaderText("Seleccione el mes al que corresponden los\npresupuestos en la lista");
+    		dialog.setResizable(true);
+    		
+    		ComboBox<String> mesComboBox = new ComboBox<String>();
+    		mesComboBox.setItems(FXCollections.observableArrayList(Presupuesto.getMeses()));
+    		
+    		//TODO: elegir el mes actual de los presupuestos
+    		int mesesito = presupuestosTable.getItems().get(0).getMes();
+    		mesComboBox.getSelectionModel().select(mesesito - 1);
+    		
+    		dialog.getDialogPane().setContent(mesComboBox);
+     	
+    		Platform.runLater(() -> mesComboBox.requestFocus());
+     				
+    		ButtonType buttonTypeOk = new ButtonType("OK", ButtonData.OK_DONE);
+    		dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+     	
+    		ButtonType buttonTypeCancel = new ButtonType("Cancelar", ButtonData.CANCEL_CLOSE);
+    		dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
+     	
+    		Optional<ButtonType> result = dialog.showAndWait();
+     	
+    		if (result.get() == buttonTypeOk) {
+    			//TODO: Alerta
+    		}
+    		else{
+    			//No hago nada
+    		}
+    	}
+    	else{
+    		Alert alert = new Alert(AlertType.WARNING, 
+		  			 "",
+                  ButtonType.OK);
+            alert.initOwner(mainApp.getPrimaryStage());
+            alert.setTitle("Elegir mes");
+            alert.setHeaderText(null);
+            alert.setContentText("No hay presupuestos no efectivos en la lista.");
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            alert.showAndWait();
+    	}
+    	 
+    	 
+     }
     	
 }
      

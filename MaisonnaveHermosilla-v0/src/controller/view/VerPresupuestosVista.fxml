@@ -80,31 +80,31 @@
                                     <Font size="18.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="15.0" layoutY="47.0" text="Fecha: " AnchorPane.leftAnchor="15.0">
+                              <Label layoutX="11.0" layoutY="39.0" text="Fecha de emisión: " AnchorPane.leftAnchor="14.0">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label layoutX="217.0" layoutY="47.0" text="CUIT:">
+                              <Label layoutX="17.0" layoutY="70.0" text="CUIT:" AnchorPane.leftAnchor="14.0">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label layoutX="15.0" layoutY="79.0" text="Denominación:" AnchorPane.leftAnchor="15.0">
+                              <Label layoutX="14.0" layoutY="97.0" text="Denominación:" AnchorPane.leftAnchor="14.0">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label layoutX="14.0" layoutY="114.0" text="IVA:" AnchorPane.leftAnchor="14.0">
+                              <Label layoutX="14.0" layoutY="127.0" text="IVA:" AnchorPane.leftAnchor="14.0">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label layoutX="220.0" layoutY="114.0" text="Alicuota:" AnchorPane.leftAnchor="220.0">
+                              <Label layoutX="220.0" layoutY="127.0" text="Alicuota:" AnchorPane.leftAnchor="220.0">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label layoutX="14.0" layoutY="149.0" text="Subtotal: $" AnchorPane.leftAnchor="14.0">
+                              <Label layoutX="14.0" layoutY="158.0" text="Subtotal: $" AnchorPane.leftAnchor="14.0">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label layoutX="16.0" layoutY="183.0" text="Conceptos:" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="183.0">
+                              <Label layoutX="14.0" layoutY="187.0" text="Conceptos:" AnchorPane.leftAnchor="13.0" AnchorPane.topAnchor="187.0">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
@@ -112,27 +112,27 @@
                                  <font>
                                     <Font size="18.0" />
                                  </font></Label>
-                              <Label fx:id="cuitLabel" layoutX="260.0" layoutY="47.0" text="cuit" textFill="#8a8a8a">
+                              <Label fx:id="cuitLabel" layoutX="57.0" layoutY="70.0" text="cuit" textFill="#8a8a8a">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label fx:id="denominacionLabel" layoutX="124.0" layoutY="79.0" text="denominacion" textFill="#8a8a8a">
+                              <Label fx:id="denominacionLabel" layoutX="124.0" layoutY="97.0" text="denominacion" textFill="#8a8a8a">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label fx:id="ivaLabel" layoutX="46.0" layoutY="114.0" text="iva" textFill="#8a8a8a">
+                              <Label fx:id="ivaLabel" layoutX="46.0" layoutY="127.0" text="iva" textFill="#8a8a8a">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label fx:id="alicuotaLabel" layoutX="284.0" layoutY="114.0" text="ali" textFill="#8a8a8a">
+                              <Label fx:id="alicuotaLabel" layoutX="284.0" layoutY="127.0" text="ali" textFill="#8a8a8a">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label fx:id="subtotalLabel" layoutX="95.0" layoutY="149.0" text="monto" textFill="#8a8a8a">
+                              <Label fx:id="subtotalLabel" layoutX="95.0" layoutY="158.0" text="monto" textFill="#8a8a8a">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <TableView fx:id="conceptosTable" layoutX="20.0" layoutY="208.0" prefHeight="367.0" prefWidth="513.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="17.0" AnchorPane.rightAnchor="23.0" AnchorPane.topAnchor="208.0">
+                              <TableView fx:id="conceptosTable" layoutX="14.0" layoutY="217.0" prefHeight="57.0" prefWidth="298.0" AnchorPane.bottomAnchor="64.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="26.0" AnchorPane.topAnchor="217.0">
                                 <columns>
                                   <TableColumn fx:id="descripcion_Column" editable="false" minWidth="-Infinity" prefWidth="220.0" text="Descripción" />
                                   <TableColumn fx:id="importe_Column" editable="false" maxWidth="2000.0" minWidth="-Infinity" prefWidth="90.0" text="Importe" />
@@ -141,11 +141,11 @@
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
                               </TableView>
-                              <Label layoutX="189.0" layoutY="148.0" text="Monto total: $" AnchorPane.leftAnchor="189.0">
+                              <Label layoutX="189.0" layoutY="158.0" text="Monto total: $" AnchorPane.leftAnchor="189.0">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
-                              <Label fx:id="montoTotalLabel" layoutX="291.0" layoutY="148.0" text="monto" textFill="#8a8a8a">
+                              <Label fx:id="montoTotalLabel" layoutX="291.0" layoutY="158.0" text="monto" textFill="#8a8a8a">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
@@ -159,10 +159,20 @@
                                     </Button>
                                  </children>
                               </HBox>
-                              <Label fx:id="fechaLabel" layoutX="68.0" layoutY="48.0" text="fecha" textFill="#8a8a8a">
+                              <Label fx:id="fechaLabel" layoutX="150.0" layoutY="39.0" text="fecha" textFill="#8a8a8a">
                                  <font>
                                     <Font size="14.0" />
                                  </font></Label>
+                              <Label layoutX="243.0" layoutY="39.0" text="Mes:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="mesLabel" layoutX="282.0" layoutY="39.0" prefHeight="18.0" prefWidth="39.0" text="mes" textFill="#8a8a8a">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
                            </children>
                         </AnchorPane>
                     </items>
