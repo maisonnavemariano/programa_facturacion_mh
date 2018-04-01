@@ -56,6 +56,8 @@ public class ReportsEngine {
 	parameters.put("Iva_monto",new Double(p.calcularIva()));
 	parameters.put("Mes", p.getMesFormateado());
 	
+	
+	
 	try {
 		printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);
 		JasperExportManager.exportReportToPdfFile(printFile, salida);
