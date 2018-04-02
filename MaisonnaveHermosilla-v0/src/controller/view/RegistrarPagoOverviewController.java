@@ -83,8 +83,8 @@ public class RegistrarPagoOverviewController {
  		
  		importeTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
         public void handle(KeyEvent event) {
-        	if(event.getCode() == KeyCode.TAB ){
-        		calcularNuevoMonto();
+        	if(event.getCode() == KeyCode.TAB){
+        		calcularYSaltar();
         	}
         }
     });
@@ -152,6 +152,11 @@ public class RegistrarPagoOverviewController {
 	 	
     }
     
+    @FXML
+    private void calcularYSaltar(){
+    	calcularNuevoMonto();
+		observacionesTextArea.requestFocus();
+    }
 
     @FXML
     private void calcularNuevoMonto(){
@@ -163,17 +168,20 @@ public class RegistrarPagoOverviewController {
     		
     		double pagado = 0;
     		
-    		if(importeTextField.getText().length()>0)
+    		if(importeTextField.getText().length()>0){
     			pagado = Double.parseDouble(importeTextField.getText());
+    		}
     		
     		viejo = viejo + pagado;
+    		//APLICO REDONDEO (?)
+    		viejo = Math.round(viejo * 20.0) / 20.0;
     		
     	}
     	else
     		this.montoViejoLabel.setText("0.0");
     	
     	this.montoNuevoLabel.setText(String.valueOf(viejo));
-    	this.observacionesTextArea.requestFocus();
+    	//this.observacionesTextArea.requestFocus();
     }
     
     

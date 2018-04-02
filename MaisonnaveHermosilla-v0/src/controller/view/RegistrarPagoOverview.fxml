@@ -39,7 +39,7 @@
       <Label layoutX="313.0" layoutY="504.0" text="Nuevo estado de cuenta: $" />
       <Label fx:id="montoViejoLabel" layoutX="202.0" layoutY="504.0" text="Monto viejo" />
       <Label fx:id="montoNuevoLabel" layoutX="492.0" layoutY="504.0" text="Monto nuevo" />
-      <TextField fx:id="importeTextField" layoutX="169.0" layoutY="345.0" onAction="#calcularNuevoMonto" prefHeight="26.0" prefWidth="198.0" promptText="Ingrese importe en pesos" />
+      <TextField fx:id="importeTextField" layoutX="169.0" layoutY="345.0" onAction="#calcularYSaltar" onKeyReleased="#calcularNuevoMonto" prefHeight="26.0" prefWidth="198.0" promptText="Ingrese importe en pesos" />
       <TextArea fx:id="observacionesTextArea" layoutX="152.0" layoutY="390.0" onMouseClicked="#calcularNuevoMonto" prefHeight="101.0" prefWidth="403.0" promptText="Ingrese observaciones" />
       <Button layoutX="389.0" layoutY="547.0" mnemonicParsing="false" onAction="#handleRegistrar" text="Registrar" />
       <Button layoutX="487.0" layoutY="547.0" mnemonicParsing="false" onAction="#handleCancelar" text="Cancelar" />

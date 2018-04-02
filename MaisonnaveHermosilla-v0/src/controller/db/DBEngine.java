@@ -1546,6 +1546,9 @@ public class DBEngine {
 			// MODIFICAR CUENTA CORRIENTE
 			double estado_cuenta_corriente = this.obtenerEstadoCuentaCorriente(cliente);
 			double nuevo_estado = estado_cuenta_corriente +  monto_pagado;
+			//APLICAR REDONDEO (?)
+			nuevo_estado = Math.round(nuevo_estado * 20.0) / 20.0;
+			//ACTUALIZAR ESTADO DE CUENTA CORRIENTE
 			this.actualizarEstadoCuentaCorriente(cliente, nuevo_estado);
 			// REGISTRAR TRANSACCION
 			toReturn = new Transaccion(cliente, Calendar.getInstance().getTime(), 'C', monto_pagado,obs,nuevo_estado);
