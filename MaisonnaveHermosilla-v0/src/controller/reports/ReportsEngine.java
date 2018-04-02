@@ -1,7 +1,9 @@
 package controller.reports;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,72 @@ import net.sf.jasperreports.export.SimplePdfExporterConfiguration;
 public class ReportsEngine {
 	public static String DefaultName(Presupuesto p) {
 		return p.getCliente().getDenominacion()+"-"+p.getNroPresupuesto()+".pdf";
+	}
+	public static void generarResumen(ResumenBean resumen, String url) {
+
+		String sourceFile = "reports_templates/Resumen_cuenta.jasper";
+		
+		List<TransaccionBean> dataList = resumen.getTransacciones();
+
+		
+		String printFile = null;
+		JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(dataList);
+		Map<String, Object> parameters = new HashMap<String,Object>();
+
+		parameters.put("denominacion",resumen.getDenominacion());
+		parameters.put("CUIT",resumen.getCUIT());
+		parameters.put("desde", resumen.getDesde());
+		parameters.put("hasta", resumen.getHasta());
+		
+	    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");  
+	    Date date = new Date();  
+
+		parameters.put("fecha_emision", formatter.format(date));
+		
+		try {
+			printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);
+			JasperExportManager.exportReportToPdfFile(printFile, url);
+	         
+		}catch(JRException e) {
+			e.printStackTrace();
+		}
+
+				
+	}
+	
+	public static String generarResumen(ResumenBean resumen) {
+		boolean salida_ok=false;
+
+		String sourceFile = "reports_templates/Resumen_cuenta.jasper";
+		String salida = "reportes/tmp/"+resumen.getDenominacion()+"_"+resumen.getDesde()+"_"+resumen.getHasta()+".pdf";
+		
+		List<TransaccionBean> dataList = resumen.getTransacciones();
+
+		
+		String printFile = null;
+		JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(dataList);
+		Map<String, Object> parameters = new HashMap<String,Object>();
+
+		parameters.put("denominacion",resumen.getDenominacion());
+		parameters.put("CUIT",resumen.getCUIT());
+		parameters.put("desde", resumen.getDesde());
+		parameters.put("hasta", resumen.getHasta());
+		
+	    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");  
+	    Date date = new Date();  
+
+		parameters.put("fecha_emision", formatter.format(date));
+		
+		try {
+			printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);
+			JasperExportManager.exportReportToPdfFile(printFile, salida);
+			salida_ok = true;
+	         
+		}catch(JRException e) {
+			e.printStackTrace();
+		}
+		return salida_ok?salida:null;
+				
 	}
 	
 	public static String generarReporte(Presupuesto p) {
@@ -55,6 +123,7 @@ public class ReportsEngine {
 	parameters.put("Subtotal",new Double(p.calcularSubtotal()));
 	parameters.put("Iva_monto",new Double(p.calcularIva()));
 	parameters.put("Mes", p.getMesFormateado());
+	
 	
 	
 	
