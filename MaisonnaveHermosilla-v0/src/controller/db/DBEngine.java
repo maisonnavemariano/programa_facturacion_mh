@@ -45,7 +45,7 @@ public class DBEngine {
 		try{
 
 		    Class.forName(myDriver);
-		    conn = DriverManager.getConnection(myUrl, "virginia", "lospiojos");
+		    conn = DriverManager.getConnection(myUrl, "root", "maisonnave1");
 		
 		}catch(Exception e){e.printStackTrace();}
 	}
@@ -1424,6 +1424,42 @@ public class DBEngine {
 		}
 		return transacciones;
 	}
+	
+	public List<Transaccion> ultimosMovimientosDesdeHasta(Cliente C,String desde, String hasta){
+		List<Transaccion> transacciones = new ArrayList<Transaccion>();
+		
+		if(!C.esValidoCodigoCliente() || C==null)
+			System.out.println("[WARNING] cliente invalido o nulo en ultimosMovimientos");
+		else {
+			Transaccion transaccion_aux;
+			String query = "SELECT * FROM Transaccion WHERE Codigo_Cliente = "+C.getCodigoCliente()+" AND Fecha<='"+hasta+"' AND Fecha>='"+desde+"' ORDER BY Fecha";
+			
+			Statement st;
+			try {
+				st = conn.createStatement();
+			    ResultSet rs = st.executeQuery(query);
+			    while(rs.next()){
+			    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+		    		//String telefono, String correoElectronico, String condicionIva, String habilitado
+			    	transaccion_aux = new Transaccion(C,
+			    			rs.getDate("Fecha"),
+			    			rs.getString("Evento").charAt(0),
+			    			rs.getDouble("Monto"),
+			    			rs.getString("Concepto"),
+			    			rs.getDouble("Estado_cuenta_corriente")
+			    			
+			    			);
+			    	transaccion_aux.actualizarNroTransaccion(rs.getInt("Nro_Transaccion"));
+			    	transacciones.add(transaccion_aux);
+			    }
+			    st.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return transacciones;
+	}
+	
 	
 	/**
 	 * Una lista con las cuentas corrientes de todos los clientes habilitados.

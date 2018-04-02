@@ -1,8 +1,10 @@
 package controller.reports;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import controller.db.Cliente;
+import controller.db.Transaccion;
 
 public class ResumenBean {
 	protected String desde;
@@ -15,6 +17,29 @@ public class ResumenBean {
  		this.desde         = desde;
  		this.hasta         = hasta;
  		this.transacciones = transacciones;
+ 	}
+ 	
+ 	public static List<TransaccionBean> TransaccionToTransaccionBean(List<Transaccion> lista){
+ 		
+ 		List<TransaccionBean> l = new ArrayList<TransaccionBean>();
+ 		
+ 		
+ 		for (Transaccion t : lista) {
+ 			double debe        = 0;
+ 			double haber       = 0;
+ 			double saldo       = t.getEstadoCuentaCorriente();
+ 			if (t.getEvento()=='C') { //credito (pago)
+ 				debe = t.getMonto(); 
+ 			}
+ 			else if (t.getEvento()=='P') { //Presupuesto
+ 				haber = t.getMonto();
+ 			}
+ 			String descripcion = t.getObservacion();
+ 			String fecha       = t.getFecha();
+ 			l.add(new TransaccionBean(fecha,descripcion, debe,haber,saldo));
+ 		}
+ 		return l;
+ 		
  	}
  	
  	public String getDesde() {
