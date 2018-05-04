@@ -1,8 +1,7 @@
 package controller.view;
  
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -117,8 +116,11 @@ public class UltimosMovimientosOverviewController {
     		
     		//Viene asi: yyyy-MM-dd
     		String s = DBMotor.fechaUltimoPago(cuenta.getCliente());
-    		//Lo quiero asi: dd/MM/yyyy
-    		String ss = s.substring(8,10)+"/"+s.substring(5,7)+"/"+s.substring(0,4);
+    		String ss = " ";
+    		if(s!=null && s.length()==0){
+    			//Lo quiero asi: dd/MM/yyyy
+    			ss = s.substring(8,10)+"/"+s.substring(5,7)+"/"+s.substring(0,4);
+    		}
     		this.fechaUltimoLabel.setText(ss); 
     		
     		this.montoLabel.setText(String.valueOf(cuenta.getEstadoCuentaCorriente()));

@@ -30,7 +30,7 @@
                         <ToggleGroup fx:id="RadioBusqueda" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton fx:id="denominacionRadioButton" layoutX="218.0" layoutY="6.0" mnemonicParsing="false" onAction="#handleDenomRadioButton" text="Denominación" toggleGroup="$RadioBusqueda">
+                  <RadioButton fx:id="denominacionRadioButton" layoutX="218.0" layoutY="6.0" mnemonicParsing="false" onAction="#handleDenomRadioButton" selected="true" text="Denominación" toggleGroup="$RadioBusqueda">
                      <font>
                         <Font size="12.0" />
                      </font>

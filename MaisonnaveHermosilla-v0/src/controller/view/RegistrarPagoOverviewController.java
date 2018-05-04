@@ -130,7 +130,7 @@ public class RegistrarPagoOverviewController {
 	                	try{
 	                		montoViejoLabel.setText(String.valueOf(newValue.getEstadoCuentaCorriente()));}
 	                	catch(NullPointerException e){
-	                		System.out.println("Cambie la tabla y por un instante no supe que hacer con el label de monto viejo!");
+	                		//System.out.println("Cambie la tabla y por un instante no supe que hacer con el label de monto viejo!");
 	                	}
 	                });
 	 	

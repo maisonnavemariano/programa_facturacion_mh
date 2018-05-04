@@ -52,8 +52,8 @@ public class ClienteOverviewController {
     private TextField busquedaTextField;
     
     //Variables booleanas de control
-    private boolean cuitPresionado = true;
-    private boolean denomPresionado = false;
+    private boolean cuitPresionado = false;
+    private boolean denomPresionado = true;
 
     // Reference to the main application.
     private Main mainApp;

@@ -64,11 +64,11 @@
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
                               </TableView>
-                              <HBox layoutX="52.0" layoutY="298.0" spacing="30.0" AnchorPane.bottomAnchor="14.0">
+                              <HBox layoutX="14.0" layoutY="298.0" spacing="30.0" AnchorPane.bottomAnchor="14.0">
                                  <children>
                                     <Button fx:id="PDFButton" mnemonicParsing="false" onAction="#handleGuardarPDF" text="Guardar PDF" />
-                                    <Button fx:id="vistaPreviaButton" mnemonicParsing="false" onAction="#handleVistaPrevia" text="Ver selección" />
-                                    <Button fx:id="imprimirTodosButton" mnemonicParsing="false" onAction="#handleImprimirTodos" text="Ver todos" />
+                                    <Button fx:id="vistaPreviaButton" mnemonicParsing="false" onAction="#handleVistaPrevia" text="Vista Previa Seleccionado" />
+                                    <Button fx:id="imprimirTodosButton" mnemonicParsing="false" onAction="#handleImprimirTodos" text="Vista Previa Todos" />
                                  </children>
                               </HBox>
                            </children>
