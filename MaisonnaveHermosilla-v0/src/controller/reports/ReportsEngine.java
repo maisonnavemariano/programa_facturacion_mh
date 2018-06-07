@@ -1,6 +1,7 @@
 package controller.reports;
 
 import java.io.File;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,7 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import controller.db.Cliente;
 import controller.db.Concepto;
+import controller.db.DBEngine;
 import controller.db.Presupuesto;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -25,7 +28,8 @@ public class ReportsEngine {
 	public static String DefaultName(Presupuesto p) {
 		return p.getCliente().getDenominacion()+"-"+p.getNroPresupuesto()+".pdf";
 	}
-	public static void generarResumen(ResumenBean resumen, String url) {
+
+	private static void generarResumen(ResumenBean resumen, String url) {
 
 		String sourceFile = "reports_templates/Resumen_cuenta.jasper";
 		
@@ -38,10 +42,11 @@ public class ReportsEngine {
 
 		parameters.put("denominacion",resumen.getDenominacion());
 		parameters.put("CUIT",resumen.getCUIT());
-		parameters.put("desde", resumen.getDesde());
-		parameters.put("hasta", resumen.getHasta());
+
 		
 	    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");  
+		parameters.put("desde", formatter.format(resumen.getDesde()).toString());
+		parameters.put("hasta", formatter.format(resumen.getHasta()).toString());
 	    Date date = new Date();  
 
 		parameters.put("fecha_emision", formatter.format(date));
@@ -57,7 +62,21 @@ public class ReportsEngine {
 				
 	}
 	
-	public static String generarResumen(ResumenBean resumen) {
+	public static void generarResumen(Cliente c, String desde, String hasta, DBEngine motor,String file) {
+		generarResumen(new ResumenBean(c,
+									desde,
+									hasta, 
+									ResumenBean.TransaccionToTransaccionBean(motor.ultimosMovimientosDesdeHasta(c, desde, hasta)) 
+									)
+				,file);
+
+	}
+	
+	public static void generarResumen(Cliente c, String desde, String hasta, DBEngine motor) {
+		generarResumen(new ResumenBean(c,desde,hasta, ResumenBean.TransaccionToTransaccionBean(motor.ultimosMovimientosDesdeHasta(c, desde, hasta)) ));
+
+	}
+	private static String generarResumen(ResumenBean resumen) {
 		boolean salida_ok=false;
 
 		String sourceFile = "reports_templates/Resumen_cuenta.jasper";
@@ -67,16 +86,31 @@ public class ReportsEngine {
 
 		
 		String printFile = null;
-		JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(dataList);
+		List<MainReportBean> l = new ArrayList<MainReportBean>();
+		l.add(new MainReportBean(dataList));
+		
+				
+		JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(l);
+
 		Map<String, Object> parameters = new HashMap<String,Object>();
 
 		parameters.put("denominacion",resumen.getDenominacion());
 		parameters.put("CUIT",resumen.getCUIT());
-		parameters.put("desde", resumen.getDesde());
-		parameters.put("hasta", resumen.getHasta());
-		
-	    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");  
-	    Date date = new Date();  
+
+		Date date;
+		parameters.put("saldo_inicial",resumen.getSaldoInicial());
+	    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+	    try {
+	    date = new SimpleDateFormat("yyyy-MM-dd").parse(resumen.getDesde());
+	    parameters.put("desde", formatter.format(date));
+
+		date = new SimpleDateFormat("yyyy-MM-dd").parse(resumen.getHasta());
+		parameters.put("hasta", formatter.format(date));
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	    date = new Date();  
 
 		parameters.put("fecha_emision", formatter.format(date));
 		
@@ -91,6 +125,7 @@ public class ReportsEngine {
 		return salida_ok?salida:null;
 				
 	}
+	
 	
 	public static String generarReporte(Presupuesto p) {
 	boolean salida_ok=false;

@@ -4,16 +4,18 @@ import java.util.List;
 
 import controller.db.Cliente;
 import controller.db.DBEngine;
+import controller.db.Transaccion;
 
 public class tester {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		DBEngine motor = new DBEngine("localhost");
-		String desde = "2001-01-01";
-		String hasta = "2018-04-01";
-		//Cliente cliente, String desde, String hasta, List<TransaccionBean> transacciones
-		ReportsEngine.generarResumen(new ResumenBean(motor.getCliente(8),desde,hasta, ResumenBean.TransaccionToTransaccionBean(motor.ultimosMovimientosDesdeHasta(motor.getCliente(8), desde, hasta)) ));
+		String desde = "2017-1-01";
+		String hasta = "2018-01-01";
+	
+
+		ReportsEngine.generarResumen(motor.getCliente(4), desde, hasta, motor); 
 		/**
 		System.out.println("arranca reportes");
 		ReportsEngine.generarReporte(motor.verPresupuesto(2175),"/home/maiso/tmp.pdf");

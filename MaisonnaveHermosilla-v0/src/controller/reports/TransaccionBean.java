@@ -6,6 +6,7 @@ public class TransaccionBean{
 	private double saldo;
 	private String descripcion;
 	private String fecha;
+	private char evento;
 	public double getDebe() {
 		return debe;
 	}
@@ -47,12 +48,16 @@ public class TransaccionBean{
 	}
 
 	
-	public TransaccionBean(String f, String descr, double d, double h, double s ){
+	public TransaccionBean(String f, String descr, double d, double h, double s, char evento ){
 		this.debe        = d;
 		this.haber       = h;
 		this.saldo       = s;
 		this.descripcion = descr;
 		this.fecha       = f;
+		this.evento = evento;
+	}
+	public char getEvento() {
+		return evento;
 	}
 	
 	
