@@ -137,7 +137,7 @@ public class DBEngine {
 		List<Cliente> lista = new ArrayList<Cliente>();
 		String query = "SELECT * "
 				+ "FROM Cliente "
-				+ "WHERE Habilitado='S' ";
+				+ "WHERE Habilitado='S' ORDER BY Denominacion";
 		
 		Statement st;
 		try {
@@ -756,7 +756,7 @@ public class DBEngine {
 			Presupuesto aux;
 			Statement st ;
 			
-			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente WHERE Cliente.Denominacion LIKE '%"+ denom+ "%' AND Presupuesto.Efectivo = 'N'";
+			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente WHERE Cliente.Denominacion LIKE '%"+ denom+ "%' AND Presupuesto.Efectivo = 'N' ORDER BY Cliente.Denominacion ASC";
 			
 			try {
 				st = conn.createStatement();
@@ -797,7 +797,7 @@ public class DBEngine {
 			Presupuesto aux;
 			Statement st ;
 			
-			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente WHERE Cliente.CUIT LIKE '%"+ cuit+ "%' AND Presupuesto.Efectivo = 'N'";
+			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente WHERE Cliente.CUIT LIKE '%"+ cuit+ "%' AND Presupuesto.Efectivo = 'N' ORDER BY Cliente.Denominacion ASC";
 			
 			try {
 				st = conn.createStatement();
@@ -1391,13 +1391,14 @@ public class DBEngine {
 	 */
 	
 	public List<Transaccion> ultimosMovimientos(Cliente C){
+		
 		List<Transaccion> transacciones = new ArrayList<Transaccion>();
 		
 		if(!C.esValidoCodigoCliente() || C==null)
 			System.out.println("[WARNING] cliente invalido o nulo en ultimosMovimientos");
 		else {
 			Transaccion transaccion_aux;
-			String query = "SELECT * FROM Transaccion WHERE Codigo_Cliente = "+C.getCodigoCliente()+" ORDER BY Fecha";
+			String query = "SELECT * FROM Transaccion WHERE Codigo_Cliente = "+C.getCodigoCliente()+" ORDER BY Nro_Transaccion";
 			
 			Statement st;
 			try {
@@ -1532,7 +1533,7 @@ public class DBEngine {
 		double monto_aux;
 		List<CuentaCorriente> lista = new ArrayList<CuentaCorriente>();
 		String query = "SELECT * "
-				+ "FROM Cliente AS C INNER JOIN Cuenta_corriente AS CC ON CC.Codigo_cliente= C.Codigo_cliente WHERE C.Habilitado= 'S' ORDER BY C.Denominacion";
+				+ "FROM Cliente AS C INNER JOIN Cuenta_corriente AS CC ON CC.Codigo_cliente= C.Codigo_cliente WHERE C.Habilitado= 'S' ORDER BY C.Denominacion ASC";
 		
 		Statement st;
 		try {

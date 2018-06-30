@@ -327,7 +327,7 @@ public class ReportsEngine {
 
 		JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(datos);
 		String sourceFile = "reports_templates/Lista_ctas_ctes.jasper";
-		String salida = "borradores/tmp/resumen_ctas_ctes"+new SimpleDateFormat("dd-MM-yyyy").format(new Date())+".pdf";
+		String salida = "reportes/tmp/listado_ctas_ctes"+new SimpleDateFormat("dd-MM-yyyy").format(new Date())+".pdf";
 		try {
 			printFile = JasperFillManager.fillReportToFile(sourceFile, new HashMap<String,Object>(), beanColDataSource);
 			JasperExportManager.exportReportToPdfFile(printFile, salida);
