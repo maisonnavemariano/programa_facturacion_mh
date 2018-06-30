@@ -37,7 +37,19 @@ public class Transaccion {
 		this.Estado_cuenta_corriente = new SimpleDoubleProperty(Estado_cuenta_corriente);
 		this.fechita=fecha;
 	}
+	public char getEvento() {
+		return Evento;
+	}
+	public String getObservacion() {
+		return this.concepto_observacion.get();
+	}
 
+	public double getMonto() {
+		return this.Monto.doubleValue();
+	}
+	public double getEstadoCuentaCorriente() {
+		return this.Estado_cuenta_corriente.doubleValue();
+	}
 	
 	public String getFormattedEvent() {
 		String ev = "";

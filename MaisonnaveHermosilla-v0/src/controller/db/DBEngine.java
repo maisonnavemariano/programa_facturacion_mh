@@ -45,7 +45,7 @@ public class DBEngine {
 		try{
 
 		    Class.forName(myDriver);
-		    conn = DriverManager.getConnection(myUrl, "virginia", "lospiojos");
+		    conn = DriverManager.getConnection(myUrl, "root", "maisonnave1");
 		
 		}catch(Exception e){e.printStackTrace();}
 	}
@@ -1424,6 +1424,66 @@ public class DBEngine {
 		}
 		return transacciones;
 	}
+
+	public List<Transaccion> ultimosMovimientosDesdeHasta(Cliente C,String desde, String hasta){
+
+
+		// CALCULAMOS PRIMER Y ULTIMA TRANSACCION =========
+		String query = "SELECT Nro_Transaccion FROM Transaccion WHERE Codigo_Cliente = "+C.getCodigoCliente()+" AND Fecha<='"+hasta+"' AND Fecha>='"+desde+"' ORDER BY Nro_Transaccion";
+		int primera_Trans = -1;
+		int ultima_Trans  = -1;
+		Statement st;
+		try {
+			st = conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    while(rs.next()){
+		    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+	    		//String telefono, String correoElectronico, String condicionIva, String habilitado
+		    	if  (primera_Trans==-1)
+		    		primera_Trans = rs.getInt("Nro_Transaccion");
+		    	ultima_Trans = rs.getInt("Nro_Transaccion");
+
+		    }
+		    st.close();
+		} catch (SQLException e) {
+		}
+		// ==============================================
+		List<Transaccion> transacciones = new ArrayList<Transaccion>();
+		
+		if(!C.esValidoCodigoCliente() || C==null)
+			System.out.println("[WARNING] cliente invalido o nulo en ultimosMovimientos");
+		else {
+			Transaccion transaccion_aux;
+			if (primera_Trans!=-1)
+				query = "SELECT * FROM Transaccion WHERE Codigo_Cliente = "+C.getCodigoCliente()+" AND Nro_Transaccion<='"+ultima_Trans+"' AND Nro_Transaccion>='"+primera_Trans+"' ORDER BY Nro_Transaccion";
+			else
+				query = "SELECT * FROM Transaccion WHERE Codigo_Cliente = "+C.getCodigoCliente()+" AND Fecha<='"+hasta+"' AND Fecha>='"+desde+"' ORDER BY Nro_Transaccion";
+
+			try {
+				st = conn.createStatement();
+			    ResultSet rs = st.executeQuery(query);
+			    while(rs.next()){
+			    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+		    		//String telefono, String correoElectronico, String condicionIva, String habilitado
+			    	transaccion_aux = new Transaccion(C,
+			    			rs.getDate("Fecha"),
+			    			rs.getString("Evento").charAt(0),
+			    			rs.getDouble("Monto"),
+			    			rs.getString("Concepto"),
+			    			rs.getDouble("Estado_cuenta_corriente")
+			    			
+			    			);
+			    	transaccion_aux.actualizarNroTransaccion(rs.getInt("Nro_Transaccion"));
+			    	transacciones.add(transaccion_aux);
+			    }
+			    st.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return transacciones;
+	}
+	
 	
 	/**
 	 * Una lista con las cuentas corrientes de todos los clientes habilitados.
