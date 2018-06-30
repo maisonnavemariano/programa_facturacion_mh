@@ -53,8 +53,7 @@ public class DBEngine {
 		try{
 
 		    Class.forName(myDriver);
-		    conn = DriverManager.getConnection(myUrl, "root", "maisonnave1");
-		    //conn = DriverManager.getConnection(myUrl, "virginia", "lospiojos");
+		    conn = DriverManager.getConnection(myUrl, "virginia", "lospiojos");
 		    
 		}catch(Exception e){e.printStackTrace();}
 	}
