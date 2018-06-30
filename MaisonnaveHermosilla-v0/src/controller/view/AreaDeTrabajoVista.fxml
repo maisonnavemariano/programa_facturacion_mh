@@ -22,7 +22,7 @@
           <AnchorPane maxHeight="40.0" minHeight="40.0" prefHeight="40.0" prefWidth="798.0">
                <children>
                   <Label layoutX="14.0" layoutY="14.0" text="Buscar por:" />
-                  <RadioButton fx:id="cuitRadioButton" layoutX="112.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleCuitRadioButton" selected="true" text="CUIT">
+                  <RadioButton fx:id="cuitRadioButton" layoutX="112.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleCuitRadioButton" text="CUIT">
                      <font>
                         <Font size="12.0" />
                      </font>
@@ -30,7 +30,7 @@
                         <ToggleGroup fx:id="RadioBusqueda" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton fx:id="denominacionRadioButton" layoutX="190.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleDenomRadioButton" text="Denominación" toggleGroup="$RadioBusqueda">
+                  <RadioButton fx:id="denominacionRadioButton" layoutX="190.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleDenomRadioButton" selected="true" text="Denominación" toggleGroup="$RadioBusqueda">
                      <font>
                         <Font size="12.0" />
                      </font>

@@ -124,8 +124,8 @@ public class AreaDeTrabajoOverviewController  {
     
     
     //Variables booleanas de control
-    private boolean cuitPresionado = true;
-    private boolean denomPresionado = false;
+    private boolean cuitPresionado = false;
+    private boolean denomPresionado = true;
     
     @FXML
     private TextField busquedaTextField;

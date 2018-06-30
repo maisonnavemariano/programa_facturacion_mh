@@ -143,6 +143,7 @@ public class ClienteOverviewController {
         if (okClicked) {
             mainApp.getClienteData().add(tempCliente);
         }
+        clienteTable.setItems(mainApp.getClienteData());
     }
 
     /**
