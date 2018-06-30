@@ -141,7 +141,7 @@ public class ClienteOverviewController {
         Cliente tempCliente = new Cliente();
         boolean okClicked = mainApp.showNuevoClienteOverview(tempCliente);
         if (okClicked) {
-            mainApp.getClienteData().add(tempCliente);
+            mainApp.setClienteDataDB();
         }
         clienteTable.setItems(mainApp.getClienteData());
     }

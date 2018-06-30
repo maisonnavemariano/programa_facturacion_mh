@@ -112,6 +112,14 @@ public class Main extends Application {
     
     
     /**
+     * Setea lista observable de clientes 
+     * @return
+     */
+    public void setClienteDataDB() {
+    	clienteData = FXCollections.observableArrayList(DBMotor.buscarCliente(""));
+    }
+    
+    /**
      * Retorna la informacion de presupuestos no efectivos como una lista observable de Clientes. 
      * @return
      */

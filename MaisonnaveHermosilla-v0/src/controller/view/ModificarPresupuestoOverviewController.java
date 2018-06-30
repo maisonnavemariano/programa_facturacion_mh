@@ -483,6 +483,7 @@ public class ModificarPresupuestoOverviewController {
     public void handleEditarConcepto(){
     	
     	Concepto concepto = conceptosTable.getSelectionModel().getSelectedItem();
+    	int indice_concepto = conceptosTable.getSelectionModel().getSelectedIndex();
     	if (concepto != null) {
     	Dialog<ButtonType> dialog = new Dialog<>();
     	dialog.setTitle("Editar concepto");
@@ -556,6 +557,7 @@ public class ModificarPresupuestoOverviewController {
     			m = Double.parseDouble(text2.getText());
     		}
     		
+    		
     		//Creo nuevo concepto con los datos ingresados
             Concepto nuevo = new Concepto(cs, m);
            
@@ -563,7 +565,8 @@ public class ModificarPresupuestoOverviewController {
     		presupuesto.getConceptos().remove(concepto);
     		
         	//agrego el concepto nuevo a la lista de nuevo
-        	presupuesto.getConceptos().add(nuevo);
+        	//presupuesto.getConceptos().add(nuevo);
+    		presupuesto.getConceptos().add(indice_concepto, nuevo);
         	
         	//recalculo el monto con el concepto nuevo
        	 	presupuesto.setSubtotal(recalcularSubtotal());
