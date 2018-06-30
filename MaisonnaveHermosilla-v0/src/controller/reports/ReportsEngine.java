@@ -62,7 +62,8 @@ public class ReportsEngine {
 				
 	}
 	
-	public static void generarResumen(Cliente c, String desde, String hasta, DBEngine motor,String file) {
+	public static void generarResumen(Cliente c, String desde, String hasta,String file) {
+		DBEngine motor = controller.db.DBSingleton.getInstance();
 		generarResumen(new ResumenBean(c,
 									desde,
 									hasta, 
@@ -72,7 +73,8 @@ public class ReportsEngine {
 
 	}
 	
-	public static void generarResumen(Cliente c, String desde, String hasta, DBEngine motor) {
+	public static void generarResumen(Cliente c, String desde, String hasta) {
+		DBEngine motor = controller.db.DBSingleton.getInstance();
 		generarResumen(new ResumenBean(c,desde,hasta, ResumenBean.TransaccionToTransaccionBean(motor.ultimosMovimientosDesdeHasta(c, desde, hasta)) ));
 
 	}
