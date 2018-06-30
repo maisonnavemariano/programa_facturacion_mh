@@ -53,8 +53,8 @@ public class DBEngine {
 		try{
 
 		    Class.forName(myDriver);
-		    conn = DriverManager.getConnection(myUrl, "root", "maisonnave1");
-		
+		    conn = DriverManager.getConnection(myUrl, "virginia", "lospiojos");
+		    
 		}catch(Exception e){e.printStackTrace();}
 	}
 	
@@ -1483,7 +1483,44 @@ public class DBEngine {
 		}
 		return transacciones;
 	}
-	
+	/**
+	 * Una lista con las cuentas corrientes de todos los clientes habilitados.
+	 * @return Una lista con objetos CuentaCorriente, donde cada objeto tiene el Cliente en cuestion, y el monto (double) que representa el estado de la cuenta corriente.
+	 */
+	public List<CuentaCorriente> getCuentasCorrientesHabilitadosSinCeros(){
+
+		Cliente aux;
+		double monto_aux;
+		List<CuentaCorriente> lista = new ArrayList<CuentaCorriente>();
+		String query = "SELECT * "
+				+ "FROM Cliente AS C INNER JOIN Cuenta_corriente AS CC ON CC.Codigo_cliente= C.Codigo_cliente WHERE C.Habilitado= 'S' AND CC.Monto!=0 ORDER BY C.Denominacion";
+		
+		Statement st;
+		try {
+			st = conn.createStatement();
+		    ResultSet rs = st.executeQuery(query);
+		    while(rs.next()){
+		    	//int Codigo_Cliente, String CUIT, String denominacion, String direccion, String localidad,
+	    		//String telefono, String correoElectronico, String condicionIva, String habilitado
+		    	aux = new Cliente(rs.getInt("Codigo_Cliente"),
+		    			rs.getString("CUIT"),
+		    			rs.getString("Denominacion"),
+		    			rs.getString("Direccion"),
+		    			rs.getString("Localidad"),
+		    			rs.getString("Telefono"),
+		    			rs.getString("Email"),
+		    			rs.getString("Condicion_iva"),
+		    			rs.getString("Habilitado"));
+		    	monto_aux = rs.getDouble("Monto");
+		    	lista.add(new CuentaCorriente(aux,monto_aux));
+		    }
+		    st.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lista;
+		
+	}
 	
 	/**
 	 * Una lista con las cuentas corrientes de todos los clientes habilitados.

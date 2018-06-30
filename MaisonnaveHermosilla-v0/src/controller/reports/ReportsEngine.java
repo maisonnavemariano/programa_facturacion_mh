@@ -11,6 +11,7 @@ import java.util.Map;
 
 import controller.db.Cliente;
 import controller.db.Concepto;
+import controller.db.CuentaCorriente;
 import controller.db.DBEngine;
 import controller.db.Presupuesto;
 import net.sf.jasperreports.engine.JRException;
@@ -310,6 +311,33 @@ public class ReportsEngine {
 			return null;
 		}
 
+	public static String generar_resumen_ctas_ctes(boolean conCeros) {
+		String printFile = null;
+		DBEngine motor = controller.db.DBSingleton.getInstance();
+		List<CuentaCorriente> l;
+		if (conCeros)
+			l = motor.getCuentasCorrientesHabilitados();
+		else
+			l = motor.getCuentasCorrientesHabilitadosSinCeros();
+			
+		List<CuentaCorrienteBean> datos = new ArrayList<CuentaCorrienteBean>();
+		for (CuentaCorriente cc : l) {
+			datos.add(new CuentaCorrienteBean(cc.getCliente().getCuit(),cc.getCliente().getDenominacion(),cc.getEstadoCuentaCorriente()));
+		}
+		JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(datos);
+		String sourceFile = "reports_templates/Lista_ctas_ctes.jasper";
+		String salida = "borradores/tmp/resumen_ctas_ctes"+new SimpleDateFormat("dd-MM-yyyy").format(new Date())+".pdf";
+		try {
+			printFile = JasperFillManager.fillReportToFile(sourceFile, new HashMap<String,Object>(), beanColDataSource);
+			JasperExportManager.exportReportToPdfFile(printFile, salida);
+	         
+		}catch(JRException e) {
+			e.printStackTrace();
+		}
+		return salida;
+	}
+	
+
 	public static String generar_todos_los_presupuestos(List<Presupuesto> lista) throws JRException{
 	  long start = System.currentTimeMillis();
 
@@ -342,6 +370,7 @@ public class ReportsEngine {
 	  System.err.println("PDF creation time : " + (System.currentTimeMillis() - start)+" millis");
 	  
 	  return "borradores/tmp/imprimir_todos.pdf";
+	
 	
 	}
 }
