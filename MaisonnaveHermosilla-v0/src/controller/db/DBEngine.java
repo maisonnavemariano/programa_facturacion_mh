@@ -452,7 +452,7 @@ public class DBEngine {
 			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente "
 					+ "WHERE Presupuesto.Efectivo = 'S' AND Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
 							+ "Cliente.CUIT LIKE '%"+cuit+"%' AND "
-									+ "Fecha BETWEEN '"+desde+"' AND '"+hasta+"';";
+									+ "Fecha BETWEEN '"+desde+"' AND '"+hasta+"' ORDER BY Cliente.Denominacion ASC;";
 			
 			try {
 				st = conn.createStatement();
@@ -1213,8 +1213,8 @@ public class DBEngine {
 	 */
 	public List<Presupuesto> obtenerPresupuestosNoEfectivos(){
 		String query = "SELECT * "
-				+ "FROM Presupuesto "
-				+ "WHERE Efectivo = 'N'";
+				+ "FROM Presupuesto AS p INNER JOIN Cliente AS c "
+				+ "WHERE p.Efectivo = 'N'  ORDER BY c.Denominacion ASC";
 		
 		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();
 		Presupuesto aux;
