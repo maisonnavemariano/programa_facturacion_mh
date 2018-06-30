@@ -452,7 +452,7 @@ public class DBEngine {
 			String query = "SELECT * FROM Presupuesto INNER JOIN Cliente ON Presupuesto.Codigo_cliente = Cliente.Codigo_cliente "
 					+ "WHERE Presupuesto.Efectivo = 'S' AND Cliente.Denominacion LIKE '%"+ denom+ "%' AND "
 							+ "Cliente.CUIT LIKE '%"+cuit+"%' AND "
-									+ "Fecha BETWEEN '"+desde+"' AND '"+hasta+"';";
+									+ "Fecha BETWEEN '"+desde+"' AND '"+hasta+"' ORDER BY Cliente.Denominacion ASC;";
 			
 			try {
 				st = conn.createStatement();
