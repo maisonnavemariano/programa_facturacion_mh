@@ -73,9 +73,9 @@ public class ReportsEngine {
 
 	}
 	
-	public static void generarResumen(Cliente c, String desde, String hasta) {
+	public static String generarResumen(Cliente c, String desde, String hasta) {
 		DBEngine motor = controller.db.DBSingleton.getInstance();
-		generarResumen(new ResumenBean(c,desde,hasta, ResumenBean.TransaccionToTransaccionBean(motor.ultimosMovimientosDesdeHasta(c, desde, hasta)) ));
+		return generarResumen(new ResumenBean(c,desde,hasta, ResumenBean.TransaccionToTransaccionBean(motor.ultimosMovimientosDesdeHasta(c, desde, hasta)) ));
 
 	}
 	private static String generarResumen(ResumenBean resumen) {
