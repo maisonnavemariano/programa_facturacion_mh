@@ -1213,7 +1213,7 @@ public class DBEngine {
 	 */
 	public List<Presupuesto> obtenerPresupuestosNoEfectivos(){
 		String query = "SELECT * "
-				+ "FROM Presupuesto AS p INNER JOIN Cliente AS c "
+				+ "FROM Presupuesto AS p INNER JOIN Cliente AS c ON p.Codigo_Cliente == c.Codigo_Cliente "
 				+ "WHERE p.Efectivo = 'N'  ORDER BY c.Denominacion ASC";
 		
 		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();
