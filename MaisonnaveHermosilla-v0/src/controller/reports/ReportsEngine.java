@@ -324,6 +324,7 @@ public class ReportsEngine {
 		for (CuentaCorriente cc : l) {
 			datos.add(new CuentaCorrienteBean(cc.getCliente().getCuit(),cc.getCliente().getDenominacion(),cc.getEstadoCuentaCorriente()));
 		}
+
 		JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(datos);
 		String sourceFile = "reports_templates/Lista_ctas_ctes.jasper";
 		String salida = "borradores/tmp/resumen_ctas_ctes"+new SimpleDateFormat("dd-MM-yyyy").format(new Date())+".pdf";
