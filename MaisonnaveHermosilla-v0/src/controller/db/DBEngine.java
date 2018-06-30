@@ -53,7 +53,7 @@ public class DBEngine {
 		try{
 
 		    Class.forName(myDriver);
-		    conn = DriverManager.getConnection(myUrl, "virginia", "lospiojos");
+		    conn = DriverManager.getConnection(myUrl, "root", "maisonnave1");
 		    
 		}catch(Exception e){e.printStackTrace();}
 	}
@@ -1213,7 +1213,7 @@ public class DBEngine {
 	 */
 	public List<Presupuesto> obtenerPresupuestosNoEfectivos(){
 		String query = "SELECT * "
-				+ "FROM Presupuesto AS p INNER JOIN Cliente AS c ON p.Codigo_Cliente == c.Codigo_Cliente "
+				+ "FROM Presupuesto AS p INNER JOIN Cliente AS c ON p.Codigo_Cliente = c.Codigo_Cliente "
 				+ "WHERE p.Efectivo = 'N'  ORDER BY c.Denominacion ASC";
 		
 		List<Presupuesto> toReturn = new ArrayList<Presupuesto>();
