@@ -53,7 +53,7 @@ public class DBEngine {
 		try{
 
 		    Class.forName(myDriver);
-		    conn = DriverManager.getConnection(myUrl, "virginia", "lospiojos");
+		    conn = DriverManager.getConnection(myUrl, "root", "maisonnave1");
 		
 		}catch(Exception e){e.printStackTrace();}
 	}
@@ -1495,7 +1495,7 @@ public class DBEngine {
 		double monto_aux;
 		List<CuentaCorriente> lista = new ArrayList<CuentaCorriente>();
 		String query = "SELECT * "
-				+ "FROM Cliente AS C INNER JOIN Cuenta_corriente AS CC ON CC.Codigo_cliente= C.Codigo_cliente WHERE C.Habilitado= 'S'";
+				+ "FROM Cliente AS C INNER JOIN Cuenta_corriente AS CC ON CC.Codigo_cliente= C.Codigo_cliente WHERE C.Habilitado= 'S' ORDER BY C.Denominacion";
 		
 		Statement st;
 		try {
