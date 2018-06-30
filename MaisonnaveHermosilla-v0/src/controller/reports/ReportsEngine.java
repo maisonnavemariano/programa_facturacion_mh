@@ -83,9 +83,19 @@ public class ReportsEngine {
 
 		String sourceFile = "reports_templates/Resumen_cuenta.jasper";
 		String salida = "reportes/tmp/"+resumen.getDenominacion()+"_"+resumen.getDesde()+"_"+resumen.getHasta()+".pdf";
-		
-		List<TransaccionBean> dataList = resumen.getTransacciones();
+	    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
+		Date date;
+		List<TransaccionBean> dataList = resumen.getTransacciones();
+		for (TransaccionBean t: dataList) {
+			try {
+				date = new SimpleDateFormat("yyyy-MM-dd").parse(t.getFecha());
+				t.setFecha(formatter.format(date));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		String printFile = null;
 		List<MainReportBean> l = new ArrayList<MainReportBean>();
@@ -99,9 +109,7 @@ public class ReportsEngine {
 		parameters.put("denominacion",resumen.getDenominacion());
 		parameters.put("CUIT",resumen.getCUIT());
 
-		Date date;
 		parameters.put("saldo_inicial",resumen.getSaldoInicial());
-	    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 	    try {
 	    date = new SimpleDateFormat("yyyy-MM-dd").parse(resumen.getDesde());
 	    parameters.put("desde", formatter.format(date));
