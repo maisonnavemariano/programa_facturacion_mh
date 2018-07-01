@@ -2,6 +2,7 @@ package controller.view;
  
 
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -259,6 +260,9 @@ public class UltimosMovimientosOverviewController {
     	desdeDatePicker.setPromptText(EPOCH.format(formatter_2));
         hastaDatePicker.setPromptText(NOW.format(formatter_2));
      	
+        Platform.runLater(() -> 
+    	desdeDatePicker.requestFocus());
+        
         // TODO: GUARDAR DETALLE COMO
         
         final Callback<DatePicker, DateCell> HCellFactory = 
