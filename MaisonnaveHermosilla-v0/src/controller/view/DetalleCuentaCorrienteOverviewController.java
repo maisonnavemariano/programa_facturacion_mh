@@ -1,6 +1,7 @@
 package controller.view;
  
 
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableCell;
@@ -8,21 +9,30 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import controller.Main;
 import controller.db.Cliente;
 import controller.db.CuentaCorriente;
+import controller.reports.ReportsEngine;
 
 
 /**
@@ -156,5 +166,69 @@ public class DetalleCuentaCorrienteOverviewController {
     	dialogStage.close();
     }
     
+    @FXML
+    private void handleImprimirListado(){
+    	Dialog<ButtonType> dialog = new Dialog<>();
+     	dialog.setTitle("Imprimir Listado");
+     	dialog.setHeaderText(null);
+     	dialog.setContentText("¿Desea imprimir el listado?");
+     	dialog.setResizable(false); 
+     	
+     	CheckBox ignorarCeros = new CheckBox("Ignorar saldos $0.00");
+     	ignorarCeros.setSelected(true);
+     	
+    	dialog.getDialogPane().setContent(ignorarCeros);
+     	
+    	
+    	
+    	//genero los dos botones : aplicar (OK) y cancelar.
+    	ButtonType buttonTypeOk = new ButtonType("Ok", ButtonData.OK_DONE);
+    	dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+    	
+    	ButtonType buttonTypeCancel = new ButtonType("Cancelar", ButtonData.CANCEL_CLOSE);
+    	dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
+   
+    	Optional<ButtonType> result = dialog.showAndWait();
+    	
+    	//Si el usuario elige Generar Presupuesto
+    	if (result.get() == buttonTypeOk) {
+    		
+    		boolean conCeros = ! ignorarCeros.isSelected();
+    		
+    		String filename = ReportsEngine.generar_resumen_ctas_ctes(conCeros);
+        	
+        	File f = new File(filename);
+        	
+        	//Thread para abrir el Okular o el Adobe
+        	Task<Void> task = new Task<Void>() {
+    		    @Override
+    		    protected Void call() throws Exception {
+    		    	
+    		    	//Llamo a la aplicacion por defecto
+    		    	Desktop escritorio = Desktop.getDesktop();
+    		    	
+    		    	//Abro el pdf en la aplicacion por defecto
+    		    	try {
+    		    		if(f.exists()) 
+    		    			escritorio.open(f);
+    				} catch (IOException e) {
+    					System.out.println("error al abrir el pdf para vista previa");
+    					e.printStackTrace();
+    				}
+    		    	
+    		    	//TODO: Ver como y cuando borrar el archivo!
+    		    	
+    		    	return null;
+    		    };
+        	};
+    	 
+        	//Inicio trabajo del thread
+        	new Thread(task).start();
+    	}
+    	else{
+    		//No hago nada y cierro
+    	}
+    	
+    }
    
 }

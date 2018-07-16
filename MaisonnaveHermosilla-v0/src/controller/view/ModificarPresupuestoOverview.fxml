@@ -52,7 +52,7 @@
             <Font size="17.0" />
          </font>
       </Label>
-      <Label fx:id="nroPresupuestoField" layoutX="344.0" layoutY="14.0" prefHeight="30.0" prefWidth="149.0" text="Un numerito">
+      <Label fx:id="nroPresupuestoField" layoutX="337.0" layoutY="16.0" text="Un numerito">
          <font>
             <Font size="22.0" />
          </font></Label>

@@ -106,9 +106,7 @@ public class Cliente {
      * */
 
     public String getCuit() {
-    	
-    	String a = String.format("%s-%s-%s", cuit.get().substring(0, 2),cuit.get().substring(2, 10),cuit.get().substring(10));
-        return a;
+    	return cuit.get();
     }
 
     public void setCuit(String cu) {

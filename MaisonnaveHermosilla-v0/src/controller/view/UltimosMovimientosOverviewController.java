@@ -1,10 +1,11 @@
 package controller.view;
  
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableCell;
@@ -12,19 +13,28 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DateCell;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
-import org.joda.time.LocalDate;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import controller.Main;
 import controller.db.Cliente;
@@ -33,6 +43,7 @@ import controller.db.DBEngine;
 import controller.db.DBSingleton;
 import controller.db.Presupuesto;
 import controller.db.Transaccion;
+import controller.reports.ReportsEngine;
 
 
 /**
@@ -45,7 +56,7 @@ public class UltimosMovimientosOverviewController {
     @FXML
     private TableView<Transaccion> transaccionesTable;
     @FXML
-    private TableColumn<Transaccion, Object> fechaColumn;
+    private TableColumn<Transaccion, String> fechaColumn;
     @FXML
     private TableColumn<Transaccion, String> eventoColumn;
     @FXML
@@ -84,19 +95,6 @@ public class UltimosMovimientosOverviewController {
  		
  		estadoColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
  		
- 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
- 		
- 		/*fechaColumn.setCellFactory(tc -> new TableCell<Transaccion, LocalDate>() {
- 		    @Override
- 		    protected void updateItem(LocalDate date, boolean empty) {
- 		        super.updateItem(date, empty);
- 		        if (empty) {
- 		            setText(null);
- 		        } else {
- 		            setText(formatter.format(date));
- 		        }
- 		    }
- 		}); */
     }
 
     /**
@@ -117,8 +115,11 @@ public class UltimosMovimientosOverviewController {
     		
     		//Viene asi: yyyy-MM-dd
     		String s = DBMotor.fechaUltimoPago(cuenta.getCliente());
-    		//Lo quiero asi: dd/MM/yyyy
-    		String ss = s.substring(8,10)+"/"+s.substring(5,7)+"/"+s.substring(0,4);
+    		String ss = " ";
+    		if(s!=null && s.length()==0){
+    			//Lo quiero asi: dd/MM/yyyy
+    			ss = s.substring(8,10)+"/"+s.substring(5,7)+"/"+s.substring(0,4);
+    		}
     		this.fechaUltimoLabel.setText(ss); 
     		
     		this.montoLabel.setText(String.valueOf(cuenta.getEstadoCuentaCorriente()));
@@ -127,7 +128,7 @@ public class UltimosMovimientosOverviewController {
     	 	transaccionesTable.setItems(listaTransacciones);
     	 	
     	 	fechaColumn.setCellValueFactory(
-    	 				cellData -> cellData.getValue().fechaObjectProperty());
+    	 				cellData -> cellData.getValue().fechaARGProperty());
     	 	
     	 	    	 	
     	 	eventoColumn.setCellValueFactory(
@@ -239,4 +240,191 @@ public class UltimosMovimientosOverviewController {
               alert.showAndWait();
     	}
     }
+
+    @FXML 
+    private void handleImprimirDetalle(){
+    	LocalDate EPOCH = LocalDate.of(2003, 1, 1);
+    	LocalDate NOW = LocalDate.now();
+    	DateTimeFormatter formatter_1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    	DateTimeFormatter formatter_2 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+  	    	
+    	Dialog<ButtonType> dialog = new Dialog<>();
+     	dialog.setTitle("Imprimir Detalle");
+     	dialog.setHeaderText(null);
+     	dialog.setResizable(false); 
+     	
+     	Label label1 = new Label("Desde:");
+     	Label label2 = new Label("Hasta:");
+     	DatePicker desdeDatePicker = new DatePicker();
+    	DatePicker hastaDatePicker = new DatePicker();
+    	desdeDatePicker.setPromptText(EPOCH.format(formatter_2));
+        hastaDatePicker.setPromptText(NOW.format(formatter_2));
+     	
+        Platform.runLater(() -> 
+    	desdeDatePicker.requestFocus());
+        
+        // TODO: GUARDAR DETALLE COMO
+        
+        final Callback<DatePicker, DateCell> HCellFactory = 
+    	        new Callback<DatePicker, DateCell>() {
+    	            @Override
+    	            public DateCell call(final DatePicker datePicker) {
+    	                return new DateCell() {
+    	                    @Override
+    	                    public void updateItem(LocalDate item, boolean empty) {
+    	                        super.updateItem(item, empty);
+    	                        LocalDate piso;
+    	                        if(desdeDatePicker.getValue()==null){
+    	                        	piso = LocalDate.of(2003, 1, 1);
+    	                        }
+    	                        else{
+    	                        	piso = desdeDatePicker.getValue().plusDays(1);
+    	                        }
+    	                        if (item.isBefore(piso)){
+    	                                setDisable(true);
+    	                                setStyle("-fx-background-color: #d3d3d3;");
+    	                        }
+    	                        if (item.isAfter(
+    	                                LocalDate.now()) 
+    	                        		){
+    	                                setDisable(true);
+    	                                setStyle("-fx-background-color: #d3d3d3;");
+    	                        }
+    	                        if (item.isBefore(
+    	                        		LocalDate.of(2003, 1, 1)) 
+    	                        		){
+    	                                setDisable(true);
+    	                                setStyle("-fx-background-color: #d3d3d3;");
+    	                        }
+    	                    }
+    	                };
+    	            }
+        		};
+    	    
+    	final Callback<DatePicker, DateCell> DECellFactory = 
+        	        new Callback<DatePicker, DateCell>() {
+        	            @Override
+        	            public DateCell call(final DatePicker datePicker) {
+        	                return new DateCell() {
+        	                    @Override
+        	                    public void updateItem(LocalDate item, boolean empty) {
+        	                        super.updateItem(item, empty);
+        	                        if (item.isAfter(
+        	                                LocalDate.now()) 
+        	                        		){
+        	                                setDisable(true);
+        	                                setStyle("-fx-background-color: #d3d3d3;");
+        	                        }
+        	                        if (item.isBefore(
+        	                        		LocalDate.of(2003, 1, 1)) 
+        	                        		){
+        	                                setDisable(true);
+        	                                setStyle("-fx-background-color: #d3d3d3;");
+        	                        }
+        	                       
+        	                }
+        	            };
+        	        }
+        	    };
+        
+    	hastaDatePicker.setDayCellFactory(HCellFactory);
+    	desdeDatePicker.setDayCellFactory(DECellFactory);
+    	
+	    //Creo la grilla de componentes para el dialogo    	
+    	GridPane grid = new GridPane();
+    	grid.add(label1, 1, 1);
+    	grid.add(desdeDatePicker, 2, 1);
+    	grid.add(label2, 1, 3);
+    	grid.add(hastaDatePicker, 2, 3);
+    	dialog.getDialogPane().setContent(grid);
+    	   	
+    	for (int i = 0; i <= 3; i++) {
+            RowConstraints con = new RowConstraints();
+            con.setPrefHeight(20);
+            grid.getRowConstraints().add(con);
+        }
+    	
+    	//genero los dos botones : aplicar (OK) y cancelar.
+    	ButtonType buttonTypeOk = new ButtonType("Ok", ButtonData.OK_DONE);
+    	dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+    	
+    	ButtonType buttonTypeCancel = new ButtonType("Cancelar", ButtonData.CANCEL_CLOSE);
+    	dialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
+   
+    	Optional<ButtonType> result = dialog.showAndWait();
+    	
+    	//Si el usuario elige Generar Presupuesto
+    	if (result.get() == buttonTypeOk) {
+    		
+    		Cliente c = this.cuenta.getCliente();
+    		
+    		String fecha_desde = EPOCH.format(formatter_1);
+    		String fecha_hasta = NOW.format(formatter_1);
+    		
+    		if(desdeDatePicker.getValue()!=null){
+    			fecha_desde = desdeDatePicker.getValue().format(formatter_1);
+    		}
+    		else{
+    			
+    			desdeDatePicker.setValue(EPOCH);
+    		}
+    			
+    		if(hastaDatePicker.getValue()!=null)
+    			fecha_hasta = hastaDatePicker.getValue().format(formatter_1);
+    		else{
+    			hastaDatePicker.setValue(NOW);
+    		}
+    		System.out.println(fecha_desde);
+    		//Chequeo errores en las fechas
+    		boolean error = (desdeDatePicker.getValue().isAfter(NOW) || hastaDatePicker.getValue().isAfter(NOW)) || (hastaDatePicker.getValue().isBefore(desdeDatePicker.getValue()));
+    			
+    		if(error){
+    				desdeDatePicker.setValue(null);
+    				hastaDatePicker.setValue(null);
+    				Alert alert = new Alert(AlertType.ERROR);
+    				alert.initOwner(dialogStage);
+    				alert.setTitle("Error");
+    				alert.setHeaderText(null);
+    				alert.setContentText("La fecha ingresada es inválida.");
+    				alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+    				alert.showAndWait();
+    		}
+    		else{//Si no hay error procedo a la busqueda en la DB
+    			String filename = ReportsEngine.generarResumen(c, fecha_desde, fecha_hasta);
+            	
+            	File f = new File(filename);
+            	
+            	//Thread para abrir el Okular o el Adobe
+            	Task<Void> task = new Task<Void>() {
+        		    @Override
+        		    protected Void call() throws Exception {
+        		    	
+        		    	//Llamo a la aplicacion por defecto
+        		    	Desktop escritorio = Desktop.getDesktop();
+        		    	
+        		    	//Abro el pdf en la aplicacion por defecto
+        		    	try {
+        		    		if(f.exists()) 
+        		    			escritorio.open(f);
+        				} catch (IOException e) {
+        					System.out.println("error al abrir el pdf para vista previa");
+        					e.printStackTrace();
+        				}
+        		    	
+        		    	//TODO: Ver como y cuando borrar el archivo!
+        		    	
+        		    	return null;
+        		    };
+            	};
+        	 
+            	//Inicio trabajo del thread
+            	new Thread(task).start();
+    		}
+    	}
+    	else{
+    		//No hago nada y cierro
+    	}
+    	
+    }
+
 }

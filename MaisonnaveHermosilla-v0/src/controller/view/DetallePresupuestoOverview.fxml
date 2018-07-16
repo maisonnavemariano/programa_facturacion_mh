@@ -75,7 +75,7 @@
       </Label>
       <Label layoutX="421.0" layoutY="253.0" prefHeight="30.0" prefWidth="15.0" text="\$" AnchorPane.leftAnchor="420.0" AnchorPane.topAnchor="251.0" />
       <Label fx:id="alicuotaLabel" layoutX="125.0" layoutY="211.0" prefHeight="30.0" prefWidth="134.0" text="Aca va un numerito" />
-      <Label fx:id="numeroLabel" layoutX="364.0" layoutY="14.0" prefHeight="30.0" prefWidth="142.0" text="numero">
+      <Label fx:id="numeroLabel" layoutX="355.0" layoutY="19.0" text="numero">
          <font>
             <Font size="17.0" />
          </font>

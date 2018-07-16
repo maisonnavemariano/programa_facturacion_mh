@@ -11,9 +11,9 @@
    <children>
       <TableView fx:id="cuentasTable" layoutX="44.0" layoutY="70.0" prefHeight="459.0" prefWidth="512.0">
         <columns>
-          <TableColumn fx:id="cuitColumn" maxWidth="1500.0" minWidth="-Infinity" prefWidth="220.0" text="CUIT " />
-          <TableColumn fx:id="denominacionColumn" maxWidth="3000.0" minWidth="-Infinity" prefWidth="500.0" text="Denominación" />
-            <TableColumn fx:id="montoColumn" maxWidth="1500.0" minWidth="-Infinity" prefWidth="300.0" text="Monto" />
+          <TableColumn fx:id="cuitColumn" maxWidth="1500.0" minWidth="-Infinity" prefWidth="220.0" sortable="false" text="CUIT " />
+          <TableColumn fx:id="denominacionColumn" maxWidth="3000.0" minWidth="-Infinity" prefWidth="500.0" sortable="false" text="Denominación" />
+            <TableColumn fx:id="montoColumn" maxWidth="1500.0" minWidth="-Infinity" prefWidth="300.0" sortable="false" text="Monto" />
         </columns>
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -24,7 +24,7 @@
             <Font size="18.0" />
          </font></Label>
       <Button layoutX="292.0" layoutY="547.0" mnemonicParsing="false" onAction="#handleUltimosMovimientos" text="Ver últimos movimientos" />
-      <Button layoutX="487.0" layoutY="547.0" mnemonicParsing="false" onAction="#handleAceptar" text="Aceptar" />
-      <Button layoutX="160.0" layoutY="547.0" mnemonicParsing="false" text="Imprimir listado" />
+      <Button layoutX="487.0" layoutY="547.0" mnemonicParsing="false" onAction="#handleAceptar" prefHeight="26.0" prefWidth="58.0" text="Salir" />
+      <Button layoutX="160.0" layoutY="547.0" mnemonicParsing="false" onAction="#handleImprimirListado" text="Imprimir listado" />
    </children>
 </AnchorPane>

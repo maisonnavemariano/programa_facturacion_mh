@@ -11,10 +11,10 @@
    <children>
       <TableView fx:id="transaccionesTable" layoutX="26.0" layoutY="170.0" prefHeight="368.0" prefWidth="550.0">
         <columns>
-          <TableColumn fx:id="fechaColumn" maxWidth="1500.0" minWidth="-Infinity" prefWidth="77.0" text="Fecha" />
-            <TableColumn fx:id="eventoColumn" maxWidth="1500.0" minWidth="-Infinity" prefWidth="67.0" text="Evento" />
-            <TableColumn fx:id="importeColumn" maxWidth="1500.0" minWidth="-Infinity" prefWidth="116.0" text="Importe" />
-          <TableColumn fx:id="observacionColumn" maxWidth="3000.0" minWidth="-Infinity" prefWidth="170.0" text="Observaciones" />
+          <TableColumn fx:id="fechaColumn" maxWidth="1500.0" minWidth="-Infinity" prefWidth="77.0" sortType="DESCENDING" sortable="false" text="Fecha" />
+            <TableColumn fx:id="eventoColumn" maxWidth="1500.0" minWidth="-Infinity" prefWidth="67.0" sortable="false" text="Evento" />
+            <TableColumn fx:id="importeColumn" maxWidth="1500.0" minWidth="-Infinity" prefWidth="116.0" sortable="false" text="Importe" />
+          <TableColumn fx:id="observacionColumn" maxWidth="3000.0" minWidth="-Infinity" prefWidth="170.0" sortable="false" text="Observaciones" />
             <TableColumn fx:id="estadoColumn" editable="false" maxWidth="1500.0" minWidth="-Infinity" prefWidth="104.0" sortType="DESCENDING" sortable="false" text="Estado" />
         </columns>
          <columnResizePolicy>
@@ -25,7 +25,7 @@
          <font>
             <Font size="18.0" />
          </font></Label>
-      <Button layoutX="486.0" layoutY="560.0" mnemonicParsing="false" onAction="#handleAceptar" prefWidth="90.0" text="Aceptar" />
+      <Button layoutX="486.0" layoutY="560.0" mnemonicParsing="false" onAction="#handleAceptar" prefWidth="90.0" text="Salir" />
       <Label fx:id="denominacionLabel" layoutX="235.0" layoutY="25.0" text="Nombre del cliente">
          <font>
             <Font size="18.0" />
@@ -50,6 +50,6 @@
       <Label fx:id="fechaUltimoLabel" layoutX="486.0" layoutY="105.0" text="fecha" />
       <Label fx:id="montoLabel" layoutX="214.0" layoutY="106.0" text="monto" />
       <Button layoutX="94.0" layoutY="560.0" mnemonicParsing="false" onAction="#handleVerPresupuestoAsociado" prefHeight="26.0" prefWidth="275.0" text="Ver presupuesto asociado a selección" />
-      <Button layoutX="383.0" layoutY="560.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="90.0" text="Imprimir" />
+      <Button layoutX="383.0" layoutY="560.0" mnemonicParsing="false" onAction="#handleImprimirDetalle" prefHeight="26.0" prefWidth="90.0" text="Imprimir" />
    </children>
 </AnchorPane>
