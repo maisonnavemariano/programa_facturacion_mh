@@ -15,7 +15,7 @@ public class tester {
 		String hasta = "2018-01-01";
 	
 
-		ReportsEngine.generarResumen(controller.db.DBSingleton.getInstance().getCliente(4),desde, hasta);
+		ReportsEngine.generarResumen(motor.getCliente(4), desde, hasta); 
 		/**
 		System.out.println("arranca reportes");
 		ReportsEngine.generarReporte(motor.verPresupuesto(2175),"/home/maiso/tmp.pdf");

@@ -20,13 +20,13 @@ public class ResumenBean {
 		}
 		else {
 			TransaccionBean t_aux = this.transacciones.get(0);
-			if (t_aux.getEvento() == 'C' || t_aux.getEvento() == 'X') //pago
+			if (t_aux.getEvento() == 'C') //pago
 				saldo_inicial = t_aux.getSaldo()-t_aux.getHaber() ;
 			else
 				if  (t_aux.getEvento()=='P') //presupuesto
 					saldo_inicial = t_aux.getSaldo() + t_aux.getDebe();
 				else {
-					System.out.println("[WARNING] se pidio saldo inicial de lista de transacciones con evento distinto de P, C o X.");
+					System.out.println("[WARNING] se pidio saldo inicial de lista de transacciones con evento distinto de P y C.");
 					return 0;
 				}
 			
@@ -52,7 +52,7 @@ public class ResumenBean {
  			double debe        = 0;
  			double haber       = 0;
  			double saldo       = t.getEstadoCuentaCorriente();
- 			if (t.getEvento()=='C' || t.getEvento() == 'X') { //credito (pago)
+ 			if (t.getEvento()=='C') { //credito (pago)
  				haber = t.getMonto(); 
  			}
  			else if (t.getEvento()=='P') { //Presupuesto
