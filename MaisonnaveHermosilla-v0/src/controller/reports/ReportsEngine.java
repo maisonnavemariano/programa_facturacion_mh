@@ -83,7 +83,7 @@ public class ReportsEngine {
 		boolean salida_ok=false;
 
 		String sourceFile = "reports_templates/Resumen_cuenta.jasper";
-		String salida = "reportes/tmp/"+resumen.getDenominacion()+"_"+resumen.getDesde()+"_"+resumen.getHasta()+".pdf";
+		String salida = "reportes/tmp/"+resumen.getDenominacion().replaceAll(" ","_").replace(",","")+"_"+resumen.getDesde()+"_"+resumen.getHasta()+".pdf";
 	    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
 		Date date;
@@ -126,8 +126,11 @@ public class ReportsEngine {
 		parameters.put("fecha_emision", formatter.format(date));
 		
 		try {
+			System.out.println("salida: "+salida);
+			System.out.println("len: "+beanColDataSource.toString());
 			printFile = JasperFillManager.fillReportToFile(sourceFile, parameters, beanColDataSource);
 			JasperExportManager.exportReportToPdfFile(printFile, salida);
+			System.out.println("[OK]");
 			salida_ok = true;
 	         
 		}catch(JRException e) {
